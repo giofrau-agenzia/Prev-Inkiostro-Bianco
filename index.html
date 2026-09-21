@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inchiostro Bianco — Preventivi Carta da Parati</title>
+<title>Inkiostro Bianco — Preventivi Carta da Parati</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -111,16 +111,23 @@
 
   /* ---------- Ruler visual ---------- */
   .ruler-wrap{ margin-top:6px; }
-  .wall-rect{ border:1px solid var(--line); border-radius:4px; overflow:hidden; width:min(100%, calc(var(--ruler-maxh) * var(--ar, 3))); }
-  .wall-band{ height:13px; background: repeating-linear-gradient(45deg, var(--waste), var(--waste) 4px, var(--waste-dim) 4px, var(--waste-dim) 8px);
-    display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:#ffe6e3; letter-spacing:0.5px; }
-  .ruler{ display:flex; aspect-ratio: var(--ar, 3) / 1; width:100%; }
-  .ruler .seg{ background:var(--surface-2); border-right:1px dashed var(--line); position:relative; display:flex; align-items:center; justify-content:center; }
+  .wall-rect-outer{ width:min(100%, calc(var(--ruler-maxh) * var(--ar, 3))); }
+  .dim-caption{ font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--waste); text-align:center; padding:2px 0; letter-spacing:0.5px; }
+  .wall-rect{ border:1px solid var(--line); border-radius:4px; overflow:hidden; width:100%; aspect-ratio: var(--ar, 3) / 1; display:flex; flex-direction:column; }
+  .wall-band{ background: repeating-linear-gradient(45deg, rgba(226,87,76,0.6), rgba(226,87,76,0.6) 4px, rgba(107,47,42,0.6) 4px, rgba(107,47,42,0.6) 8px); flex-grow:50; flex-shrink:1; flex-basis:0; min-height:0; }
+  .ruler{ display:flex; width:100%; flex-shrink:1; flex-basis:0; min-height:0; position:relative; overflow:hidden; }
+  .ruler .seg{ background:var(--surface-2); border-right:1px dashed var(--line); position:relative; z-index:1; display:flex; align-items:center; justify-content:center; }
+  .ruler .wall-img-wrap{ position:absolute; inset:0; overflow:hidden; z-index:0; }
+  .ruler .wall-img{ position:absolute; display:block; }
+  .img-controls{ display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin-top:8px; padding:8px 10px; background:var(--surface-2); border-radius:6px; }
+  .img-controls label{ display:flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; color:var(--paper-dim); }
+  .img-controls input[type="range"]{ width:130px; accent-color:var(--gold); }
+  .img-controls span{ color:var(--gold); min-width:38px; }
   .ruler .seg:last-child{ border-right:none; }
   .ruler .fill{ background: linear-gradient(180deg, #d7bd7c, var(--gold)); height:100%; }
   .ruler .fill-img{ background:transparent; height:100%; }
   .ruler .seg-img{ background:transparent; }
-  .ruler .waste{ background: repeating-linear-gradient(45deg, var(--waste), var(--waste) 4px, var(--waste-dim) 4px, var(--waste-dim) 8px); height:100%; }
+  .ruler .waste{ background: repeating-linear-gradient(45deg, rgba(226,87,76,0.6), rgba(226,87,76,0.6) 4px, rgba(107,47,42,0.6) 4px, rgba(107,47,42,0.6) 8px); height:100%; }
   .ruler-caption{ display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--paper-dim); margin-top:4px; }
   .ruler-caption .waste-note{ color:var(--waste); }
 
@@ -144,14 +151,16 @@
     body{ background:#fff; color:#111; }
     .tabs, .toolbar, .no-print{ display:none !important; }
     .card{ background:#fff; border-color:#ccc; }
-    .ruler .seg:not(.seg-img){ background:#eee; } .ruler .fill{ background:#ddb96b; } .ruler .waste{ background:#e2574c; }
+    .ruler .seg:not(.seg-img){ background:#eee; } .ruler .fill{ background:#ddb96b; } .ruler .waste{ background: repeating-linear-gradient(45deg, rgba(226,87,76,0.6), rgba(226,87,76,0.6) 4px, rgba(107,47,42,0.6) 4px, rgba(107,47,42,0.6) 8px); }
     .ruler, .ruler .seg, .ruler .fill, .ruler .fill-img, .ruler .waste, .wall-band{
       -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact;
     }
+    .grafica-status, .ruler-caption a{ display:none; }
     #ruler-section{ break-before: page; page-break-before: always; }
     #ruler-section .card{ padding-top:40px; }
-    .wall-rect{ border:1px solid #999; --ruler-maxh: 460px; }
-    .wall-band{ height:26px; font-size:12px; color:#fff; }
+    .wall-rect{ border:1px solid #999; }
+    .wall-rect-outer{ --ruler-maxh: 460px; }
+    .dim-caption{ font-size:11px; color:#c0392b; }
     .ruler-wrap{ margin-top:26px; margin-bottom:10px; }
     .ruler-caption{ font-size:12px; }
   }
@@ -164,7 +173,7 @@
 
   <div class="masthead">
     <div class="brand">
-      <div class="mark">Inchiostro<span>·</span>Bianco</div>
+      <div class="mark">Inkiostro<span>·</span>Bianco</div>
       <div class="sub">Preventivi — Carta da Parati</div>
     </div>
     <div class="tabs no-print">
@@ -383,11 +392,11 @@ const DEFAULT_PRODOTTI = [
   { id: uid(), descrizione: 'Silk Touch - 100cm', prezzo: 129, larghezza: 1000 },
   { id: uid(), descrizione: 'Gold Vinyl - 66cm', prezzo: 119, larghezza: 660 },
   { id: uid(), descrizione: 'Gold Leaf / Pink Gold - 47cm', prezzo: 119, larghezza: 470 },
-  { id: uid(), descrizione: 'Special Edition Vinile - 68cm', prezzo: 189, larghezza: 680 },
-  { id: uid(), descrizione: 'Special Edition Vinile - 100cm', prezzo: 190, larghezza: 1000 },
-  { id: uid(), descrizione: 'Special Edition RAW - 94cm', prezzo: 191, larghezza: 940 },
-  { id: uid(), descrizione: 'Special Edition EQ·dekor fibra di vetro - 94cm', prezzo: 192, larghezza: 940 },
-  { id: uid(), descrizione: 'Special Edition Silk Touch - 100cm', prezzo: 193, larghezza: 1000 },
+  { id: uid(), descrizione: 'S-Edition Vinile - 68cm', prezzo: 189, larghezza: 680 },
+  { id: uid(), descrizione: 'S-Edition Vinile - 100cm', prezzo: 189, larghezza: 1000 },
+  { id: uid(), descrizione: 'S-Edition RAW - 94cm', prezzo: 189, larghezza: 940 },
+  { id: uid(), descrizione: 'S-Edition EQ·dekor fibra di vetro - 94cm', prezzo: 189, larghezza: 940 },
+  { id: uid(), descrizione: 'S-Edition Silk Touch - 100cm', prezzo: 189, larghezza: 1000 },
 ];
 const DEFAULT_PRIMER = { consumo: 0.15, prezzo: 26.266667 };
 
@@ -417,7 +426,7 @@ let preventivo = {
 };
 
 function nuovaRiga(){
-  return { id: uid(), prodottoId: prodotti[0] ? prodotti[0].id : '', rifAmbiente: '', rif: '', codiceGrafica: '', larghezza: 2000, altezza: 2500 };
+  return { id: uid(), prodottoId: prodotti[0] ? prodotti[0].id : '', rifAmbiente: '', rif: '', codiceGrafica: '', larghezza: 3600, altezza: 2700, imgScale: 100, imgPosX: 50, imgPosY: 50 };
 }
 
 /* ===================== CALCOLI (logica del foglio C-Parati) ===================== */
@@ -480,7 +489,7 @@ function renderClienteDettagli(){
 }
 
 /* ===================== RENDER: RIGHE ===================== */
-function isSpecialEdition(prodotto){ return /special edition/i.test(prodotto.descrizione); }
+function isSpecialEdition(prodotto){ return /special edition|s-edition/i.test(prodotto.descrizione); }
 
 // se la grafica scelta è Special Edition, forza un prodotto Special Edition; ritorna true se il vincolo è attivo
 function ensureProdottoValido(riga){
@@ -603,6 +612,53 @@ function renderRighe_partial(){
 }
 
 /* ===================== RENDER: RULER (elemento firma) ===================== */
+
+// Calcola dimensioni e posizione dell'immagine in pixel, preservando sempre le sue proporzioni naturali.
+// Base "cover" (l'immagine copre l'intero riquadro senza distorcerla) + zoom + spostamento su entrambi gli assi.
+function posizionaImmagine(rigaId){
+  const riga = preventivo.righe.find(r => r.id === rigaId);
+  const wrapEl = document.getElementById('imgwrap-'+rigaId);
+  const img = document.getElementById('img-'+rigaId);
+  if(!riga || !wrapEl || !img) return;
+  if(!img.complete || !img.naturalWidth){ img.onload = () => posizionaImmagine(rigaId); return; }
+
+  const cw = wrapEl.clientWidth, ch = wrapEl.clientHeight;
+  if(!cw || !ch) return;
+  const nw = img.naturalWidth, nh = img.naturalHeight;
+  let baseW, baseH;
+  if(nw/nh > cw/ch){ baseH = ch; baseW = ch * (nw/nh); } // immagine relativamente più larga: altezza a riempimento
+  else { baseW = cw; baseH = cw * (nh/nw); } // immagine relativamente più stretta: larghezza a riempimento
+
+  const scale = (riga.imgScale || 100) / 100;
+  const posX = riga.imgPosX===undefined ? 50 : riga.imgPosX;
+  const posY = riga.imgPosY===undefined ? 50 : riga.imgPosY;
+  const w = baseW * scale, h = baseH * scale;
+  const left = -(w - cw) * (posX/100);
+  const top = -(h - ch) * (posY/100);
+
+  img.style.width = w+'px';
+  img.style.height = h+'px';
+  img.style.left = left+'px';
+  img.style.top = top+'px';
+}
+
+function aggiornaImgParam(rigaId, campo, valore){
+  const riga = preventivo.righe.find(r => r.id === rigaId);
+  if(!riga) return;
+  riga[campo] = Number(valore);
+  posizionaImmagine(rigaId);
+  const scale = riga.imgScale || 100;
+  const posX = riga.imgPosX===undefined ? 50 : riga.imgPosX;
+  const posY = riga.imgPosY===undefined ? 50 : riga.imgPosY;
+  const zoomLabel = document.getElementById('zoom-val-'+rigaId);
+  const posLabel = document.getElementById('pos-val-'+rigaId);
+  const posYLabel = document.getElementById('posy-val-'+rigaId);
+  if(zoomLabel) zoomLabel.textContent = scale+'%';
+  if(posLabel) posLabel.textContent = posX+'%';
+  if(posYLabel) posYLabel.textContent = posY+'%';
+  autosave();
+}
+
 function renderRuler(){
   const wrap = document.getElementById('ruler-section');
   const rows = preventivo.righe.map(r=>({riga:r, calc:calcolaRiga(r)})).filter(x=>x.calc);
@@ -632,21 +688,45 @@ function renderRuler(){
           </div>`;
       }
       const label = (riga.rifAmbiente || riga.rif || calc.prodotto.descrizione);
-      const aspectRatio = calc.larghezzaArr / riga.altezza;
+      const aspectRatio = calc.larghezzaArr / (riga.altezza + 100);
       const specialTag = grafica && grafica.specialEdition ? ' <span class="badge special">Special Edition</span>' : '';
       const graficaLink = grafica ? ` · <a href="${escapeHtml(grafica.url)}" target="_blank" style="color:var(--gold); text-decoration:none;">${escapeHtml(grafica.nome||riga.codiceGrafica)} ↗</a>` : (riga.codiceGrafica ? ` · <a href="${googleSiteSearchUrl(riga.codiceGrafica)}" target="_blank" style="color:var(--gold); text-decoration:none;">cerca "${escapeHtml(riga.codiceGrafica)}" ↗</a>` : '');
-      const rulerStyle = imgUrl ? `background-image:url('${escapeHtml(imgUrl)}'); background-size:cover; background-position:center;` : '';
+      const scale = riga.imgScale || 100;
+      const posX = riga.imgPosX===undefined ? 50 : riga.imgPosX;
+      const posY = riga.imgPosY===undefined ? 50 : riga.imgPosY;
+      const imgTag = imgUrl ? `<div class="wall-img-wrap" id="imgwrap-${riga.id}"><img class="wall-img" id="img-${riga.id}" src="${escapeHtml(imgUrl)}"></div>` : '';
+      const controlliImmagine = imgUrl ? `
+          <div class="img-controls no-print">
+            <label>Zoom <span id="zoom-val-${riga.id}">${scale}%</span>
+              <input type="range" min="100" max="400" step="5" value="${scale}" oninput="aggiornaImgParam('${riga.id}','imgScale',this.value)">
+            </label>
+            <label>Posizione orizzontale <span id="pos-val-${riga.id}">${posX}%</span>
+              <input type="range" min="0" max="100" step="1" value="${posX}" oninput="aggiornaImgParam('${riga.id}','imgPosX',this.value)">
+            </label>
+            <label>Posizione verticale <span id="posy-val-${riga.id}">${posY}%</span>
+              <input type="range" min="0" max="100" step="1" value="${posY}" oninput="aggiornaImgParam('${riga.id}','imgPosY',this.value)">
+            </label>
+            <button type="button" class="ghost" onclick="aggiornaImgParam('${riga.id}','imgScale',100);aggiornaImgParam('${riga.id}','imgPosX',50);aggiornaImgParam('${riga.id}','imgPosY',50);renderRuler();">Reimposta</button>
+          </div>` : '';
       return `<div class="ruler-wrap">
           <div class="ruler-caption"><span>${escapeHtml(label)} — ${calc.prodotto.descrizione}${specialTag}${graficaLink}</span><span>${calc.nRolli} × ${calc.rollWidth}mm</span></div>
-          <div class="wall-rect" style="--ar:${aspectRatio};">
-            <div class="wall-band">↑ 50mm</div>
-            <div class="ruler" style="${rulerStyle}">${segs}</div>
-            <div class="wall-band">↓ 50mm</div>
+          <div class="wall-rect-outer" style="--ar:${aspectRatio};">
+            <div class="dim-caption">↕ margine 50mm</div>
+            <div class="wall-rect">
+              <div class="wall-band" style="flex-grow:50;"></div>
+              <div class="ruler" id="ruler-img-${riga.id}" style="flex-grow:${riga.altezza};">${imgTag}${segs}</div>
+              <div class="wall-band" style="flex-grow:50;"></div>
+            </div>
+            <div class="dim-caption">↕ margine 50mm</div>
           </div>
+          ${controlliImmagine}
           <div class="ruler-caption"><span>Larghezza richiesta ${fmtMM(riga.larghezza)} · Altezza ${fmtMM(riga.altezza)}</span><span class="${calc.sfrido<100?'waste-note':''}">Sfrido ${fmtMM(calc.sfrido)} totale — ${fmtMM(wasteEach)} primo + ${fmtMM(wasteEach)} ultimo rotolo${calc.sfrido<100?' · sotto il minimo 100mm':''}</span></div>
         </div>`;
     }).join('<div style="height:14px;"></div>') + `</div>`;
+  rows.forEach(({riga}) => { if(riga.codiceGrafica && trovaGrafica(riga.codiceGrafica) && trovaGrafica(riga.codiceGrafica).immagine) posizionaImmagine(riga.id); });
 }
+window.addEventListener('resize', () => { if(document.getElementById('ruler-section').innerHTML) renderRuler(); });
+window.addEventListener('beforeprint', () => { if(document.getElementById('ruler-section').innerHTML) renderRuler(); });
 
 /* ===================== RENDER: TOTALI ===================== */
 function renderTotali(){
