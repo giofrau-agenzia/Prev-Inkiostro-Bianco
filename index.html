@@ -19,7 +19,7 @@
     --gold: #c9a34e;
     --gold-dim: #7a6432;
     --ok: #7fae6a;
-    --ruler-maxh: 240px;
+    --ruler-maxh: 420px;
   }
   *{ box-sizing: border-box; }
   html,body{ margin:0; padding:0; background:var(--ink); color:var(--paper); font-family:'Inter',sans-serif; }
@@ -103,6 +103,9 @@
   .badge.special{ background:var(--gold); color:var(--ink); font-family:'Big Shoulders',sans-serif; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; font-size:10.5px; }
 
   .grafica-cell{ min-width:150px; }
+  .print-val{ display:none; }
+  #righe-table th:nth-child(2), #righe-table th:nth-child(3){ font-size:8.5px; letter-spacing:0; padding-left:3px; padding-right:3px; }
+  #righe-table td:nth-child(2), #righe-table td:nth-child(3){ padding-left:3px; padding-right:3px; }
   .grafica-cell input{ margin-bottom:4px; width:100%; }
   .grafica-status{ font-size:10.5px; line-height:1.4; }
   .grafica-status a{ color:var(--gold); text-decoration:none; }
@@ -113,22 +116,31 @@
   .ruler-wrap{ margin-top:6px; }
   .wall-rect-outer{ width:min(100%, calc(var(--ruler-maxh) * var(--ar, 3))); }
   .dim-caption{ font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--waste); text-align:center; padding:2px 0; letter-spacing:0.5px; }
-  .wall-rect{ border:1px solid var(--line); border-radius:4px; overflow:hidden; width:100%; aspect-ratio: var(--ar, 3) / 1; display:flex; flex-direction:column; }
-  .wall-band{ background: repeating-linear-gradient(45deg, rgba(226,87,76,0.6), rgba(226,87,76,0.6) 4px, rgba(107,47,42,0.6) 4px, rgba(107,47,42,0.6) 8px); flex-grow:50; flex-shrink:1; flex-basis:0; min-height:0; }
-  .ruler{ display:flex; width:100%; flex-shrink:1; flex-basis:0; min-height:0; position:relative; overflow:hidden; }
-  .ruler .seg{ background:var(--surface-2); border-right:1px dashed var(--line); position:relative; z-index:1; display:flex; align-items:center; justify-content:center; }
-  .ruler .wall-img-wrap{ position:absolute; inset:0; overflow:hidden; z-index:0; }
-  .ruler .wall-img{ position:absolute; display:block; }
+  .wall-rect{ position:relative; overflow:hidden; border:1px solid var(--line); border-radius:4px; width:100%; aspect-ratio: var(--ar, 3) / 1; background:var(--surface-2); }
+  .wall-rect.no-img{ background: linear-gradient(180deg, #d7bd7c, var(--gold)); }
+  .wall-img{ position:absolute; display:block; max-width:none; z-index:0; }
+  /* sfridi: tinta unita semitrasparente + filo pieno sul bordo interno (resta visibile anche se il driver di stampa scarta la trasparenza) */
+  .wb{ position:absolute; box-sizing:border-box; background:rgba(226,87,76,0.42); pointer-events:none; z-index:2; }
+  .wb-t{ border-bottom:1.5px solid rgba(205,45,35,0.95); }
+  .wb-b{ border-top:1.5px solid rgba(205,45,35,0.95); }
+  .wb-l{ border-right:1.5px solid rgba(205,45,35,0.95); }
+  .wb-r{ border-left:1.5px solid rgba(205,45,35,0.95); }
+  .roll-line{ position:absolute; top:0; bottom:0; width:0; border-left:1px dashed rgba(0,0,0,0.8); box-shadow:1px 0 0 rgba(255,255,255,0.5); pointer-events:none; z-index:1; }
+
+  /* ---------- Editor inquadratura ---------- */
   .img-controls{ display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin-top:8px; padding:8px 10px; background:var(--surface-2); border-radius:6px; }
   .img-controls label{ display:flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; color:var(--paper-dim); }
-  .img-controls input[type="range"]{ width:130px; accent-color:var(--gold); }
-  .img-controls span{ color:var(--gold); min-width:38px; }
-  .ruler .seg:last-child{ border-right:none; }
-  .ruler .fill{ background: linear-gradient(180deg, #d7bd7c, var(--gold)); height:100%; }
-  .ruler .fill-img{ background:transparent; height:100%; }
-  .ruler .seg-img{ background:transparent; }
-  .ruler .waste{ background: repeating-linear-gradient(45deg, rgba(226,87,76,0.6), rgba(226,87,76,0.6) 4px, rgba(107,47,42,0.6) 4px, rgba(107,47,42,0.6) 8px); height:100%; }
-  .ruler-caption{ display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--paper-dim); margin-top:4px; }
+  .img-controls input[type="range"]{ width:150px; accent-color:var(--gold); }
+  .img-controls span.val{ color:var(--gold); min-width:38px; }
+  .crop-tool-row{ margin-top:10px; margin-bottom:12px; }
+  .crop-stage{ position:relative; width:min(100%, calc(340px * var(--ar, 3))); aspect-ratio: var(--ar, 3) / 1; background:var(--surface-2); border-radius:6px; overflow:hidden; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
+  .crop-stage.dragging{ cursor:grabbing; }
+  .crop-frame-anchor{ position:absolute; left:15%; top:15%; width:70%; height:70%; }
+  .crop-frame-anchor .wall-img{ pointer-events:none; }
+  .crop-frame-visual{ position:absolute; left:15%; top:15%; width:70%; height:70%; pointer-events:none; outline:2px solid var(--gold); outline-offset:-2px; box-shadow:0 0 0 1000px rgba(10,9,8,0.6); z-index:5; }
+  .crop-hint{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--paper-dim); margin:8px 0; }
+  .crop-hint.warn{ color:var(--waste); }
+  .ruler-caption{ display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--paper-dim); margin-top:4px; }
   .ruler-caption .waste-note{ color:var(--waste); }
 
   /* ---------- Totals ---------- */
@@ -151,17 +163,21 @@
     body{ background:#fff; color:#111; }
     .tabs, .toolbar, .no-print{ display:none !important; }
     .card{ background:#fff; border-color:#ccc; }
-    .ruler .seg:not(.seg-img){ background:#eee; } .ruler .fill{ background:#ddb96b; } .ruler .waste{ background: repeating-linear-gradient(45deg, rgba(226,87,76,0.6), rgba(226,87,76,0.6) 4px, rgba(107,47,42,0.6) 4px, rgba(107,47,42,0.6) 8px); }
-    .ruler, .ruler .seg, .ruler .fill, .ruler .fill-img, .ruler .waste, .wall-band{
+    .has-print-val{ display:none !important; }
+    .print-val{ display:block; font-size:10.5px; line-height:1.25; color:#111; word-break:normal; overflow-wrap:anywhere; }
+    #righe-table td:nth-child(2) .print-val, #righe-table td:nth-child(3) .print-val{ font-size:9.5px; }
+    .wall-rect, .wall-rect.no-img, .wall-img, .wb, .roll-line{
       -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact;
     }
     .grafica-status, .ruler-caption a{ display:none; }
     #ruler-section{ break-before: page; page-break-before: always; }
+    .ruler-wrap{ break-inside: avoid; page-break-inside: avoid; }
     #ruler-section .card{ padding-top:40px; }
     .wall-rect{ border:1px solid #999; }
     .wall-rect-outer{ --ruler-maxh: 460px; }
     .dim-caption{ font-size:11px; color:#c0392b; }
     .ruler-wrap{ margin-top:26px; margin-bottom:10px; }
+    .ruler-wrap ~ .ruler-wrap{ break-before: page; page-break-before: always; padding-top:30px; }
     .ruler-caption{ font-size:12px; }
   }
 </style>
@@ -212,9 +228,9 @@
       <div class="table-scroll-x">
       <table id="righe-table">
         <colgroup>
-          <col style="width:19%"><col style="width:8%"><col style="width:6%"><col style="width:12%">
+          <col style="width:19%"><col style="width:6%"><col style="width:6%"><col style="width:16%">
           <col style="width:8%"><col style="width:8%"><col style="width:7%"><col style="width:8%">
-          <col style="width:7.5%"><col style="width:11%"><col style="width:5.5%">
+          <col style="width:7.5%"><col style="width:11%"><col style="width:3.5%">
         </colgroup>
         <thead>
           <tr>
@@ -426,7 +442,7 @@ let preventivo = {
 };
 
 function nuovaRiga(){
-  return { id: uid(), prodottoId: prodotti[0] ? prodotti[0].id : '', rifAmbiente: '', rif: '', codiceGrafica: '', larghezza: 3600, altezza: 2700, imgScale: 100, imgPosX: 50, imgPosY: 50 };
+  return { id: uid(), prodottoId: prodotti[0] ? prodotti[0].id : '', rifAmbiente: '', rif: '', codiceGrafica: '', larghezza: 3600, altezza: 2700, imgScale: 100, imgPx: 0.5, imgPy: 0.5 };
 }
 
 /* ===================== CALCOLI (logica del foglio C-Parati) ===================== */
@@ -555,24 +571,32 @@ function renderRighe(){
     const td = document.createElement('td');
     const inp = document.createElement('input');
     inp.className='row-mini-input'; inp.type=type; inp.value = obj[field];
-    inp.oninput = ()=>{ obj[field] = type==='number' ? Number(inp.value) : inp.value; renderRighe_partial(); renderTotali(); renderRuler(); autosave(); };
+    let pv = null;
+    if(type==='text'){
+      inp.classList.add('has-print-val');
+      pv = document.createElement('span'); pv.className='print-val'; pv.textContent = obj[field] || '';
+    }
+    inp.oninput = ()=>{ obj[field] = type==='number' ? Number(inp.value) : inp.value; if(pv) pv.textContent = obj[field]; renderRighe_partial(); renderTotali(); renderRuler(); autosave(); };
     td.appendChild(inp);
+    if(pv) td.appendChild(pv);
     return td;
   }
 
   function buildGraficaCell(riga){
     const td = document.createElement('td'); td.className='grafica-cell';
     const inp = document.createElement('input');
-    inp.className='row-mini-input'; inp.type='text'; inp.placeholder='INKFGIC2601'; inp.value = riga.codiceGrafica || ''; inp.setAttribute('list','grafiche-datalist');
+    inp.className='row-mini-input has-print-val'; inp.type='text'; inp.placeholder='INKFGIC2601'; inp.value = riga.codiceGrafica || ''; inp.setAttribute('list','grafiche-datalist');
+    const pv = document.createElement('span'); pv.className='print-val'; pv.textContent = riga.codiceGrafica || '';
     const status = document.createElement('div'); status.className='grafica-status';
     status.innerHTML = graficaStatusHtml(riga.codiceGrafica);
     inp.oninput = ()=>{
       riga.codiceGrafica = inp.value;
+      pv.textContent = inp.value;
       status.innerHTML = graficaStatusHtml(riga.codiceGrafica);
       aggiornaVincoloProdotto(riga, td.closest('tr'));
       renderRuler(); autosave();
     };
-    td.append(inp, status);
+    td.append(inp, pv, status);
     return td;
   }
 }
@@ -612,121 +636,204 @@ function renderRighe_partial(){
 }
 
 /* ===================== RENDER: RULER (elemento firma) ===================== */
+/* Modello dell'inquadratura:
+   l'immagine resta INTERA e a dimensione reale rispetto alla parete;
+   il riquadro (misure + sfridi) è la finestra che ci scorre sopra, anche senza zoom.
+   Tutte le posizioni sono percentuali del riquadro: il browser le ricalcola da solo
+   (schermo, stampa, PDF) senza alcun calcolo JavaScript al momento della stampa. */
+const imgARCache = {}; // url -> rapporto larghezza/altezza (0 = non caricabile, null = in caricamento)
 
-// Calcola dimensioni e posizione dell'immagine in pixel, preservando sempre le sue proporzioni naturali.
-// Base "cover" (l'immagine copre l'intero riquadro senza distorcerla) + zoom + spostamento su entrambi gli assi.
-function posizionaImmagine(rigaId){
-  const riga = preventivo.righe.find(r => r.id === rigaId);
-  const wrapEl = document.getElementById('imgwrap-'+rigaId);
-  const img = document.getElementById('img-'+rigaId);
-  if(!riga || !wrapEl || !img) return;
-  if(!img.complete || !img.naturalWidth){ img.onload = () => posizionaImmagine(rigaId); return; }
-
-  const cw = wrapEl.clientWidth, ch = wrapEl.clientHeight;
-  if(!cw || !ch) return;
-  const nw = img.naturalWidth, nh = img.naturalHeight;
-  let baseW, baseH;
-  if(nw/nh > cw/ch){ baseH = ch; baseW = ch * (nw/nh); } // immagine relativamente più larga: altezza a riempimento
-  else { baseW = cw; baseH = cw * (nh/nw); } // immagine relativamente più stretta: larghezza a riempimento
-
-  const scale = (riga.imgScale || 100) / 100;
-  const posX = riga.imgPosX===undefined ? 50 : riga.imgPosX;
-  const posY = riga.imgPosY===undefined ? 50 : riga.imgPosY;
-  const w = baseW * scale, h = baseH * scale;
-  const left = -(w - cw) * (posX/100);
-  const top = -(h - ch) * (posY/100);
-
-  img.style.width = w+'px';
-  img.style.height = h+'px';
-  img.style.left = left+'px';
-  img.style.top = top+'px';
+function ottieniAR(url){
+  if(!url) return undefined;
+  if(url in imgARCache) return imgARCache[url] === null ? undefined : imgARCache[url];
+  imgARCache[url] = null;
+  const probe = new Image();
+  probe.onload = () => { imgARCache[url] = (probe.naturalWidth && probe.naturalHeight) ? probe.naturalWidth / probe.naturalHeight : 0; renderRuler(); };
+  probe.onerror = () => { imgARCache[url] = 0; renderRuler(); };
+  probe.src = url;
+  return undefined;
 }
 
-function aggiornaImgParam(rigaId, campo, valore){
+// F = rapporto del riquadro (larghezza arrotondata ai rotoli / altezza + 100mm), A = rapporto dell'immagine
+function geomImmagine(riga, F, A){
+  const s = (riga.imgScale || 100) / 100;
+  const w = Math.max(100, 100 * A / F) * s;   // % larghezza del riquadro
+  const h = Math.max(100, 100 * F / A) * s;   // % altezza del riquadro
+  const ovX = 100 - w, ovY = 100 - h;         // sporgenza (<= 0): intervallo di spostamento
+  const px = riga.imgPx === undefined ? 0.5 : riga.imgPx;
+  const py = riga.imgPy === undefined ? 0.5 : riga.imgPy;
+  return { w, h, ovX, ovY, left: ovX * px, top: ovY * py };
+}
+
+function stileImg(g){
+  return `width:${g.w}%; height:${g.h}%; left:${g.left}%; top:${g.top}%;`;
+}
+
+function contestoImg(rigaId){
+  const riga = preventivo.righe.find(r => r.id === rigaId);
+  if(!riga) return null;
+  const calc = calcolaRiga(riga);
+  if(!calc) return null;
+  const grafica = trovaGrafica(riga.codiceGrafica);
+  const url = grafica && grafica.immagine ? grafica.immagine : '';
+  const A = url ? imgARCache[url] : 0;
+  if(!A) return null;
+  const F = calc.larghezzaArr / (riga.altezza + 100);
+  return { riga, calc, F, A, g: geomImmagine(riga, F, A) };
+}
+
+let trascinamentoStato = null;
+
+function iniziaTrascinamento(ev, rigaId){
+  const ctx = contestoImg(rigaId);
+  if(!ctx) return;
+  ev.preventDefault();
+  const stage = document.getElementById('stage-' + rigaId);
+  if(!stage) return;
+  const rect = stage.querySelector('.crop-frame-anchor').getBoundingClientRect();
+  const p = ev.touches ? ev.touches[0] : ev;
+  trascinamentoStato = { rigaId, stage, startX: p.clientX, startY: p.clientY, startLeft: ctx.g.left, startTop: ctx.g.top, rectW: rect.width, rectH: rect.height };
+  stage.classList.add('dragging');
+  window.addEventListener('mousemove', muoviTrascinamento);
+  window.addEventListener('mouseup', fineTrascinamento);
+  window.addEventListener('touchmove', muoviTrascinamento, { passive: false });
+  window.addEventListener('touchend', fineTrascinamento);
+}
+
+function muoviTrascinamento(ev){
+  const st = trascinamentoStato;
+  if(!st) return;
+  ev.preventDefault();
+  const ctx = contestoImg(st.rigaId);
+  if(!ctx) return;
+  const p = ev.touches ? ev.touches[0] : ev;
+  const g = ctx.g;
+  const nl = Math.max(g.ovX, Math.min(0, st.startLeft + (p.clientX - st.startX) / st.rectW * 100));
+  const nt = Math.max(g.ovY, Math.min(0, st.startTop + (p.clientY - st.startY) / st.rectH * 100));
+  ctx.riga.imgPx = g.ovX < 0 ? nl / g.ovX : 0.5;
+  ctx.riga.imgPy = g.ovY < 0 ? nt / g.ovY : 0.5;
+  applicaPosizioneImg(st.rigaId);
+}
+
+function fineTrascinamento(){
+  if(trascinamentoStato){
+    trascinamentoStato.stage.classList.remove('dragging');
+    autosave();
+  }
+  trascinamentoStato = null;
+  window.removeEventListener('mousemove', muoviTrascinamento);
+  window.removeEventListener('mouseup', fineTrascinamento);
+  window.removeEventListener('touchmove', muoviTrascinamento);
+  window.removeEventListener('touchend', fineTrascinamento);
+}
+
+function applicaPosizioneImg(rigaId){
+  const ctx = contestoImg(rigaId);
+  if(!ctx) return;
+  ['img-' + rigaId, 'editimg-' + rigaId].forEach(id => {
+    const el = document.getElementById(id);
+    if(el){ el.style.width = ctx.g.w + '%'; el.style.height = ctx.g.h + '%'; el.style.left = ctx.g.left + '%'; el.style.top = ctx.g.top + '%'; }
+  });
+}
+
+function aggiornaZoom(rigaId, valore){
+  const ctx = contestoImg(rigaId);
+  if(!ctx) return;
+  const { riga, F, A, g } = ctx;
+  const cx = (50 - g.left) / g.w, cy = (50 - g.top) / g.h; // punto dell'immagine oggi al centro del riquadro
+  riga.imgScale = Number(valore);
+  const g1 = geomImmagine(riga, F, A);
+  const nl = Math.max(g1.ovX, Math.min(0, 50 - cx * g1.w));
+  const nt = Math.max(g1.ovY, Math.min(0, 50 - cy * g1.h));
+  riga.imgPx = g1.ovX < 0 ? nl / g1.ovX : 0.5;
+  riga.imgPy = g1.ovY < 0 ? nt / g1.ovY : 0.5;
+  applicaPosizioneImg(rigaId);
+  const lbl = document.getElementById('zoom-val-' + rigaId);
+  if(lbl) lbl.textContent = riga.imgScale + '%';
+  autosave();
+}
+
+function reimpostaImg(rigaId){
   const riga = preventivo.righe.find(r => r.id === rigaId);
   if(!riga) return;
-  riga[campo] = Number(valore);
-  posizionaImmagine(rigaId);
-  const scale = riga.imgScale || 100;
-  const posX = riga.imgPosX===undefined ? 50 : riga.imgPosX;
-  const posY = riga.imgPosY===undefined ? 50 : riga.imgPosY;
-  const zoomLabel = document.getElementById('zoom-val-'+rigaId);
-  const posLabel = document.getElementById('pos-val-'+rigaId);
-  const posYLabel = document.getElementById('posy-val-'+rigaId);
-  if(zoomLabel) zoomLabel.textContent = scale+'%';
-  if(posLabel) posLabel.textContent = posX+'%';
-  if(posYLabel) posYLabel.textContent = posY+'%';
+  riga.imgScale = 100; riga.imgPx = 0.5; riga.imgPy = 0.5;
+  renderRuler();
   autosave();
+}
+
+// sfridi (tinta unita semitrasparente) + linee di giunzione dei rotoli, tutto in % del riquadro
+function overlayHtml(riga, calc){
+  const tPct = 50 / (riga.altezza + 100) * 100;
+  const wPct = (calc.sfrido / 2) / calc.larghezzaArr * 100;
+  let h = `<div class="wb wb-t" style="top:0; left:0; width:100%; height:${tPct}%;"></div>`
+        + `<div class="wb wb-b" style="bottom:0; left:0; width:100%; height:${tPct}%;"></div>`;
+  if(wPct > 0){
+    h += `<div class="wb wb-l" style="left:0; top:${tPct}%; bottom:${tPct}%; width:${wPct}%;"></div>`
+       + `<div class="wb wb-r" style="right:0; top:${tPct}%; bottom:${tPct}%; width:${wPct}%;"></div>`;
+  }
+  for(let k = 1; k < calc.nRolli; k++){
+    h += `<div class="roll-line" style="left:${k * calc.rollWidth / calc.larghezzaArr * 100}%;"></div>`;
+  }
+  return h;
 }
 
 function renderRuler(){
   const wrap = document.getElementById('ruler-section');
-  const rows = preventivo.righe.map(r=>({riga:r, calc:calcolaRiga(r)})).filter(x=>x.calc);
-  if(!rows.length){ wrap.innerHTML=''; return; }
+  const rows = preventivo.righe.map(r => ({ riga: r, calc: calcolaRiga(r) })).filter(x => x.calc);
+  if(!rows.length){ wrap.innerHTML = ''; return; }
 
   wrap.innerHTML = `<div class="card"><h2><span class="num">＝</span> Taglio rotoli</h2>` +
-    rows.map(({riga,calc})=>{
+    rows.map(({ riga, calc }) => {
       const grafica = trovaGrafica(riga.codiceGrafica);
-      const imgUrl = grafica && grafica.immagine ? grafica.immagine : '';
-      const segWidth = 100 / calc.nRolli;
-      const wasteEach = calc.sfrido / 2; // metà sfrido sul primo rotolo, metà sull'ultimo
-      let segs = '';
-      for(let i=0;i<calc.nRolli;i++){
-        const isFirst = i === 0;
-        const isLast = i === calc.nRolli - 1;
-        const leftWastePct = isFirst ? (wasteEach/calc.rollWidth)*100 : 0;
-        const rightWastePct = isLast ? (wasteEach/calc.rollWidth)*100 : 0;
-        const usedPct = 100 - leftWastePct - rightWastePct;
-        const fillClass = imgUrl ? 'fill-img' : 'fill';
-        const segClass = imgUrl ? 'seg seg-img' : 'seg';
-        segs += `<div class="${segClass}" style="width:${segWidth}%">
-            <div style="display:flex; width:100%; height:100%;">
-              ${leftWastePct>0 ? `<div class="waste" style="width:${leftWastePct}%"></div>` : ''}
-              <div class="${fillClass}" style="width:${usedPct}%"></div>
-              ${rightWastePct>0 ? `<div class="waste" style="width:${rightWastePct}%"></div>` : ''}
-            </div>
-          </div>`;
-      }
+      const url = grafica && grafica.immagine ? grafica.immagine : '';
+      const A = url ? ottieniAR(url) : undefined;       // undefined = in caricamento, 0 = non caricabile
+      const imgOk = !!A;
+      const caricamento = !!url && A === undefined;
+      const fallita = !!url && A === 0;
+      const F = calc.larghezzaArr / (riga.altezza + 100);
+      const wasteEach = calc.sfrido / 2;
       const label = (riga.rifAmbiente || riga.rif || calc.prodotto.descrizione);
-      const aspectRatio = calc.larghezzaArr / (riga.altezza + 100);
       const specialTag = grafica && grafica.specialEdition ? ' <span class="badge special">Special Edition</span>' : '';
-      const graficaLink = grafica ? ` · <a href="${escapeHtml(grafica.url)}" target="_blank" style="color:var(--gold); text-decoration:none;">${escapeHtml(grafica.nome||riga.codiceGrafica)} ↗</a>` : (riga.codiceGrafica ? ` · <a href="${googleSiteSearchUrl(riga.codiceGrafica)}" target="_blank" style="color:var(--gold); text-decoration:none;">cerca "${escapeHtml(riga.codiceGrafica)}" ↗</a>` : '');
+      const graficaLink = grafica ? ` · <a href="${escapeHtml(grafica.url)}" target="_blank" style="color:var(--gold); text-decoration:none;">${escapeHtml(grafica.nome || riga.codiceGrafica)} ↗</a>` : (riga.codiceGrafica ? ` · <a href="${googleSiteSearchUrl(riga.codiceGrafica)}" target="_blank" style="color:var(--gold); text-decoration:none;">cerca "${escapeHtml(riga.codiceGrafica)}" ↗</a>` : '');
+      const g = imgOk ? geomImmagine(riga, F, A) : null;
+      const overlays = overlayHtml(riga, calc);
       const scale = riga.imgScale || 100;
-      const posX = riga.imgPosX===undefined ? 50 : riga.imgPosX;
-      const posY = riga.imgPosY===undefined ? 50 : riga.imgPosY;
-      const imgTag = imgUrl ? `<div class="wall-img-wrap" id="imgwrap-${riga.id}"><img class="wall-img" id="img-${riga.id}" src="${escapeHtml(imgUrl)}"></div>` : '';
-      const controlliImmagine = imgUrl ? `
-          <div class="img-controls no-print">
-            <label>Zoom <span id="zoom-val-${riga.id}">${scale}%</span>
-              <input type="range" min="100" max="400" step="5" value="${scale}" oninput="aggiornaImgParam('${riga.id}','imgScale',this.value)">
-            </label>
-            <label>Posizione orizzontale <span id="pos-val-${riga.id}">${posX}%</span>
-              <input type="range" min="0" max="100" step="1" value="${posX}" oninput="aggiornaImgParam('${riga.id}','imgPosX',this.value)">
-            </label>
-            <label>Posizione verticale <span id="posy-val-${riga.id}">${posY}%</span>
-              <input type="range" min="0" max="100" step="1" value="${posY}" oninput="aggiornaImgParam('${riga.id}','imgPosY',this.value)">
-            </label>
-            <button type="button" class="ghost" onclick="aggiornaImgParam('${riga.id}','imgScale',100);aggiornaImgParam('${riga.id}','imgPosX',50);aggiornaImgParam('${riga.id}','imgPosY',50);renderRuler();">Reimposta</button>
-          </div>` : '';
+      const imgPreview = imgOk ? `<img class="wall-img" id="img-${riga.id}" src="${escapeHtml(url)}" style="${stileImg(g)}">` : '';
+
+      let editor = '';
+      if(imgOk){
+        editor = `
+          <div class="crop-tool-row no-print">
+            <div class="crop-stage" id="stage-${riga.id}" style="--ar:${F};" onmousedown="iniziaTrascinamento(event,'${riga.id}')" ontouchstart="iniziaTrascinamento(event,'${riga.id}')">
+              <div class="crop-frame-anchor"><img class="wall-img" id="editimg-${riga.id}" src="${escapeHtml(url)}" draggable="false" style="${stileImg(g)}"></div>
+              <div class="crop-frame-visual">${overlays}</div>
+            </div>
+            <div class="img-controls">
+              <label>Zoom <span class="val" id="zoom-val-${riga.id}">${scale}%</span>
+                <input type="range" min="100" max="400" step="5" value="${scale}" oninput="aggiornaZoom('${riga.id}',this.value)">
+              </label>
+              <button type="button" class="ghost" onclick="reimpostaImg('${riga.id}')">Reimposta</button>
+            </div>
+            <div class="crop-hint">Trascina l'immagine per scegliere l'inquadratura: il riquadro dorato è ciò che verrà stampato, le fasce rosse sono lo sfrido.</div>
+          </div>`;
+      } else if(caricamento){
+        editor = `<div class="crop-hint no-print">Caricamento immagine…</div>`;
+      } else if(fallita){
+        editor = `<div class="crop-hint warn no-print">Impossibile caricare l'immagine: controlla il link nel Catalogo grafiche.</div>`;
+      }
+
       return `<div class="ruler-wrap">
           <div class="ruler-caption"><span>${escapeHtml(label)} — ${calc.prodotto.descrizione}${specialTag}${graficaLink}</span><span>${calc.nRolli} × ${calc.rollWidth}mm</span></div>
-          <div class="wall-rect-outer" style="--ar:${aspectRatio};">
+          ${editor}
+          <div class="wall-rect-outer" style="--ar:${F};">
             <div class="dim-caption">↕ margine 50mm</div>
-            <div class="wall-rect">
-              <div class="wall-band" style="flex-grow:50;"></div>
-              <div class="ruler" id="ruler-img-${riga.id}" style="flex-grow:${riga.altezza};">${imgTag}${segs}</div>
-              <div class="wall-band" style="flex-grow:50;"></div>
-            </div>
+            <div class="wall-rect${imgOk ? '' : ' no-img'}" id="rect-${riga.id}">${imgPreview}${overlays}</div>
             <div class="dim-caption">↕ margine 50mm</div>
           </div>
-          ${controlliImmagine}
-          <div class="ruler-caption"><span>Larghezza richiesta ${fmtMM(riga.larghezza)} · Altezza ${fmtMM(riga.altezza)}</span><span class="${calc.sfrido<100?'waste-note':''}">Sfrido ${fmtMM(calc.sfrido)} totale — ${fmtMM(wasteEach)} primo + ${fmtMM(wasteEach)} ultimo rotolo${calc.sfrido<100?' · sotto il minimo 100mm':''}</span></div>
+          <div class="ruler-caption"><span>Larghezza richiesta ${fmtMM(riga.larghezza)} · Altezza ${fmtMM(riga.altezza)}</span><span class="${calc.sfrido < 100 ? 'waste-note' : ''}">Sfrido ${fmtMM(calc.sfrido)} totale — ${fmtMM(wasteEach)} primo + ${fmtMM(wasteEach)} ultimo rotolo${calc.sfrido < 100 ? ' · sotto il minimo 100mm' : ''}</span></div>
         </div>`;
     }).join('<div style="height:14px;"></div>') + `</div>`;
-  rows.forEach(({riga}) => { if(riga.codiceGrafica && trovaGrafica(riga.codiceGrafica) && trovaGrafica(riga.codiceGrafica).immagine) posizionaImmagine(riga.id); });
 }
-window.addEventListener('resize', () => { if(document.getElementById('ruler-section').innerHTML) renderRuler(); });
-window.addEventListener('beforeprint', () => { if(document.getElementById('ruler-section').innerHTML) renderRuler(); });
 
 /* ===================== RENDER: TOTALI ===================== */
 function renderTotali(){
