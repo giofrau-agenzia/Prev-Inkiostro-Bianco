@@ -1,1148 +1,1230 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inkiostro Bianco — Preventivi Carta da Parati</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --ink: #131211;
-    --surface: #1c1a17;
-    --surface-2: #242019;
-    --line: #423d34;
-    --paper: #F3EFE6;
-    --paper-dim: #b8b2a2;
-    --waste: #e2574c;
-    --waste-dim: #6b2f2a;
-    --gold: #c9a34e;
-    --gold-dim: #7a6432;
-    --ok: #7fae6a;
-    --ruler-maxh: 420px;
-  }
-  *{ box-sizing: border-box; }
-  html,body{ margin:0; padding:0; background:var(--ink); color:var(--paper); font-family:'Inter',sans-serif; }
-  body{ min-height:100vh; }
-  ::selection{ background:var(--gold); color:var(--ink); }
-
-  .app{ max-width:1180px; margin:0 auto; padding:28px 20px 80px; }
-
-  /* ---------- Header ---------- */
-  .masthead{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; border-bottom:2px solid var(--line); padding-bottom:16px; margin-bottom:6px; flex-wrap:wrap;}
-  .brand{ display:flex; flex-direction:column; gap:2px; }
-  .brand .mark{ font-family:'Big Shoulders', sans-serif; font-weight:800; font-size:34px; letter-spacing:0.5px; text-transform:uppercase; line-height:0.95; }
-  .brand .mark span{ color:var(--gold); }
-  .brand .sub{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--paper-dim); }
-
-  .tabs{ display:flex; gap:2px; }
-  .tab{ font-family:'Big Shoulders', sans-serif; font-weight:600; font-size:15px; letter-spacing:1px; text-transform:uppercase;
-    background:var(--surface); color:var(--paper-dim); border:1px solid var(--line); border-bottom:none; padding:10px 18px 8px;
-    cursor:pointer; border-radius:6px 6px 0 0; position:relative; top:1px; }
-  .tab.active{ background:var(--ink); color:var(--paper); border-color:var(--gold); }
-
-  .backup-bar{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:18px; padding:8px 2px; }
-
-  /* ---------- Panels ---------- */
-  .panel{ display:none; }
-  .panel.active{ display:block; }
-
-  .card{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:18px 20px; margin-bottom:18px; }
-  .card h2{ font-family:'Big Shoulders', sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:1px; font-size:16px; margin:0 0 14px; color:var(--paper); display:flex; align-items:center; gap:8px;}
-  .card h2 .num{ color:var(--gold); font-family:'IBM Plex Mono',monospace; font-size:12px; }
-
-  .grid{ display:grid; gap:12px; }
-  .grid.cols-4{ grid-template-columns: repeat(4,1fr); }
-  .grid.cols-3{ grid-template-columns: repeat(3,1fr); }
-  .grid.cols-2{ grid-template-columns: repeat(2,1fr); }
-  @media(max-width:820px){ .grid.cols-4, .grid.cols-3, .grid.cols-2{ grid-template-columns: 1fr 1fr; } }
-  @media(max-width:720px){
-    #righe-table{ min-width:760px; table-layout:auto !important; }
-    #righe-table col{ width:auto !important; }
-    #righe-table th:nth-child(5), #righe-table th:nth-child(6){ min-width:90px; }
-    #righe-table td:nth-child(5), #righe-table td:nth-child(6){ min-width:90px; }
-    .row-mini-input{ font-size:16px; padding:10px 8px; }
-    #righe-table select{ font-size:14px; padding:10px 6px; }
-    .grafica-cell input{ font-size:14px; }
-  }
-
-  label{ display:block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:1px; text-transform:uppercase; color:var(--paper-dim); margin-bottom:5px; }
-  input, select{ width:100%; background:var(--surface-2); border:1px solid var(--line); color:var(--paper); border-radius:6px;
-    padding:9px 10px; font-family:'IBM Plex Mono',monospace; font-size:13.5px; }
-  input:focus, select:focus{ outline:none; border-color:var(--gold); }
-  input[type="checkbox"]{ width:auto; accent-color:var(--gold); }
-  .field{ display:flex; flex-direction:column; }
-
-  button{ font-family:'Big Shoulders',sans-serif; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; font-size:13px;
-    border-radius:6px; border:1px solid var(--line); background:var(--surface-2); color:var(--paper); padding:9px 14px; cursor:pointer; }
-  button:hover{ border-color:var(--gold); }
-  button.primary{ background:var(--gold); color:var(--ink); border-color:var(--gold); }
-  button.primary:hover{ background:#dbb668; }
-  button.danger{ color:var(--waste); }
-  button.danger:hover{ border-color:var(--waste); }
-  button.ghost{ background:transparent; border-color:transparent; color:var(--paper-dim); padding:6px 8px; }
-  button.ghost:hover{ color:var(--paper); }
-  button:disabled{ opacity:0.4; cursor:not-allowed; }
-
-  table{ width:100%; border-collapse:collapse; font-size:13px; }
-  #righe-table{ table-layout:fixed; }
-  #righe-table select{ font-size:12.5px; text-overflow:ellipsis; }
-  .table-scroll-x{ overflow-x:auto; }
-  th{ font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--paper-dim);
-    text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); }
-  td{ padding:7px 8px; border-bottom:1px solid #2a2620; font-family:'IBM Plex Mono',monospace; vertical-align:middle;}
-  tr:last-child td{ border-bottom:none; }
-  td.num, th.num{ text-align:right; }
-  .mono{ font-family:'IBM Plex Mono',monospace; }
-
-  .row-mini-input{ width:100%; padding:5px 6px; font-size:12.5px; }
-
-  .badge{ display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-family:'IBM Plex Mono',monospace; }
-  .badge.warn{ background:var(--waste-dim); color:#ffd9d5; }
-  .badge.ok{ background:#294a2a; color:#c8f0c4; }
-  .badge.special{ background:var(--gold); color:var(--ink); font-family:'Big Shoulders',sans-serif; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; font-size:10.5px; }
-
-  .grafica-cell{ min-width:150px; }
-  .print-val{ display:none; }
-  #righe-table th:nth-child(2), #righe-table th:nth-child(3){ font-size:8.5px; letter-spacing:0; padding-left:3px; padding-right:3px; }
-  #righe-table td:nth-child(2), #righe-table td:nth-child(3){ padding-left:3px; padding-right:3px; }
-  .grafica-cell input{ margin-bottom:4px; width:100%; }
-  .grafica-status{ font-size:10.5px; line-height:1.4; }
-  .grafica-status a{ color:var(--gold); text-decoration:none; }
-  .grafica-status a:hover{ text-decoration:underline; }
-  .grafica-status .muted{ color:var(--paper-dim); }
-
-  /* ---------- Ruler visual ---------- */
-  .ruler-wrap{ margin-top:6px; }
-  .wall-rect-outer{ width:min(100%, calc(var(--ruler-maxh) * var(--ar, 3))); }
-  .dim-caption{ font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--waste); text-align:center; padding:2px 0; letter-spacing:0.5px; }
-  .wall-rect{ position:relative; overflow:hidden; border:1px solid var(--line); border-radius:4px; width:100%; aspect-ratio: var(--ar, 3) / 1; background:var(--surface-2); }
-  .wall-rect.no-img{ background: linear-gradient(180deg, #d7bd7c, var(--gold)); }
-  .wall-img{ position:absolute; display:block; max-width:none; z-index:0; }
-  /* sfridi: tinta unita semitrasparente + filo pieno sul bordo interno (resta visibile anche se il driver di stampa scarta la trasparenza) */
-  .wb{ position:absolute; box-sizing:border-box; background:rgba(226,87,76,0.42); pointer-events:none; z-index:2; }
-  .wb-t{ border-bottom:1.5px solid rgba(205,45,35,0.95); }
-  .wb-b{ border-top:1.5px solid rgba(205,45,35,0.95); }
-  .wb-l{ border-right:1.5px solid rgba(205,45,35,0.95); }
-  .wb-r{ border-left:1.5px solid rgba(205,45,35,0.95); }
-  .roll-line{ position:absolute; top:0; bottom:0; width:0; border-left:1px dashed rgba(0,0,0,0.8); box-shadow:1px 0 0 rgba(255,255,255,0.5); pointer-events:none; z-index:1; }
-
-  /* ---------- Editor inquadratura ---------- */
-  .img-controls{ display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin-top:8px; padding:8px 10px; background:var(--surface-2); border-radius:6px; }
-  .img-controls label{ display:flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; color:var(--paper-dim); }
-  .img-controls input[type="range"]{ width:150px; accent-color:var(--gold); }
-  .img-controls span.val{ color:var(--gold); min-width:38px; }
-  .crop-tool-row{ margin-top:10px; margin-bottom:12px; }
-  .crop-stage{ position:relative; width:min(100%, calc(340px * var(--ar, 3))); aspect-ratio: var(--ar, 3) / 1; background:var(--surface-2); border-radius:6px; overflow:hidden; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
-  .crop-stage.dragging{ cursor:grabbing; }
-  .crop-frame-anchor{ position:absolute; left:15%; top:15%; width:70%; height:70%; }
-  .crop-frame-anchor .wall-img{ pointer-events:none; }
-  .crop-frame-visual{ position:absolute; left:15%; top:15%; width:70%; height:70%; pointer-events:none; outline:2px solid var(--gold); outline-offset:-2px; box-shadow:0 0 0 1000px rgba(10,9,8,0.6); z-index:5; }
-  .crop-hint{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--paper-dim); margin:8px 0; }
-  .crop-hint.warn{ color:var(--waste); }
-  .ruler-caption{ display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--paper-dim); margin-top:4px; }
-  .ruler-caption .waste-note{ color:var(--waste); }
-
-  /* ---------- Totals ---------- */
-  .totals{ display:flex; flex-direction:column; gap:0; }
-  .totals .line{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #2a2620; font-family:'IBM Plex Mono',monospace; font-size:13.5px; }
-  .totals .line.grand{ border-bottom:none; border-top:2px solid var(--gold); margin-top:4px; padding-top:12px; font-size:19px; font-weight:600; color:var(--gold); }
-  .totals .line .lbl{ color:var(--paper-dim); }
-  .totals .line.grand .lbl{ color:var(--paper); font-family:'Big Shoulders',sans-serif; letter-spacing:0.5px; text-transform:uppercase; font-size:15px;}
-
-  .toolbar{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
-  .hint{ font-size:11.5px; color:var(--paper-dim); margin-top:6px; line-height:1.5; }
-  .empty{ text-align:center; padding:30px 10px; color:var(--paper-dim); font-family:'IBM Plex Mono',monospace; font-size:12.5px; }
-
-  .saved-item{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #2a2620; }
-  .saved-item:last-child{ border-bottom:none; }
-  .saved-item .meta{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--paper-dim); }
-  .saved-item .meta b{ color:var(--paper); font-size:13.5px; }
-
-  @media print{
-    body{ background:#fff; color:#111; }
-    .tabs, .toolbar, .no-print{ display:none !important; }
-    .card{ background:#fff; border-color:#ccc; }
-    .has-print-val{ display:none !important; }
-    .print-val{ display:block; font-size:10.5px; line-height:1.25; color:#111; word-break:normal; overflow-wrap:anywhere; }
-    #righe-table td:nth-child(2) .print-val, #righe-table td:nth-child(3) .print-val{ font-size:9.5px; }
-    .wall-rect, .wall-rect.no-img, .wall-img, .wb, .roll-line{
-      -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact;
-    }
-    .grafica-status, .ruler-caption a{ display:none; }
-    #ruler-section{ break-before: page; page-break-before: always; }
-    .ruler-wrap{ break-inside: avoid; page-break-inside: avoid; }
-    #ruler-section .card{ padding-top:40px; }
-    .wall-rect{ border:1px solid #999; }
-    .wall-rect-outer{ --ruler-maxh: 460px; }
-    .dim-caption{ font-size:11px; color:#c0392b; }
-    .ruler-wrap{ margin-top:26px; margin-bottom:10px; }
-    .ruler-wrap ~ .ruler-wrap{ break-before: page; page-break-before: always; padding-top:30px; }
-    .ruler-caption{ font-size:12px; }
-  }
-</style>
-</head>
-<body>
-<div class="app">
-  <datalist id="grafiche-datalist"></datalist>
-
-
-  <div class="masthead">
-    <div class="brand">
-      <div class="mark">Inkiostro<span>·</span>Bianco</div>
-      <div class="sub">Preventivi — Carta da Parati</div>
-    </div>
-    <div class="tabs no-print">
-      <button class="tab active" data-tab="preventivo">Preventivo</button>
-      <button class="tab" data-tab="clienti">Clienti</button>
-      <button class="tab" data-tab="prodotti">Prodotti</button>
-      <button class="tab" data-tab="catalogo">Catalogo grafiche</button>
-      <button class="tab" data-tab="salvati">Salvati</button>
-    </div>
-  </div>
-
-  <div class="backup-bar no-print">
-    <span class="hint" style="margin:0;">Dati salvati solo su questo dispositivo/browser.</span>
-    <div style="display:flex; gap:8px;">
-      <button id="btn-export" title="Scarica un file con tutti i dati">⬇ Esporta backup</button>
-      <button id="btn-import" title="Carica un file di backup esportato in precedenza">⬆ Importa backup</button>
-      <input type="file" id="import-file" accept="application/json" style="display:none;">
-    </div>
-  </div>
-
-  <!-- ================= PREVENTIVO ================= -->
-  <div class="panel active" id="panel-preventivo">
-
+<!DOCTYPE html>  
+<html lang="it">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>Inkiostro Bianco — Preventivi Carta da Parati e Tela</title>  
+<style>  
+  :root{  
+    --ink: #131211;  
+    --surface: #1c1a17;  
+    --surface-2: #242019;  
+    --line: #423d34;  
+    --paper: #F3EFE6;  
+    --paper-dim: #b8b2a2;  
+    --waste: #e2574c;  
+    --waste-dim: #6b2f2a;  
+    --gold: #c9a34e;  
+    --gold-dim: #7a6432;  
+    --ok: #7fae6a;  
+    --ruler-maxh: 420px;  
+  }  
+  *{ box-sizing: border-box; }  
+  html,body{ margin:0; padding:0; background:var(--ink); color:var(--paper); font-family:Inter,Arial,sans-serif; }  
+  body{ min-height:100vh; }  
+  ::selection{ background:var(--gold); color:var(--ink); }  
+  .app{ max-width:1180px; margin:0 auto; padding:28px 20px 80px; }  
+  /* ---------- Header ---------- */  
+  .masthead{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; border-bottom:2px solid var(--line); padding-bottom:16px; margin-bottom:6px; flex-wrap:wrap;}  
+  .brand{ display:flex; flex-direction:column; gap:2px; }  
+  .brand .mark{ font-family:'Arial Narrow',Arial,sans-serif; font-weight:800; font-size:34px; letter-spacing:0.5px; text-transform:uppercase; line-height:0.95; }  
+  .brand .mark span{ color:var(--gold); }  
+  .brand .sub{ font-family:Consolas,'Courier New',monospace; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--paper-dim); }  
+  .tabs{ display:flex; gap:2px; }  
+  .tab{ font-family:'Arial Narrow',Arial,sans-serif; font-weight:600; font-size:15px; letter-spacing:1px; text-transform:uppercase;  
+    background:var(--surface); color:var(--paper-dim); border:1px solid var(--line); border-bottom:none; padding:10px 18px 8px;  
+    cursor:pointer; border-radius:6px 6px 0 0; position:relative; top:1px; }  
+  .tab.active{ background:var(--ink); color:var(--paper); border-color:var(--gold); }  
+  .backup-bar{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:18px; padding:8px 2px; }  
+  /* ---------- Panels ---------- */  
+  .panel{ display:none; }  
+  .panel.active{ display:block; }  
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:18px 20px; margin-bottom:18px; }  
+  .card h2{ font-family:'Arial Narrow',Arial,sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:1px; font-size:16px; margin:0 0 14px; color:var(--paper); display:flex; align-items:center; gap:8px;}  
+  .card h2 .num{ color:var(--gold); font-family:Consolas,'Courier New',monospace; font-size:12px; }  
+  .grid{ display:grid; gap:12px; }  
+  .grid.cols-4{ grid-template-columns: repeat(4,1fr); }  
+  .grid.cols-3{ grid-template-columns: repeat(3,1fr); }  
+  .grid.cols-2{ grid-template-columns: repeat(2,1fr); }  
+  @media(max-width:820px){ .grid.cols-4, .grid.cols-3, .grid.cols-2{ grid-template-columns: 1fr 1fr; } }  
+  @media(max-width:720px){  
+    #righe-table{ min-width:760px; table-layout:auto !important; }  
+    #righe-table col{ width:auto !important; }  
+    #righe-table th:nth-child(5), #righe-table th:nth-child(6){ min-width:90px; }  
+    #righe-table td:nth-child(5), #righe-table td:nth-child(6){ min-width:90px; }  
+    .row-mini-input{ font-size:16px; padding:10px 8px; }  
+    #righe-table select{ font-size:14px; padding:10px 6px; }  
+    .grafica-cell input{ font-size:14px; }  
+  }  
+  label{ display:block; font-family:Consolas,'Courier New',monospace; font-size:10.5px; letter-spacing:1px; text-transform:uppercase; color:var(--paper-dim); margin-bottom:5px; }  
+  input, select{ width:100%; background:var(--surface-2); border:1px solid var(--line); color:var(--paper); border-radius:6px;  
+    padding:9px 10px; font-family:Consolas,'Courier New',monospace; font-size:13.5px; }  
+  input:focus, select:focus{ outline:none; border-color:var(--gold); }  
+  input[type="checkbox"]{ width:auto; accent-color:var(--gold); }  
+  .field{ display:flex; flex-direction:column; }  
+  button{ font-family:'Arial Narrow',Arial,sans-serif; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; font-size:13px;  
+    border-radius:6px; border:1px solid var(--line); background:var(--surface-2); color:var(--paper); padding:9px 14px; cursor:pointer; }  
+  button:hover{ border-color:var(--gold); }  
+  button.primary{ background:var(--gold); color:var(--ink); border-color:var(--gold); }  
+  button.primary:hover{ background:#dbb668; }  
+  button.danger{ color:var(--waste); }  
+  button.danger:hover{ border-color:var(--waste); }  
+  button.ghost{ background:transparent; border-color:transparent; color:var(--paper-dim); padding:6px 8px; }  
+  button.ghost:hover{ color:var(--paper); }  
+  button:disabled{ opacity:0.4; cursor:not-allowed; }  
+  table{ width:100%; border-collapse:collapse; font-size:13px; }  
+  #righe-table{ table-layout:fixed; }  
+  #righe-table select{ font-size:12.5px; text-overflow:ellipsis; }  
+  .table-scroll-x{ overflow-x:auto; }  
+  th{ font-family:Consolas,'Courier New',monospace; font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--paper-dim);  
+    text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); }  
+  td{ padding:7px 8px; border-bottom:1px solid #2a2620; font-family:Consolas,'Courier New',monospace; vertical-align:middle;}  
+  tr:last-child td{ border-bottom:none; }  
+  td.num, th.num{ text-align:right; }  
+  .mono{ font-family:Consolas,'Courier New',monospace; }  
+  .row-mini-input{ width:100%; padding:5px 6px; font-size:12.5px; }  
+  .badge{ display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-family:Consolas,'Courier New',monospace; }  
+  .badge.warn{ background:var(--waste-dim); color:#ffd9d5; }  
+  .badge.ok{ background:#294a2a; color:#c8f0c4; }  
+  .badge.special{ background:var(--gold); color:var(--ink); font-family:'Arial Narrow',Arial,sans-serif; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; font-size:10.5px; }  
+  .grafica-cell{ min-width:150px; }  
+  .print-val{ display:none; }  
+  #righe-table th:nth-child(2), #righe-table th:nth-child(3){ font-size:8.5px; letter-spacing:0; padding-left:3px; padding-right:3px; }  
+  #righe-table td:nth-child(2), #righe-table td:nth-child(3){ padding-left:3px; padding-right:3px; }  
+  .grafica-cell input{ margin-bottom:4px; width:100%; }  
+  .grafica-status{ font-size:10.5px; line-height:1.4; }  
+  .grafica-status a{ color:var(--gold); text-decoration:none; }  
+  .grafica-status a:hover{ text-decoration:underline; }  
+  .grafica-status .muted{ color:var(--paper-dim); }  
+  /* ---------- Ruler visual ---------- */  
+  .ruler-wrap{ margin-top:6px; }  
+  .wall-rect-outer{ width:min(100%, calc(var(--ruler-maxh) * var(--ar, 3))); }  
+  .dim-caption{ font-family:Consolas,'Courier New',monospace; font-size:9px; color:var(--waste); text-align:center; padding:2px 0; letter-spacing:0.5px; }  
+  .wall-rect{ position:relative; overflow:hidden; border:1px solid var(--line); border-radius:4px; width:100%; aspect-ratio: var(--ar, 3) / 1; background:var(--surface-2); }  
+  .wall-rect.no-img{ background: linear-gradient(180deg, #d7bd7c, var(--gold)); }  
+  .wall-img{ position:absolute; display:block; max-width:none; z-index:0; }  
+  /* sfridi: tinta unita semitrasparente + filo pieno sul bordo interno (resta visibile anche se il driver di stampa scarta la trasparenza) */  
+  .wb{ position:absolute; box-sizing:border-box; background:rgba(226,87,76,0.42); pointer-events:none; z-index:2; }  
+  .wb-t{ border-bottom:1.5px solid rgba(205,45,35,0.95); }  
+  .wb-b{ border-top:1.5px solid rgba(205,45,35,0.95); }  
+  .wb-l{ border-right:1.5px solid rgba(205,45,35,0.95); }  
+  .wb-r{ border-left:1.5px solid rgba(205,45,35,0.95); }  
+  .roll-line{ position:absolute; top:0; bottom:0; width:0; border-left:1px dashed rgba(0,0,0,0.8); box-shadow:1px 0 0 rgba(255,255,255,0.5); pointer-events:none; z-index:1; }  
+  /* ---------- Editor inquadratura ---------- */  
+  .img-controls{ display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin-top:8px; padding:8px 10px; background:var(--surface-2); border-radius:6px; }  
+  .img-controls label{ display:flex; align-items:center; gap:8px; font-family:Consolas,'Courier New',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; color:var(--paper-dim); }  
+  .img-controls input[type="range"]{ width:150px; accent-color:var(--gold); }  
+  .img-controls span.val{ color:var(--gold); min-width:38px; }  
+  .crop-tool-row{ margin-top:10px; margin-bottom:12px; }  
+  .crop-stage{ position:relative; width:min(100%, calc(340px * var(--ar, 3))); aspect-ratio: var(--ar, 3) / 1; background:var(--surface-2); border-radius:6px; overflow:hidden; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }  
+  .crop-stage.dragging{ cursor:grabbing; }  
+  .crop-frame-anchor{ position:absolute; left:15%; top:15%; width:70%; height:70%; }  
+  .crop-frame-anchor .wall-img{ pointer-events:none; }  
+  .crop-frame-visual{ position:absolute; left:15%; top:15%; width:70%; height:70%; pointer-events:none; outline:2px solid var(--gold); outline-offset:-2px; box-shadow:0 0 0 1000px rgba(10,9,8,0.6); z-index:5; }  
+  .crop-hint{ font-family:Consolas,'Courier New',monospace; font-size:10.5px; color:var(--paper-dim); margin:8px 0; }  
+  .crop-hint.warn{ color:var(--waste); }  
+  .ruler-caption{ display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; font-family:Consolas,'Courier New',monospace; font-size:10.5px; color:var(--paper-dim); margin-top:4px; }  
+  .ruler-caption .waste-note{ color:var(--waste); }  
+  /* ---------- Totals ---------- */  
+  .totals{ display:flex; flex-direction:column; gap:0; }  
+  .totals .line{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #2a2620; font-family:Consolas,'Courier New',monospace; font-size:13.5px; }  
+  .totals .line.grand{ border-bottom:none; border-top:2px solid var(--gold); margin-top:4px; padding-top:12px; font-size:19px; font-weight:600; color:var(--gold); }  
+  .totals .line .lbl{ color:var(--paper-dim); }  
+  .totals .line.grand .lbl{ color:var(--paper); font-family:'Arial Narrow',Arial,sans-serif; letter-spacing:0.5px; text-transform:uppercase; font-size:15px;}  
+  .tela-row-invalid input{ border-color:var(--waste); }
+  .tela-error{ color:#ffd9d5; font-size:10px; margin-top:4px; min-height:14px; }
+  .tela-detail-group td{ padding-top:14px; color:var(--gold); font-family:Consolas,'Courier New',monospace; font-weight:600; }
+  #tela-righe-table{ min-width:920px; }
+  #tela-dettaglio-table{ min-width:680px; }
+  .tela-note{ border-inline-start:3px solid var(--gold); padding-inline-start:10px; }
+  .toolbar{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }  
+  .hint{ font-size:11.5px; color:var(--paper-dim); margin-top:6px; line-height:1.5; }  
+  .empty{ text-align:center; padding:30px 10px; color:var(--paper-dim); font-family:Consolas,'Courier New',monospace; font-size:12.5px; }  
+  .saved-item{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #2a2620; }  
+  .saved-item:last-child{ border-bottom:none; }  
+  .saved-item .meta{ font-family:Consolas,'Courier New',monospace; font-size:12px; color:var(--paper-dim); }  
+  .saved-item .meta b{ color:var(--paper); font-size:13.5px; }  
+  @media print{  
+    body{ background:#fff; color:#111; }  
+    .tabs, .toolbar, .no-print{ display:none !important; }  
+    .card{ background:#fff; border-color:#ccc; }  
+    .has-print-val{ display:none !important; }  
+    .print-val{ display:block; font-size:10.5px; line-height:1.25; color:#111; word-break:normal; overflow-wrap:anywhere; }  
+    #righe-table td:nth-child(2) .print-val, #righe-table td:nth-child(3) .print-val{ font-size:9.5px; }  
+    .wall-rect, .wall-rect.no-img, .wall-img, .wb, .roll-line{  
+      -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact;  
+    }  
+    .grafica-status, .ruler-caption a{ display:none; }  
+    #ruler-section{ break-before: page; page-break-before: always; }  
+    .ruler-wrap{ break-inside: avoid; page-break-inside: avoid; }  
+    #ruler-section .card{ padding-top:40px; }  
+    .wall-rect{ border:1px solid #999; }  
+    .wall-rect-outer{ --ruler-maxh: 460px; }  
+    .dim-caption{ font-size:11px; color:#c0392b; }  
+    .ruler-wrap{ margin-top:26px; margin-bottom:10px; }  
+    .ruler-wrap ~ .ruler-wrap{ break-before: page; page-break-before: always; padding-top:30px; }  
+    .ruler-caption{ font-size:12px; }  
+  }  
+</style>  
+</head>  
+<body>  
+<div class="app">  
+  <datalist id="grafiche-datalist"></datalist>  
+  <div class="masthead">  
+    <div class="brand">  
+      <div class="mark">Inkiostro<span>·</span>Bianco</div>  
+      <div class="sub">Preventivi — Carta da Parati e Tela</div>  
+    </div>  
+    <div class="tabs no-print">  
+      <button class="tab active" data-tab="preventivo">Carta da parati</button>  
+      <button class="tab" data-tab="tela">Tela</button>  
+      <button class="tab" data-tab="clienti">Clienti</button>  
+      <button class="tab" data-tab="prodotti">Prodotti</button>  
+      <button class="tab" data-tab="catalogo">Catalogo grafiche</button>  
+      <button class="tab" data-tab="salvati">Salvati</button>  
+    </div>  
+  </div>  
+  <div class="backup-bar no-print">  
+    <span class="hint" style="margin:0;">Dati salvati solo su questo dispositivo/browser.</span>  
+    <div style="display:flex; gap:8px;">  
+      <button id="btn-export" title="Scarica un file con tutti i dati">⬇ Esporta backup</button>  
+      <button id="btn-import" title="Carica un file di backup esportato in precedenza">⬆ Importa backup</button>  
+      <input type="file" id="import-file" accept="application/json" style="display:none;">  
+    </div>  
+  </div>  
+  <!-- ================= PREVENTIVO ================= -->  
+  <div class="panel active" id="panel-preventivo">  
+    <div class="card">  
+      <h2><span class="num">01</span> Dati preventivo</h2>  
+      <div class="grid cols-4">  
+        <div class="field"><label>Numero</label><input id="pv-numero" type="text" placeholder="2026-001"></div>  
+        <div class="field"><label>Data</label><input id="pv-data" type="date"></div>  
+        <div class="field" style="grid-column: span 2;"><label>Cliente</label><select id="pv-cliente"></select></div>  
+      </div>  
+      <div id="pv-cliente-dettagli" class="hint"></div>  
+    </div>  
+    <div class="card">  
+      <h2><span class="num">02</span> Ambienti / righe</h2>  
+      <div class="table-scroll-x">  
+      <table id="righe-table">  
+        <colgroup>  
+          <col style="width:19%"><col style="width:6%"><col style="width:6%"><col style="width:16%">  
+          <col style="width:8%"><col style="width:8%"><col style="width:7%"><col style="width:8%">  
+          <col style="width:7.5%"><col style="width:11%"><col style="width:3.5%">  
+        </colgroup>  
+        <thead>  
+          <tr>  
+            <th>Prodotto</th><th>Rif. ambiente</th><th>Rif.</th><th>Codice grafica</th>  
+            <th class="num">L. mm</th><th class="num">H. mm</th>  
+            <th class="num">N. rotoli</th><th class="num">Sfrido</th><th class="num">Mq</th><th class="num">Importo €</th><th></th>  
+          </tr>  
+        </thead>  
+        <tbody id="righe-body"></tbody>  
+      </table>  
+      </div>  
+      <div style="margin-top:12px;"><button id="btn-add-riga">+ Aggiungi ambiente</button></div>  
+      <div id="righe-empty" class="empty" style="display:none;">Nessun ambiente inserito. Aggiungine uno per iniziare.</div>  
+      <div class="hint">Il margine di 100mm in altezza è ripartito 50mm sopra + 50mm sotto. Lo sfrido in larghezza è ripartito metà sul primo rotolo e metà sull'ultimo (vedi grafico "Taglio rotoli" più sotto).</div>  
+    </div>  
+    <div id="ruler-section"></div>  
+    <div class="card">  
+      <h2><span class="num">03</span> Riepilogo</h2>  
+      <div class="grid cols-3" style="margin-bottom:16px;">  
+        <div class="field"><label>Sconto generale %</label><input id="pv-sconto" type="number" step="0.1" min="0" max="100" value="0"></div>  
+        <div class="field"><label>Trasporto € — non soggetto a sconto</label><input id="pv-trasporto" type="number" step="1" min="0" value="30"></div>  
+        <div class="field" style="justify-content:flex-end;">  
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">  
+            <input id="pv-primer" type="checkbox"> Applica Primer G — facoltativo (adesione supporto)  
+          </label>  
+        </div>  
+      </div>  
+      <div class="totals" id="totals-box"></div>  
+      <div class="hint" id="primer-hint"></div>  
+    </div>  
+    <div class="toolbar no-print">  
+      <button class="primary" id="btn-salva-preventivo">Salva preventivo</button>  
+      <button id="btn-nuovo-preventivo">Nuovo (svuota)</button>  
+      <button id="btn-stampa">Stampa / PDF</button>  
+    </div>  
+  </div>  
+  <!-- ================= TELA ================= -->
+  <div class="panel" id="panel-tela">
     <div class="card">
-      <h2><span class="num">01</span> Dati preventivo</h2>
+      <h2><span class="num">01</span> Dati preventivo Tela</h2>
       <div class="grid cols-4">
-        <div class="field"><label>Numero</label><input id="pv-numero" type="text" placeholder="2026-001"></div>
-        <div class="field"><label>Data</label><input id="pv-data" type="date"></div>
-        <div class="field" style="grid-column: span 2;"><label>Cliente</label><select id="pv-cliente"></select></div>
+        <div class="field"><label>Numero</label><input id="tela-numero" type="text" placeholder="2026-T001"></div>
+        <div class="field"><label>Data</label><input id="tela-data" type="date"></div>
+        <div class="field" style="grid-column:span 2;"><label>Cliente</label><select id="tela-cliente"></select></div>
       </div>
-      <div id="pv-cliente-dettagli" class="hint"></div>
+      <div id="tela-cliente-dettagli" class="hint"></div>
     </div>
-
     <div class="card">
-      <h2><span class="num">02</span> Ambienti / righe</h2>
+      <h2><span class="num">02</span> Elementi Tela</h2>
       <div class="table-scroll-x">
-      <table id="righe-table">
-        <colgroup>
-          <col style="width:19%"><col style="width:6%"><col style="width:6%"><col style="width:16%">
-          <col style="width:8%"><col style="width:8%"><col style="width:7%"><col style="width:8%">
-          <col style="width:7.5%"><col style="width:11%"><col style="width:3.5%">
-        </colgroup>
-        <thead>
-          <tr>
-            <th>Prodotto</th><th>Rif. ambiente</th><th>Rif.</th><th>Codice grafica</th>
-            <th class="num">L. mm</th><th class="num">H. mm</th>
-            <th class="num">N. rotoli</th><th class="num">Sfrido</th><th class="num">Mq</th><th class="num">Importo €</th><th></th>
-          </tr>
-        </thead>
-        <tbody id="righe-body"></tbody>
-      </table>
+        <table id="tela-righe-table">
+          <thead><tr><th>Rif. ambiente</th><th class="num">L. mm</th><th class="num">H. mm</th><th>Spessore</th><th>Tipo tela</th><th class="num">Mq</th><th class="num">Importo tela</th><th></th></tr></thead>
+          <tbody id="tela-righe-body"></tbody>
+        </table>
       </div>
-      <div style="margin-top:12px;"><button id="btn-add-riga">+ Aggiungi ambiente</button></div>
-      <div id="righe-empty" class="empty" style="display:none;">Nessun ambiente inserito. Aggiungine uno per iniziare.</div>
-      <div class="hint">Il margine di 100mm in altezza è ripartito 50mm sopra + 50mm sotto. Lo sfrido in larghezza è ripartito metà sul primo rotolo e metà sull'ultimo (vedi grafico "Taglio rotoli" più sotto).</div>
+      <div style="margin-top:12px;"><button id="btn-add-tela-riga">+ Aggiungi elemento Tela</button></div>
+      <div id="tela-righe-empty" class="empty">Nessun elemento inserito. Aggiungine uno per iniziare.</div>
+      <div class="hint tela-note">Altezza massima 2.970 mm. Profili, connettori e confezionamento vengono calcolati automaticamente secondo le misure inserite.</div>
     </div>
-
-    <div id="ruler-section"></div>
-
     <div class="card">
-      <h2><span class="num">03</span> Riepilogo</h2>
-      <div class="grid cols-3" style="margin-bottom:16px;">
-        <div class="field"><label>Sconto generale %</label><input id="pv-sconto" type="number" step="0.1" min="0" max="100" value="0"></div>
-        <div class="field"><label>Trasporto €</label><input id="pv-trasporto" type="number" step="1" min="0" value="30"></div>
-        <div class="field" style="justify-content:flex-end;">
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-            <input id="pv-primer" type="checkbox"> Applica Primer G — facoltativo (adesione supporto)
-          </label>
-        </div>
+      <h2><span class="num">03</span> Dettaglio economico</h2>
+      <div class="table-scroll-x">
+        <table id="tela-dettaglio-table">
+          <thead><tr><th>Descrizione</th><th class="num">Q.tà</th><th class="num">Prezzo unitario</th><th class="num">Importo</th></tr></thead>
+          <tbody id="tela-dettaglio-body"></tbody>
+        </table>
       </div>
-      <div class="totals" id="totals-box"></div>
-      <div class="hint" id="primer-hint"></div>
+      <div id="tela-dettaglio-empty" class="empty">Completa almeno una riga valida per visualizzare il dettaglio.</div>
     </div>
-
+    <div class="card">
+      <h2><span class="num">04</span> Riepilogo Tela</h2>
+      <div class="grid cols-2" style="margin-bottom:16px;">
+        <div class="field"><label>Sconto % — solo merce</label><input id="tela-sconto" type="number" step="0.1" min="0" max="100" value="0"></div>
+        <div class="field"><label>Trasporto € — non soggetto a sconto</label><input id="tela-trasporto" type="number" step="1" min="0" value="30"></div>
+      </div>
+      <div class="totals" id="tela-totals-box"></div>
+      <div class="hint tela-note">Lo sconto si applica esclusivamente alla merce. Il trasporto viene aggiunto dopo lo sconto e rientra nell'imponibile IVA.</div>
+    </div>
     <div class="toolbar no-print">
-      <button class="primary" id="btn-salva-preventivo">Salva preventivo</button>
-      <button id="btn-nuovo-preventivo">Nuovo (svuota)</button>
-      <button id="btn-stampa">Stampa / PDF</button>
+      <button class="primary" id="btn-salva-tela">Salva preventivo Tela</button>
+      <button id="btn-nuovo-tela">Nuovo (svuota)</button>
+      <button id="btn-stampa-tela">Stampa / PDF</button>
     </div>
   </div>
-
-  <!-- ================= CLIENTI ================= -->
-  <div class="panel" id="panel-clienti">
-    <div class="card">
-      <h2><span class="num">＋</span> Nuovo cliente</h2>
-      <div class="grid cols-4">
-        <div class="field"><label>Codice</label><input id="cl-codice" placeholder="C-01"></div>
-        <div class="field" style="grid-column:span 2;"><label>Ragione sociale / Nome</label><input id="cl-nome"></div>
-        <div class="field"><label>P.IVA / C.F.</label><input id="cl-piva"></div>
-        <div class="field" style="grid-column:span 2;"><label>Indirizzo</label><input id="cl-indirizzo"></div>
-        <div class="field"><label>CAP</label><input id="cl-cap"></div>
-        <div class="field"><label>Città</label><input id="cl-citta"></div>
-        <div class="field"><label>Prov.</label><input id="cl-prov" maxlength="2"></div>
-        <div class="field"><label>Telefono</label><input id="cl-telefono"></div>
-      </div>
-      <div style="margin-top:14px;"><button class="primary" id="btn-add-cliente">Aggiungi cliente</button></div>
-    </div>
-    <div class="card">
-      <h2><span class="num">·</span> Elenco clienti</h2>
-      <table>
-        <thead><tr><th>Codice</th><th>Ragione sociale</th><th>Città</th><th>P.IVA</th><th>Telefono</th><th></th></tr></thead>
-        <tbody id="clienti-body"></tbody>
-      </table>
-      <div id="clienti-empty" class="empty" style="display:none;">Nessun cliente ancora registrato.</div>
-    </div>
-  </div>
-
-  <!-- ================= PRODOTTI ================= -->
-  <div class="panel" id="panel-prodotti">
-    <div class="card">
-      <h2><span class="num">＋</span> Nuovo prodotto / rotolo</h2>
-      <div class="grid cols-4">
-        <div class="field" style="grid-column:span 2;"><label>Descrizione</label><input id="pr-descrizione" placeholder="es. Vinile - 68cm"></div>
-        <div class="field"><label>Prezzo unitario €/mq</label><input id="pr-prezzo" type="number" step="0.01" min="0"></div>
-        <div class="field"><label>Larghezza rotolo mm</label><input id="pr-larghezza" type="number" step="1" min="1"></div>
-      </div>
-      <div style="margin-top:14px;"><button class="primary" id="btn-add-prodotto">Aggiungi prodotto</button></div>
-    </div>
-    <div class="card">
-      <h2><span class="num">·</span> Listino</h2>
-      <table>
-        <thead><tr><th>Descrizione</th><th class="num">Prezzo €/mq</th><th class="num">Rotolo mm</th><th></th></tr></thead>
-        <tbody id="prodotti-body"></tbody>
-      </table>
-    </div>
-    <div class="card">
-      <h2><span class="num">·</span> Primer G — impostazioni consumo</h2>
-      <div class="grid cols-2">
-        <div class="field"><label>Consumo kg / mq</label><input id="pg-consumo" type="number" step="0.01" min="0"></div>
-        <div class="field"><label>Prezzo € / kg (confezione)</label><input id="pg-prezzo" type="number" step="0.01" min="0"></div>
-      </div>
-      <div style="margin-top:12px;"><button id="btn-save-primer">Salva impostazioni Primer G</button></div>
-      <div class="hint">Il consumo viene arrotondato per eccesso alla confezione intera da 1 kg, come nel foglio originale.</div>
-    </div>
-  </div>
-
-  <!-- ================= CATALOGO GRAFICHE ================= -->
-  <div class="panel" id="panel-catalogo">
-    <div class="card">
-      <h2><span class="num">＋</span> Nuova grafica in catalogo</h2>
-      <div class="hint" style="margin-bottom:12px;">Cerca la grafica sul <a href="https://www.inkiostrobianco.com/catalogo/" target="_blank" style="color:var(--gold);">catalogo Inkiostro Bianco</a>, copia il link della pagina e salvalo qui insieme al codice. La prossima volta che userai quel codice in un preventivo, il link comparirà automaticamente.</div>
-      <div class="grid cols-4">
-        <div class="field"><label>Codice grafica</label><input id="gr-codice" placeholder="INKFGIC2601"></div>
-        <div class="field" style="grid-column:span 2;"><label>Nome grafica / collezione</label><input id="gr-nome" placeholder="House of the Gladiators"></div>
-        <div class="field"><label style="display:flex; align-items:center; gap:8px; margin-top:6px; cursor:pointer;"><input id="gr-special" type="checkbox" style="width:auto;"> Special Edition</label></div>
-        <div class="field" style="grid-column:span 4;"><label>Link pagina prodotto</label><input id="gr-url" placeholder="https://www.inkiostrobianco.com/collezioni/.../..."></div>
-        <div class="field" style="grid-column:span 4;"><label>Link immagine anteprima (opzionale, per il grafico Taglio rotoli)</label><input id="gr-immagine" placeholder="https://www.inkiostrobianco.com/wp-content/uploads/.../nome-448x251.jpg"></div>
-      </div>
-      <div style="margin-top:14px;"><button class="primary" id="btn-add-grafica">Aggiungi al catalogo</button></div>
-    </div>
-    <div class="card">
-      <h2><span class="num">·</span> Grafiche salvate</h2>
-      <table>
-        <thead><tr><th>Codice</th><th>Nome</th><th></th><th></th></tr></thead>
-        <tbody id="grafiche-body"></tbody>
-      </table>
-      <div id="grafiche-empty" class="empty" style="display:none;">Nessuna grafica salvata ancora.</div>
-    </div>
-  </div>
-
-  <!-- ================= SALVATI ================= -->
-  <div class="panel" id="panel-salvati">
-    <div class="card">
-      <h2><span class="num">·</span> Preventivi salvati</h2>
-      <div id="salvati-list"></div>
-      <div id="salvati-empty" class="empty" style="display:none;">Nessun preventivo salvato ancora.</div>
-    </div>
-  </div>
-
-</div>
-
-<script>
-/* ===================== STORAGE: fallback per hosting esterno =====================
-   window.storage è disponibile solo dentro le "artifacts" di Claude. Alcuni host
-   (es. Netlify) iniettano script propri che possono usare lo stesso nome globale
-   "window.storage" per scopi diversi: per evitare conflitti, consideriamo "nativo"
-   solo un oggetto che ha TUTTE e 4 le funzioni attese (get/set/delete/list). */
-const IB_PREFIX = 'ib_';
-const localFallback = {
-  async get(key){ const v = localStorage.getItem(IB_PREFIX+key); return v!==null ? {key, value:v} : null; },
-  async set(key, value){ localStorage.setItem(IB_PREFIX+key, value); return {key, value}; },
-  async delete(key){ localStorage.removeItem(IB_PREFIX+key); return {key, deleted:true}; },
-  async list(prefix){ const p=IB_PREFIX+(prefix||''); const keys = Object.keys(localStorage).filter(k=>k.startsWith(p)).map(k=>k.slice(IB_PREFIX.length)); return {keys}; }
+  <!-- ================= CLIENTI ================= -->  
+  <div class="panel" id="panel-clienti">  
+    <div class="card">  
+      <h2><span class="num">＋</span> Nuovo cliente</h2>  
+      <div class="grid cols-4">  
+        <div class="field"><label>Codice</label><input id="cl-codice" placeholder="C-01"></div>  
+        <div class="field" style="grid-column:span 2;"><label>Ragione sociale / Nome</label><input id="cl-nome"></div>  
+        <div class="field"><label>P.IVA / C.F.</label><input id="cl-piva"></div>  
+        <div class="field" style="grid-column:span 2;"><label>Indirizzo</label><input id="cl-indirizzo"></div>  
+        <div class="field"><label>CAP</label><input id="cl-cap"></div>  
+        <div class="field"><label>Città</label><input id="cl-citta"></div>  
+        <div class="field"><label>Prov.</label><input id="cl-prov" maxlength="2"></div>  
+        <div class="field"><label>Telefono</label><input id="cl-telefono"></div>  
+      </div>  
+      <div style="margin-top:14px;"><button class="primary" id="btn-add-cliente">Aggiungi cliente</button></div>  
+    </div>  
+    <div class="card">  
+      <h2><span class="num">·</span> Elenco clienti</h2>  
+      <table>  
+        <thead><tr><th>Codice</th><th>Ragione sociale</th><th>Città</th><th>P.IVA</th><th>Telefono</th><th></th></tr></thead>  
+        <tbody id="clienti-body"></tbody>  
+      </table>  
+      <div id="clienti-empty" class="empty" style="display:none;">Nessun cliente ancora registrato.</div>  
+    </div>  
+  </div>  
+  <!-- ================= PRODOTTI ================= -->  
+  <div class="panel" id="panel-prodotti">  
+    <div class="card">  
+      <h2><span class="num">＋</span> Nuovo prodotto / rotolo</h2>  
+      <div class="grid cols-4">  
+        <div class="field" style="grid-column:span 2;"><label>Descrizione</label><input id="pr-descrizione" placeholder="es. Vinile - 68cm"></div>  
+        <div class="field"><label>Prezzo unitario €/mq</label><input id="pr-prezzo" type="number" step="0.01" min="0"></div>  
+        <div class="field"><label>Larghezza rotolo mm</label><input id="pr-larghezza" type="number" step="1" min="1"></div>  
+      </div>  
+      <div style="margin-top:14px;"><button class="primary" id="btn-add-prodotto">Aggiungi prodotto</button></div>  
+    </div>  
+    <div class="card">  
+      <h2><span class="num">·</span> Listino</h2>  
+      <table>  
+        <thead><tr><th>Descrizione</th><th class="num">Prezzo €/mq</th><th class="num">Rotolo mm</th><th></th></tr></thead>  
+        <tbody id="prodotti-body"></tbody>  
+      </table>  
+    </div>  
+    <div class="card">  
+      <h2><span class="num">·</span> Primer G — impostazioni consumo</h2>  
+      <div class="grid cols-2">  
+        <div class="field"><label>Consumo kg / mq</label><input id="pg-consumo" type="number" step="0.01" min="0"></div>  
+        <div class="field"><label>Prezzo € / kg (confezione)</label><input id="pg-prezzo" type="number" step="0.01" min="0"></div>  
+      </div>  
+      <div style="margin-top:12px;"><button id="btn-save-primer">Salva impostazioni Primer G</button></div>  
+      <div class="hint">Il consumo viene arrotondato per eccesso alla confezione intera da 1 kg, come nel foglio originale.</div>  
+    </div>  
+  </div>  
+  <!-- ================= CATALOGO GRAFICHE ================= -->  
+  <div class="panel" id="panel-catalogo">  
+    <div class="card">  
+      <h2><span class="num">＋</span> Nuova grafica in catalogo</h2>  
+      <div class="hint" style="margin-bottom:12px;">Cerca la grafica sul <a href="https://www.inkiostrobianco.com/catalogo/" target="_blank" style="color:var(--gold);">catalogo Inkiostro Bianco</a>, copia il link della pagina e salvalo qui insieme al codice. La prossima volta che userai quel codice in un preventivo, il link comparirà automaticamente.</div>  
+      <div class="grid cols-4">  
+        <div class="field"><label>Codice grafica</label><input id="gr-codice" placeholder="INKFGIC2601"></div>  
+        <div class="field" style="grid-column:span 2;"><label>Nome grafica / collezione</label><input id="gr-nome" placeholder="House of the Gladiators"></div>  
+        <div class="field"><label style="display:flex; align-items:center; gap:8px; margin-top:6px; cursor:pointer;"><input id="gr-special" type="checkbox" style="width:auto;"> Special Edition</label></div>  
+        <div class="field" style="grid-column:span 4;"><label>Link pagina prodotto</label><input id="gr-url" placeholder="https://www.inkiostrobianco.com/collezioni/.../..."></div>  
+        <div class="field" style="grid-column:span 4;"><label>Link immagine anteprima (opzionale, per il grafico Taglio rotoli)</label><input id="gr-immagine" placeholder="https://www.inkiostrobianco.com/wp-content/uploads/.../nome-448x251.jpg"></div>  
+      </div>  
+      <div style="margin-top:14px;"><button class="primary" id="btn-add-grafica">Aggiungi al catalogo</button></div>  
+    </div>  
+    <div class="card">  
+      <h2><span class="num">·</span> Grafiche salvate</h2>  
+      <table>  
+        <thead><tr><th>Codice</th><th>Nome</th><th></th><th></th></tr></thead>  
+        <tbody id="grafiche-body"></tbody>  
+      </table>  
+      <div id="grafiche-empty" class="empty" style="display:none;">Nessuna grafica salvata ancora.</div>  
+    </div>  
+  </div>  
+  <!-- ================= SALVATI ================= -->  
+  <div class="panel" id="panel-salvati">  
+    <div class="card">  
+      <h2><span class="num">·</span> Preventivi salvati</h2>  
+      <div id="salvati-list"></div>  
+      <div id="salvati-empty" class="empty" style="display:none;">Nessun preventivo salvato ancora.</div>  
+    </div>  
+  </div>  
+</div>  
+<script>  
+/* ===================== STORAGE: fallback per hosting esterno =====================  
+   window.storage è disponibile solo dentro le "artifacts" di Claude. Alcuni host  
+   (es. Netlify) iniettano script propri che possono usare lo stesso nome globale  
+   "window.storage" per scopi diversi: per evitare conflitti, consideriamo "nativo"  
+   solo un oggetto che ha TUTTE e 4 le funzioni attese (get/set/delete/list). */  
+const IB_PREFIX = 'ib_';  
+const localFallback = {  
+  async get(key){ const v = localStorage.getItem(IB_PREFIX+key); return v!==null ? {key, value:v} : null; },  
+  async set(key, value){ localStorage.setItem(IB_PREFIX+key, value); return {key, value}; },  
+  async delete(key){ localStorage.removeItem(IB_PREFIX+key); return {key, deleted:true}; },  
+  async list(prefix){ const p=IB_PREFIX+(prefix||''); const keys = Object.keys(localStorage).filter(k=>k.startsWith(p)).map(k=>k.slice(IB_PREFIX.length)); return {keys}; }  
+};  
+function looksNative(obj){  
+  return !!obj && ['get','set','delete','list'].every(fn => typeof obj[fn] === 'function');  
+}  
+/* ===================== STORAGE HELPERS ===================== */  
+async function loadKey(key, fallback){  
+  try{  
+    const store = looksNative(window.storage) ? window.storage : localFallback;  
+    const r = await store.get(key, false);  
+    return r ? JSON.parse(r.value) : fallback;  
+  }catch(e){  
+    try{ const r = await localFallback.get(key); return r ? JSON.parse(r.value) : fallback; }  
+    catch(e2){ return fallback; }  
+  }  
+}  
+async function saveKey(key, value){  
+  try{  
+    const store = looksNative(window.storage) ? window.storage : localFallback;  
+    await store.set(key, JSON.stringify(value), false);  
+  }catch(e){  
+    console.error('storage error', key, e);  
+    try{ await localFallback.set(key, JSON.stringify(value)); }catch(e2){ console.error('fallback storage error', key, e2); }  
+  }  
+}  
+/* ===================== DEFAULT DATA ===================== */  
+const DEFAULT_PRODOTTI = [  
+  { id: uid(), descrizione: 'Vinile - 68cm', prezzo: 94, larghezza: 680 },  
+  { id: uid(), descrizione: 'Vinile - 100cm', prezzo: 94, larghezza: 1000 },  
+  { id: uid(), descrizione: 'RAW - 94cm (fibra di vetro, ambienti asciutti)', prezzo: 129, larghezza: 940 },  
+  { id: uid(), descrizione: 'EQ·dekor fibra di vetro - 94cm', prezzo: 177, larghezza: 940 },  
+  { id: uid(), descrizione: 'Silk Touch - 100cm', prezzo: 129, larghezza: 1000 },  
+  { id: uid(), descrizione: 'Gold Vinyl - 66cm', prezzo: 119, larghezza: 660 },  
+  { id: uid(), descrizione: 'Gold Leaf / Pink Gold - 47cm', prezzo: 119, larghezza: 470 },  
+  { id: uid(), descrizione: 'S-Edition Vinile - 68cm', prezzo: 189, larghezza: 680 },  
+  { id: uid(), descrizione: 'S-Edition Vinile - 100cm', prezzo: 189, larghezza: 1000 },  
+  { id: uid(), descrizione: 'S-Edition RAW - 94cm', prezzo: 189, larghezza: 940 },  
+  { id: uid(), descrizione: 'S-Edition EQ·dekor fibra di vetro - 94cm', prezzo: 189, larghezza: 940 },  
+  { id: uid(), descrizione: 'S-Edition Silk Touch - 100cm', prezzo: 189, larghezza: 1000 },  
+];  
+const DEFAULT_PRIMER = { consumo: 0.15, prezzo: 26.266667 };  
+function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }  
+/* ===================== STATE ===================== */  
+let prodotti = [];  
+let clienti = [];  
+let primerConfig = { ...DEFAULT_PRIMER };  
+let preventiviSalvati = [];  
+let grafiche = [];  
+const TELA_LISTINO = {
+  tela: { standard:119, special:189 },
+  profili: { '18':{500:8.91,1000:14.80,1500:20.45}, '60':{500:13.20,1000:23.20,1500:33.20} },
+  lineare:7.80, angolare:7.80, confezionamento:7.35, iva:0.22
 };
-function looksNative(obj){
-  return !!obj && ['get','set','delete','list'].every(fn => typeof obj[fn] === 'function');
+let telaPreventivo = { numero:'', data:new Date().toISOString().slice(0,10), clienteId:'', sconto:0, trasporto:30, righe:[] };
+function trovaGrafica(codice){  
+  if(!codice) return null;  
+  const c = codice.trim().toLowerCase();  
+  if(!c) return null;  
+  return grafiche.find(g => g.codice.trim().toLowerCase() === c) || null;  
+}  
+function googleSiteSearchUrl(codice){  
+  return 'https://www.google.com/search?q=' + encodeURIComponent('site:inkiostrobianco.com ' + codice);  
+}  
+let preventivo = {  
+  numero: '', data: new Date().toISOString().slice(0,10), clienteId: '',  
+  sconto: 0, trasporto: 30, primerAttivo: false,  
+  righe: []  
+};  
+function nuovaRiga(){  
+  return { id: uid(), prodottoId: prodotti[0] ? prodotti[0].id : '', rifAmbiente: '', rif: '', codiceGrafica: '', larghezza: 3600, altezza: 2700, imgScale: 100, imgPx: 0.5, imgPy: 0.5 };  
+}  
+/* ===================== CALCOLI (logica del foglio C-Parati) ===================== */  
+function calcolaRiga(riga){  
+  const prodotto = prodotti.find(p => p.id === riga.prodottoId);  
+  if(!prodotto || !riga.larghezza || !riga.altezza) return null;  
+  const rollWidth = prodotto.larghezza;  
+  const larghezzaArr = Math.ceil(riga.larghezza / rollWidth) * rollWidth; // CEILING(K,C)  
+  const altezzaStampa = riga.altezza + 100; // +100mm margine  
+  const nRolli = larghezzaArr / rollWidth;  
+  const sfrido = larghezzaArr - riga.larghezza;  
+  const mq = (larghezzaArr/1000) * (altezzaStampa/1000);  
+  const importo = mq * prodotto.prezzo;  
+  return { prodotto, rollWidth, larghezzaArr, altezzaStampa, nRolli, sfrido, mq, importo };  
+}  
+function calcolaTotali(){  
+  const righeCalc = preventivo.righe.map(r => ({ riga:r, calc: calcolaRiga(r) })).filter(x => x.calc);  
+  const totaleMerce = righeCalc.reduce((s,x)=> s + x.calc.importo, 0);  
+  const totaleMq = righeCalc.reduce((s,x)=> s + x.calc.mq, 0);  
+  const imponibile = totaleMerce * (1 - (preventivo.sconto||0)/100);  
+  const primerKg = Math.ceil(totaleMq * primerConfig.consumo) || 0;  
+  const primerCosto = preventivo.primerAttivo ? primerKg * primerConfig.prezzo : 0;  
+  const trasporto = Number(preventivo.trasporto)||0;  
+  const base = imponibile + primerCosto + trasporto;  
+  const iva = base * 0.22;  
+  const totale = base + iva;  
+  return { righeCalc, totaleMerce, totaleMq, imponibile, primerKg, primerCosto, trasporto, iva, totale };  
+}  
+/* ===================== TELA: CALCOLI E RENDER ===================== */
+function nuovaTelaRiga(){ return { id:uid(), rifAmbiente:'', larghezza:'', altezza:'', spessore:'18', tipo:'standard' }; }
+function calcolaTelaRiga(r){
+  const L=Number(r.larghezza), H=Number(r.altezza);
+  if(!Number.isFinite(L) || !Number.isFinite(H) || L<=0 || H<=0 || H>2970) return null;
+  const profilo=dimensione=>{
+    const resto=dimensione%1500;
+    return { p500:resto>0&&resto<=500?1:0, p1000:resto>500&&resto<=1000?1:0, p1500:Math.floor(dimensione/1500)+(resto>1000?1:0) };
+  };
+  const a=profilo(L), b=profilo(H);
+  const q500=2*(a.p500+b.p500), q1000=2*(a.p1000+b.p1000), q1500=2*(a.p1500+b.p1500);
+  const lineari=Math.max(0,q500+q1000+q1500-4), angolari=4, confezionamento=1;
+  const mq=(L/1000)*(H/1000), prezzoTela=TELA_LISTINO.tela[r.tipo==='special'?'special':'standard'];
+  const prezzi=TELA_LISTINO.profili[r.spessore==='60'?'60':'18'];
+  const righe=[
+    {descrizione:`Tela ${r.tipo==='special'?'Special Edition':'Standard'} - telaio sp. ${r.spessore==='60'?'6':'1,8'} cm`,qta:mq,prezzo:prezzoTela},
+    {descrizione:`Profilo alluminio sp. ${r.spessore==='60'?'6':'1,8'} cm L. 50 cm`,qta:q500,prezzo:prezzi[500]},
+    {descrizione:`Profilo alluminio sp. ${r.spessore==='60'?'6':'1,8'} cm L. 100 cm`,qta:q1000,prezzo:prezzi[1000]},
+    {descrizione:`Profilo alluminio sp. ${r.spessore==='60'?'6':'1,8'} cm L. 150 cm`,qta:q1500,prezzo:prezzi[1500]},
+    {descrizione:'Connettori lineari in alluminio',qta:lineari,prezzo:TELA_LISTINO.lineare},
+    {descrizione:'Connettori angolari in alluminio',qta:angolari,prezzo:TELA_LISTINO.angolare},
+    {descrizione:'Confezionamento',qta:confezionamento,prezzo:TELA_LISTINO.confezionamento}
+  ].map(x=>({...x,importo:x.qta*x.prezzo}));
+  return { L,H,mq,q500,q1000,q1500,lineari,angolari,confezionamento,righe,totale:righe.reduce((s,x)=>s+x.importo,0) };
 }
-
-/* ===================== STORAGE HELPERS ===================== */
-async function loadKey(key, fallback){
-  try{
-    const store = looksNative(window.storage) ? window.storage : localFallback;
-    const r = await store.get(key, false);
-    return r ? JSON.parse(r.value) : fallback;
-  }catch(e){
-    try{ const r = await localFallback.get(key); return r ? JSON.parse(r.value) : fallback; }
-    catch(e2){ return fallback; }
-  }
+function calcolaTelaTotali(){
+  const righeCalc=telaPreventivo.righe.map(r=>({riga:r,calc:calcolaTelaRiga(r)})).filter(x=>x.calc);
+  const totaleMerce=righeCalc.reduce((s,x)=>s+x.calc.totale,0);
+  const totaleMq=righeCalc.reduce((s,x)=>s+x.calc.mq,0);
+  const sconto=Math.min(100,Math.max(0,Number(telaPreventivo.sconto)||0));
+  const merceScontata=totaleMerce*(1-sconto/100);
+  const trasporto=Math.max(0,Number(telaPreventivo.trasporto)||0);
+  const imponibileIva=merceScontata+trasporto;
+  const iva=imponibileIva*TELA_LISTINO.iva;
+  return {righeCalc,totaleMerce,totaleMq,sconto,merceScontata,trasporto,imponibileIva,iva,totale:imponibileIva+iva};
 }
-async function saveKey(key, value){
-  try{
-    const store = looksNative(window.storage) ? window.storage : localFallback;
-    await store.set(key, JSON.stringify(value), false);
-  }catch(e){
-    console.error('storage error', key, e);
-    try{ await localFallback.set(key, JSON.stringify(value)); }catch(e2){ console.error('fallback storage error', key, e2); }
-  }
+function renderTelaClienteSelect(){
+  const sel=document.getElementById('tela-cliente');
+  sel.innerHTML='<option value="">— Seleziona cliente —</option>'+clienti.map(c=>`<option value="${c.id}" ${c.id===telaPreventivo.clienteId?'selected':''}>${c.codice?escapeHtml(c.codice)+' — ':''}${escapeHtml(c.nome)}</option>`).join('');
+  sel.onchange=()=>{ telaPreventivo.clienteId=sel.value; renderTelaClienteDettagli(); autosaveTela(); };
+  renderTelaClienteDettagli();
 }
-
-/* ===================== DEFAULT DATA ===================== */
-const DEFAULT_PRODOTTI = [
-  { id: uid(), descrizione: 'Vinile - 68cm', prezzo: 94, larghezza: 680 },
-  { id: uid(), descrizione: 'Vinile - 100cm', prezzo: 94, larghezza: 1000 },
-  { id: uid(), descrizione: 'RAW - 94cm (fibra di vetro, ambienti asciutti)', prezzo: 129, larghezza: 940 },
-  { id: uid(), descrizione: 'EQ·dekor fibra di vetro - 94cm', prezzo: 177, larghezza: 940 },
-  { id: uid(), descrizione: 'Silk Touch - 100cm', prezzo: 129, larghezza: 1000 },
-  { id: uid(), descrizione: 'Gold Vinyl - 66cm', prezzo: 119, larghezza: 660 },
-  { id: uid(), descrizione: 'Gold Leaf / Pink Gold - 47cm', prezzo: 119, larghezza: 470 },
-  { id: uid(), descrizione: 'S-Edition Vinile - 68cm', prezzo: 189, larghezza: 680 },
-  { id: uid(), descrizione: 'S-Edition Vinile - 100cm', prezzo: 189, larghezza: 1000 },
-  { id: uid(), descrizione: 'S-Edition RAW - 94cm', prezzo: 189, larghezza: 940 },
-  { id: uid(), descrizione: 'S-Edition EQ·dekor fibra di vetro - 94cm', prezzo: 189, larghezza: 940 },
-  { id: uid(), descrizione: 'S-Edition Silk Touch - 100cm', prezzo: 189, larghezza: 1000 },
-];
-const DEFAULT_PRIMER = { consumo: 0.15, prezzo: 26.266667 };
-
-function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
-
-/* ===================== STATE ===================== */
-let prodotti = [];
-let clienti = [];
-let primerConfig = { ...DEFAULT_PRIMER };
-let preventiviSalvati = [];
-let grafiche = [];
-
-function trovaGrafica(codice){
-  if(!codice) return null;
-  const c = codice.trim().toLowerCase();
-  if(!c) return null;
-  return grafiche.find(g => g.codice.trim().toLowerCase() === c) || null;
+function renderTelaClienteDettagli(){
+  const box=document.getElementById('tela-cliente-dettagli'), c=clienti.find(x=>x.id===telaPreventivo.clienteId);
+  box.textContent=c?[c.indirizzo,[c.cap,c.citta,c.prov].filter(Boolean).join(' '),c.piva?'P.IVA '+c.piva:'',c.telefono].filter(Boolean).join(' · '):'';
 }
-function googleSiteSearchUrl(codice){
-  return 'https://www.google.com/search?q=' + encodeURIComponent('site:inkiostrobianco.com ' + codice);
-}
-
-let preventivo = {
-  numero: '', data: new Date().toISOString().slice(0,10), clienteId: '',
-  sconto: 0, trasporto: 30, primerAttivo: false,
-  righe: []
-};
-
-function nuovaRiga(){
-  return { id: uid(), prodottoId: prodotti[0] ? prodotti[0].id : '', rifAmbiente: '', rif: '', codiceGrafica: '', larghezza: 3600, altezza: 2700, imgScale: 100, imgPx: 0.5, imgPy: 0.5 };
-}
-
-/* ===================== CALCOLI (logica del foglio C-Parati) ===================== */
-function calcolaRiga(riga){
-  const prodotto = prodotti.find(p => p.id === riga.prodottoId);
-  if(!prodotto || !riga.larghezza || !riga.altezza) return null;
-  const rollWidth = prodotto.larghezza;
-  const larghezzaArr = Math.ceil(riga.larghezza / rollWidth) * rollWidth; // CEILING(K,C)
-  const altezzaStampa = riga.altezza + 100; // +100mm margine
-  const nRolli = larghezzaArr / rollWidth;
-  const sfrido = larghezzaArr - riga.larghezza;
-  const mq = (larghezzaArr/1000) * (altezzaStampa/1000);
-  const importo = mq * prodotto.prezzo;
-  return { prodotto, rollWidth, larghezzaArr, altezzaStampa, nRolli, sfrido, mq, importo };
-}
-
-function calcolaTotali(){
-  const righeCalc = preventivo.righe.map(r => ({ riga:r, calc: calcolaRiga(r) })).filter(x => x.calc);
-  const totaleMerce = righeCalc.reduce((s,x)=> s + x.calc.importo, 0);
-  const totaleMq = righeCalc.reduce((s,x)=> s + x.calc.mq, 0);
-  const imponibile = totaleMerce * (1 - (preventivo.sconto||0)/100);
-  const primerKg = Math.ceil(totaleMq * primerConfig.consumo) || 0;
-  const primerCosto = preventivo.primerAttivo ? primerKg * primerConfig.prezzo : 0;
-  const trasporto = Number(preventivo.trasporto)||0;
-  const base = imponibile + primerCosto + trasporto;
-  const iva = base * 0.22;
-  const totale = base + iva;
-  return { righeCalc, totaleMerce, totaleMq, imponibile, primerKg, primerCosto, trasporto, iva, totale };
-}
-
-/* ===================== FORMAT ===================== */
-const fmtEUR = n => '€ ' + (n||0).toLocaleString('it-IT', {minimumFractionDigits:2, maximumFractionDigits:2});
-const fmtMM  = n => Math.round(n) + ' mm';
-const fmtMQ  = n => (n||0).toLocaleString('it-IT', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' m²';
-
-/* ===================== TABS ===================== */
-document.querySelectorAll('.tab').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
-    if(btn.dataset.tab==='salvati') renderSalvati();
-  });
-});
-
-/* ===================== RENDER: PRODOTTI SELECT ===================== */
-function renderClienteSelect(){
-  const sel = document.getElementById('pv-cliente');
-  sel.innerHTML = '<option value="">— Seleziona cliente —</option>' +
-    clienti.map(c => `<option value="${c.id}" ${c.id===preventivo.clienteId?'selected':''}>${c.codice ? c.codice+' — ' : ''}${escapeHtml(c.nome)}</option>`).join('');
-  sel.onchange = ()=>{ preventivo.clienteId = sel.value; renderClienteDettagli(); autosave(); };
-  renderClienteDettagli();
-}
-function renderClienteDettagli(){
-  const box = document.getElementById('pv-cliente-dettagli');
-  const c = clienti.find(x=>x.id===preventivo.clienteId);
-  if(!c){ box.textContent=''; return; }
-  box.innerHTML = [c.indirizzo, [c.cap,c.citta,c.prov].filter(Boolean).join(' '), c.piva ? 'P.IVA '+c.piva : '', c.telefono].filter(Boolean).join(' · ');
-}
-
-/* ===================== RENDER: RIGHE ===================== */
-function isSpecialEdition(prodotto){ return /special edition|s-edition/i.test(prodotto.descrizione); }
-
-// se la grafica scelta è Special Edition, forza un prodotto Special Edition; ritorna true se il vincolo è attivo
-function ensureProdottoValido(riga){
-  const grafica = trovaGrafica(riga.codiceGrafica);
-  const requireSpecial = !!(grafica && grafica.specialEdition);
-  if(requireSpecial){
-    const attuale = prodotti.find(p => p.id === riga.prodottoId);
-    if(!attuale || !isSpecialEdition(attuale)){
-      const primaSE = prodotti.find(isSpecialEdition);
-      if(primaSE) riga.prodottoId = primaSE.id;
-    }
-  }
-  return requireSpecial;
-}
-function buildProdottoOptionsHtml(riga, requireSpecial){
-  return prodotti.map(p=>{
-    const disabled = requireSpecial && !isSpecialEdition(p);
-    return `<option value="${p.id}" ${p.id===riga.prodottoId?'selected':''} ${disabled?'disabled':''}>${escapeHtml(p.descrizione)}${disabled?' — non disp. (Special Edition)':''}</option>`;
-  }).join('');
-}
-
-function renderRighe(){
-  const body = document.getElementById('righe-body');
-  const empty = document.getElementById('righe-empty');
-  body.innerHTML = '';
-  empty.style.display = preventivo.righe.length ? 'none' : 'block';
-
-  preventivo.righe.forEach(riga=>{
-    const requireSpecial = ensureProdottoValido(riga);
-    const calc = calcolaRiga(riga);
-    const tr = document.createElement('tr');
-
-    const prodSel = document.createElement('select');
-    prodSel.innerHTML = buildProdottoOptionsHtml(riga, requireSpecial);
-    prodSel.onchange = ()=>{ riga.prodottoId = prodSel.value; renderRighe(); renderTotali(); renderRuler(); autosave(); };
-
-    const tdP = document.createElement('td'); tdP.appendChild(prodSel);
-    const tdAmb = td_input(riga, 'rifAmbiente', 'text');
-    const tdRif = td_input(riga, 'rif', 'text');
-    const tdGrafica = buildGraficaCell(riga);
-    const tdL = td_input(riga, 'larghezza', 'number');
-    const tdH = td_input(riga, 'altezza', 'number');
-
-    const tdRolli = document.createElement('td'); tdRolli.className='num'; tdRolli.textContent = calc? calc.nRolli : '—';
-    const tdSfrido = document.createElement('td'); tdSfrido.className='num';
-    if(calc){
-      const warn = calc.sfrido < 100;
-      tdSfrido.innerHTML = `<span class="badge ${warn?'warn':'ok'}">${fmtMM(calc.sfrido)}</span>`;
-    } else tdSfrido.textContent = '—';
-    const tdMq = document.createElement('td'); tdMq.className='num'; tdMq.textContent = calc? fmtMQ(calc.mq) : '—';
-    const tdImp = document.createElement('td'); tdImp.className='num'; tdImp.textContent = calc? fmtEUR(calc.importo) : '—';
-
-    const tdDel = document.createElement('td');
-    const delBtn = document.createElement('button'); delBtn.className='ghost no-print'; delBtn.textContent='✕';
-    delBtn.onclick = ()=>{ preventivo.righe = preventivo.righe.filter(r=>r.id!==riga.id); renderRighe(); renderTotali(); renderRuler(); autosave(); };
-    tdDel.appendChild(delBtn);
-
-    tr.append(tdP, tdAmb, tdRif, tdGrafica, tdL, tdH, tdRolli, tdSfrido, tdMq, tdImp, tdDel);
+function renderTelaRighe(){
+  const body=document.getElementById('tela-righe-body'); body.innerHTML='';
+  document.getElementById('tela-righe-empty').style.display=telaPreventivo.righe.length?'none':'block';
+  telaPreventivo.righe.forEach(r=>{
+    const calc=calcolaTelaRiga(r), tr=document.createElement('tr');
+    const err=Number(r.altezza)>2970?'Altezza max 2.970 mm':((r.larghezza||r.altezza)&&!calc?'Inserire misure valide':'');
+    if(err) tr.className='tela-row-invalid';
+    tr.innerHTML=`<td><input class="row-mini-input" data-field="rifAmbiente" type="text" value="${escapeHtml(r.rifAmbiente||'')}" placeholder="es. Sala"></td>
+      <td><input class="row-mini-input" data-field="larghezza" type="number" min="1" step="1" value="${escapeHtml(r.larghezza)}"><div class="tela-error">${err&&Number(r.larghezza)<=0?err:''}</div></td>
+      <td><input class="row-mini-input" data-field="altezza" type="number" min="1" max="2970" step="1" value="${escapeHtml(r.altezza)}"><div class="tela-error">${escapeHtml(err)}</div></td>
+      <td><select data-field="spessore"><option value="18" ${r.spessore==='18'?'selected':''}>1,8 cm</option><option value="60" ${r.spessore==='60'?'selected':''}>6 cm</option></select></td>
+      <td><select data-field="tipo"><option value="standard" ${r.tipo==='standard'?'selected':''}>Standard</option><option value="special" ${r.tipo==='special'?'selected':''}>Special Edition</option></select></td>
+      <td class="num">${calc?fmtMQ(calc.mq):'—'}</td><td class="num">${calc?fmtEUR(calc.righe[0].importo):'—'}</td><td><button class="ghost danger" data-action="delete" type="button">✕</button></td>`;
+    tr.querySelectorAll('[data-field]').forEach(el=>el.addEventListener('input',()=>{
+      r[el.dataset.field]=el.type==='number'?el.value:el.value;
+      renderTelaRighe(); renderTelaDettaglio(); renderTelaTotali(); autosaveTela();
+    }));
+    tr.querySelector('[data-action="delete"]').addEventListener('click',()=>{ telaPreventivo.righe=telaPreventivo.righe.filter(x=>x.id!==r.id); renderTelaRighe(); renderTelaDettaglio(); renderTelaTotali(); autosaveTela(); });
     body.appendChild(tr);
   });
-
-  function td_input(obj, field, type){
-    const td = document.createElement('td');
-    const inp = document.createElement('input');
-    inp.className='row-mini-input'; inp.type=type; inp.value = obj[field];
-    let pv = null;
-    if(type==='text'){
-      inp.classList.add('has-print-val');
-      pv = document.createElement('span'); pv.className='print-val'; pv.textContent = obj[field] || '';
-    }
-    inp.oninput = ()=>{ obj[field] = type==='number' ? Number(inp.value) : inp.value; if(pv) pv.textContent = obj[field]; renderRighe_partial(); renderTotali(); renderRuler(); autosave(); };
-    td.appendChild(inp);
-    if(pv) td.appendChild(pv);
-    return td;
-  }
-
-  function buildGraficaCell(riga){
-    const td = document.createElement('td'); td.className='grafica-cell';
-    const inp = document.createElement('input');
-    inp.className='row-mini-input has-print-val'; inp.type='text'; inp.placeholder='INKFGIC2601'; inp.value = riga.codiceGrafica || ''; inp.setAttribute('list','grafiche-datalist');
-    const pv = document.createElement('span'); pv.className='print-val'; pv.textContent = riga.codiceGrafica || '';
-    const status = document.createElement('div'); status.className='grafica-status';
-    status.innerHTML = graficaStatusHtml(riga.codiceGrafica);
-    inp.oninput = ()=>{
-      riga.codiceGrafica = inp.value;
-      pv.textContent = inp.value;
-      status.innerHTML = graficaStatusHtml(riga.codiceGrafica);
-      aggiornaVincoloProdotto(riga, td.closest('tr'));
-      renderRuler(); autosave();
-    };
-    td.append(inp, pv, status);
-    return td;
-  }
 }
-
-function aggiornaVincoloProdotto(riga, tr){
-  if(!tr) return;
-  const requireSpecial = ensureProdottoValido(riga);
-  const select = tr.querySelector('select');
-  if(select) select.innerHTML = buildProdottoOptionsHtml(riga, requireSpecial);
-  renderRighe_partial();
-  renderTotali();
-}
-
-function graficaStatusHtml(codice){
-  if(!codice || !codice.trim()) return '';
-  const match = trovaGrafica(codice);
-  if(match){
-    return `<a href="${escapeHtml(match.url)}" target="_blank">Apri pagina ↗</a>${match.specialEdition ? ' <span class="badge special">Special Edition</span>' : ''}`;
-  }
-  return `<a href="${googleSiteSearchUrl(codice)}" target="_blank">Cerca sul sito ↗</a> <span class="muted">— non in catalogo</span>`;
-}
-// lightweight refresh of computed cells only (avoids losing focus while typing dimensions)
-function renderRighe_partial(){
-  const rows = document.querySelectorAll('#righe-body tr');
-  preventivo.righe.forEach((riga, i)=>{
-    const calc = calcolaRiga(riga);
-    const tr = rows[i]; if(!tr) return;
-    const cells = tr.querySelectorAll('td');
-    cells[6].textContent = calc? calc.nRolli : '—';
-    if(calc){
-      const warn = calc.sfrido < 100;
-      cells[7].innerHTML = `<span class="badge ${warn?'warn':'ok'}">${fmtMM(calc.sfrido)}</span>`;
-    } else cells[7].textContent='—';
-    cells[8].textContent = calc? fmtMQ(calc.mq) : '—';
-    cells[9].textContent = calc? fmtEUR(calc.importo) : '—';
+function renderTelaDettaglio(){
+  const t=calcolaTelaTotali(), body=document.getElementById('tela-dettaglio-body'); body.innerHTML='';
+  document.getElementById('tela-dettaglio-empty').style.display=t.righeCalc.length?'none':'block';
+  t.righeCalc.forEach((x,i)=>{
+    const h=document.createElement('tr'); h.className='tela-detail-group';
+    h.innerHTML=`<td colspan="4">${escapeHtml(x.riga.rifAmbiente||('Elemento '+(i+1)))} — ${fmtMM(x.calc.L)} × ${fmtMM(x.calc.H)}</td>`; body.appendChild(h);
+    x.calc.righe.forEach(item=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${escapeHtml(item.descrizione)}</td><td class="num">${Number.isInteger(item.qta)?item.qta:item.qta.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td class="num">${fmtEUR(item.prezzo)}</td><td class="num">${fmtEUR(item.importo)}</td>`; body.appendChild(tr); });
   });
 }
-
-/* ===================== RENDER: RULER (elemento firma) ===================== */
-/* Modello dell'inquadratura:
-   l'immagine resta INTERA e a dimensione reale rispetto alla parete;
-   il riquadro (misure + sfridi) è la finestra che ci scorre sopra, anche senza zoom.
-   Tutte le posizioni sono percentuali del riquadro: il browser le ricalcola da solo
-   (schermo, stampa, PDF) senza alcun calcolo JavaScript al momento della stampa. */
-const imgARCache = {}; // url -> rapporto larghezza/altezza (0 = non caricabile, null = in caricamento)
-
-function ottieniAR(url){
-  if(!url) return undefined;
-  if(url in imgARCache) return imgARCache[url] === null ? undefined : imgARCache[url];
-  imgARCache[url] = null;
-  const probe = new Image();
-  probe.onload = () => { imgARCache[url] = (probe.naturalWidth && probe.naturalHeight) ? probe.naturalWidth / probe.naturalHeight : 0; renderRuler(); };
-  probe.onerror = () => { imgARCache[url] = 0; renderRuler(); };
-  probe.src = url;
-  return undefined;
-}
-
-// F = rapporto del riquadro (larghezza arrotondata ai rotoli / altezza + 100mm), A = rapporto dell'immagine
-function geomImmagine(riga, F, A){
-  const s = (riga.imgScale || 100) / 100;
-  const w = Math.max(100, 100 * A / F) * s;   // % larghezza del riquadro
-  const h = Math.max(100, 100 * F / A) * s;   // % altezza del riquadro
-  const ovX = 100 - w, ovY = 100 - h;         // sporgenza (<= 0): intervallo di spostamento
-  const px = riga.imgPx === undefined ? 0.5 : riga.imgPx;
-  const py = riga.imgPy === undefined ? 0.5 : riga.imgPy;
-  return { w, h, ovX, ovY, left: ovX * px, top: ovY * py };
-}
-
-function stileImg(g){
-  return `width:${g.w}%; height:${g.h}%; left:${g.left}%; top:${g.top}%;`;
-}
-
-function contestoImg(rigaId){
-  const riga = preventivo.righe.find(r => r.id === rigaId);
-  if(!riga) return null;
-  const calc = calcolaRiga(riga);
-  if(!calc) return null;
-  const grafica = trovaGrafica(riga.codiceGrafica);
-  const url = grafica && grafica.immagine ? grafica.immagine : '';
-  const A = url ? imgARCache[url] : 0;
-  if(!A) return null;
-  const F = calc.larghezzaArr / (riga.altezza + 100);
-  return { riga, calc, F, A, g: geomImmagine(riga, F, A) };
-}
-
-let trascinamentoStato = null;
-
-function iniziaTrascinamento(ev, rigaId){
-  const ctx = contestoImg(rigaId);
-  if(!ctx) return;
-  ev.preventDefault();
-  const stage = document.getElementById('stage-' + rigaId);
-  if(!stage) return;
-  const rect = stage.querySelector('.crop-frame-anchor').getBoundingClientRect();
-  const p = ev.touches ? ev.touches[0] : ev;
-  trascinamentoStato = { rigaId, stage, startX: p.clientX, startY: p.clientY, startLeft: ctx.g.left, startTop: ctx.g.top, rectW: rect.width, rectH: rect.height };
-  stage.classList.add('dragging');
-  window.addEventListener('mousemove', muoviTrascinamento);
-  window.addEventListener('mouseup', fineTrascinamento);
-  window.addEventListener('touchmove', muoviTrascinamento, { passive: false });
-  window.addEventListener('touchend', fineTrascinamento);
-}
-
-function muoviTrascinamento(ev){
-  const st = trascinamentoStato;
-  if(!st) return;
-  ev.preventDefault();
-  const ctx = contestoImg(st.rigaId);
-  if(!ctx) return;
-  const p = ev.touches ? ev.touches[0] : ev;
-  const g = ctx.g;
-  const nl = Math.max(g.ovX, Math.min(0, st.startLeft + (p.clientX - st.startX) / st.rectW * 100));
-  const nt = Math.max(g.ovY, Math.min(0, st.startTop + (p.clientY - st.startY) / st.rectH * 100));
-  ctx.riga.imgPx = g.ovX < 0 ? nl / g.ovX : 0.5;
-  ctx.riga.imgPy = g.ovY < 0 ? nt / g.ovY : 0.5;
-  applicaPosizioneImg(st.rigaId);
-}
-
-function fineTrascinamento(){
-  if(trascinamentoStato){
-    trascinamentoStato.stage.classList.remove('dragging');
-    autosave();
-  }
-  trascinamentoStato = null;
-  window.removeEventListener('mousemove', muoviTrascinamento);
-  window.removeEventListener('mouseup', fineTrascinamento);
-  window.removeEventListener('touchmove', muoviTrascinamento);
-  window.removeEventListener('touchend', fineTrascinamento);
-}
-
-function applicaPosizioneImg(rigaId){
-  const ctx = contestoImg(rigaId);
-  if(!ctx) return;
-  ['img-' + rigaId, 'editimg-' + rigaId].forEach(id => {
-    const el = document.getElementById(id);
-    if(el){ el.style.width = ctx.g.w + '%'; el.style.height = ctx.g.h + '%'; el.style.left = ctx.g.left + '%'; el.style.top = ctx.g.top + '%'; }
-  });
-}
-
-function aggiornaZoom(rigaId, valore){
-  const ctx = contestoImg(rigaId);
-  if(!ctx) return;
-  const { riga, F, A, g } = ctx;
-  const cx = (50 - g.left) / g.w, cy = (50 - g.top) / g.h; // punto dell'immagine oggi al centro del riquadro
-  riga.imgScale = Number(valore);
-  const g1 = geomImmagine(riga, F, A);
-  const nl = Math.max(g1.ovX, Math.min(0, 50 - cx * g1.w));
-  const nt = Math.max(g1.ovY, Math.min(0, 50 - cy * g1.h));
-  riga.imgPx = g1.ovX < 0 ? nl / g1.ovX : 0.5;
-  riga.imgPy = g1.ovY < 0 ? nt / g1.ovY : 0.5;
-  applicaPosizioneImg(rigaId);
-  const lbl = document.getElementById('zoom-val-' + rigaId);
-  if(lbl) lbl.textContent = riga.imgScale + '%';
-  autosave();
-}
-
-function reimpostaImg(rigaId){
-  const riga = preventivo.righe.find(r => r.id === rigaId);
-  if(!riga) return;
-  riga.imgScale = 100; riga.imgPx = 0.5; riga.imgPy = 0.5;
-  renderRuler();
-  autosave();
-}
-
-// sfridi (tinta unita semitrasparente) + linee di giunzione dei rotoli, tutto in % del riquadro
-function overlayHtml(riga, calc){
-  const tPct = 50 / (riga.altezza + 100) * 100;
-  const wPct = (calc.sfrido / 2) / calc.larghezzaArr * 100;
-  let h = `<div class="wb wb-t" style="top:0; left:0; width:100%; height:${tPct}%;"></div>`
-        + `<div class="wb wb-b" style="bottom:0; left:0; width:100%; height:${tPct}%;"></div>`;
-  if(wPct > 0){
-    h += `<div class="wb wb-l" style="left:0; top:${tPct}%; bottom:${tPct}%; width:${wPct}%;"></div>`
-       + `<div class="wb wb-r" style="right:0; top:${tPct}%; bottom:${tPct}%; width:${wPct}%;"></div>`;
-  }
-  for(let k = 1; k < calc.nRolli; k++){
-    h += `<div class="roll-line" style="left:${k * calc.rollWidth / calc.larghezzaArr * 100}%;"></div>`;
-  }
-  return h;
-}
-
-function renderRuler(){
-  const wrap = document.getElementById('ruler-section');
-  const rows = preventivo.righe.map(r => ({ riga: r, calc: calcolaRiga(r) })).filter(x => x.calc);
-  if(!rows.length){ wrap.innerHTML = ''; return; }
-
-  wrap.innerHTML = `<div class="card"><h2><span class="num">＝</span> Taglio rotoli</h2>` +
-    rows.map(({ riga, calc }) => {
-      const grafica = trovaGrafica(riga.codiceGrafica);
-      const url = grafica && grafica.immagine ? grafica.immagine : '';
-      const A = url ? ottieniAR(url) : undefined;       // undefined = in caricamento, 0 = non caricabile
-      const imgOk = !!A;
-      const caricamento = !!url && A === undefined;
-      const fallita = !!url && A === 0;
-      const F = calc.larghezzaArr / (riga.altezza + 100);
-      const wasteEach = calc.sfrido / 2;
-      const label = (riga.rifAmbiente || riga.rif || calc.prodotto.descrizione);
-      const specialTag = grafica && grafica.specialEdition ? ' <span class="badge special">Special Edition</span>' : '';
-      const graficaLink = grafica ? ` · <a href="${escapeHtml(grafica.url)}" target="_blank" style="color:var(--gold); text-decoration:none;">${escapeHtml(grafica.nome || riga.codiceGrafica)} ↗</a>` : (riga.codiceGrafica ? ` · <a href="${googleSiteSearchUrl(riga.codiceGrafica)}" target="_blank" style="color:var(--gold); text-decoration:none;">cerca "${escapeHtml(riga.codiceGrafica)}" ↗</a>` : '');
-      const g = imgOk ? geomImmagine(riga, F, A) : null;
-      const overlays = overlayHtml(riga, calc);
-      const scale = riga.imgScale || 100;
-      const imgPreview = imgOk ? `<img class="wall-img" id="img-${riga.id}" src="${escapeHtml(url)}" style="${stileImg(g)}">` : '';
-
-      let editor = '';
-      if(imgOk){
-        editor = `
-          <div class="crop-tool-row no-print">
-            <div class="crop-stage" id="stage-${riga.id}" style="--ar:${F};" onmousedown="iniziaTrascinamento(event,'${riga.id}')" ontouchstart="iniziaTrascinamento(event,'${riga.id}')">
-              <div class="crop-frame-anchor"><img class="wall-img" id="editimg-${riga.id}" src="${escapeHtml(url)}" draggable="false" style="${stileImg(g)}"></div>
-              <div class="crop-frame-visual">${overlays}</div>
-            </div>
-            <div class="img-controls">
-              <label>Zoom <span class="val" id="zoom-val-${riga.id}">${scale}%</span>
-                <input type="range" min="100" max="400" step="5" value="${scale}" oninput="aggiornaZoom('${riga.id}',this.value)">
-              </label>
-              <button type="button" class="ghost" onclick="reimpostaImg('${riga.id}')">Reimposta</button>
-            </div>
-            <div class="crop-hint">Trascina l'immagine per scegliere l'inquadratura: il riquadro dorato è ciò che verrà stampato, le fasce rosse sono lo sfrido.</div>
-          </div>`;
-      } else if(caricamento){
-        editor = `<div class="crop-hint no-print">Caricamento immagine…</div>`;
-      } else if(fallita){
-        editor = `<div class="crop-hint warn no-print">Impossibile caricare l'immagine: controlla il link nel Catalogo grafiche.</div>`;
-      }
-
-      return `<div class="ruler-wrap">
-          <div class="ruler-caption"><span>${escapeHtml(label)} — ${calc.prodotto.descrizione}${specialTag}${graficaLink}</span><span>${calc.nRolli} × ${calc.rollWidth}mm</span></div>
-          ${editor}
-          <div class="wall-rect-outer" style="--ar:${F};">
-            <div class="dim-caption">↕ margine 50mm</div>
-            <div class="wall-rect${imgOk ? '' : ' no-img'}" id="rect-${riga.id}">${imgPreview}${overlays}</div>
-            <div class="dim-caption">↕ margine 50mm</div>
-          </div>
-          <div class="ruler-caption"><span>Larghezza richiesta ${fmtMM(riga.larghezza)} · Altezza ${fmtMM(riga.altezza)}</span><span class="${calc.sfrido < 100 ? 'waste-note' : ''}">Sfrido ${fmtMM(calc.sfrido)} totale — ${fmtMM(wasteEach)} primo + ${fmtMM(wasteEach)} ultimo rotolo${calc.sfrido < 100 ? ' · sotto il minimo 100mm' : ''}</span></div>
-        </div>`;
-    }).join('<div style="height:14px;"></div>') + `</div>`;
-}
-
-/* ===================== RENDER: TOTALI ===================== */
-function renderTotali(){
-  const t = calcolaTotali();
-  const box = document.getElementById('totals-box');
-  box.innerHTML = `
-    <div class="line"><span class="lbl">Totale merce</span><span>${fmtEUR(t.totaleMerce)}</span></div>
+function renderTelaTotali(){
+  const t=calcolaTelaTotali(), box=document.getElementById('tela-totals-box');
+  box.innerHTML=`<div class="line"><span class="lbl">Totale merce</span><span>${fmtEUR(t.totaleMerce)}</span></div>
     <div class="line"><span class="lbl">Totale superficie</span><span>${fmtMQ(t.totaleMq)}</span></div>
-    <div class="line"><span class="lbl">Sconto ${preventivo.sconto||0}% (solo su merce)</span><span>− ${fmtEUR(t.totaleMerce - t.imponibile)}</span></div>
-    <div class="line"><span class="lbl">Imponibile</span><span>${fmtEUR(t.imponibile)}</span></div>
-    <div class="line"><span class="lbl">Primer G ${preventivo.primerAttivo? '('+t.primerKg+' kg)':'(non applicato)'}</span><span>${fmtEUR(t.primerCosto)}</span></div>
-    <div class="line"><span class="lbl">Trasporto</span><span>${fmtEUR(t.trasporto)}</span></div>
+    <div class="line"><span class="lbl">Sconto ${t.sconto}% (solo merce)</span><span>− ${fmtEUR(t.totaleMerce-t.merceScontata)}</span></div>
+    <div class="line"><span class="lbl">Merce dopo lo sconto</span><span>${fmtEUR(t.merceScontata)}</span></div>
+    <div class="line"><span class="lbl">Trasporto (non soggetto a sconto)</span><span>${fmtEUR(t.trasporto)}</span></div>
+    <div class="line"><span class="lbl">Imponibile IVA</span><span>${fmtEUR(t.imponibileIva)}</span></div>
     <div class="line"><span class="lbl">IVA 22%</span><span>${fmtEUR(t.iva)}</span></div>
-    <div class="line grand"><span class="lbl">Totale</span><span>${fmtEUR(t.totale)}</span></div>
-  `;
+    <div class="line grand"><span class="lbl">Totale ivato</span><span>${fmtEUR(t.totale)}</span></div>`;
 }
-
-/* ===================== EVENTS: TESTATA ===================== */
-document.getElementById('pv-numero').addEventListener('input', e=>{ preventivo.numero = e.target.value; autosave(); });
-document.getElementById('pv-data').addEventListener('input', e=>{ preventivo.data = e.target.value; autosave(); });
-document.getElementById('pv-sconto').addEventListener('input', e=>{ preventivo.sconto = Number(e.target.value)||0; renderTotali(); autosave(); });
-document.getElementById('pv-trasporto').addEventListener('input', e=>{ preventivo.trasporto = Number(e.target.value)||0; renderTotali(); autosave(); });
-document.getElementById('pv-primer').addEventListener('change', e=>{ preventivo.primerAttivo = e.target.checked; renderTotali(); autosave(); });
-
-document.getElementById('btn-add-riga').addEventListener('click', ()=>{
-  if(!prodotti.length){ alert('Aggiungi prima almeno un prodotto nella scheda "Prodotti".'); return; }
-  preventivo.righe.push(nuovaRiga());
-  renderRighe(); renderTotali(); renderRuler(); autosave();
-});
-
-function prossimoNumero(){
-  const anno = new Date().getFullYear();
-  const prefix = anno + '-';
-  let max = 0;
-  preventiviSalvati.forEach(p=>{
-    if(p.numero && p.numero.startsWith(prefix)){
-      const n = parseInt(p.numero.slice(prefix.length), 10);
-      if(!isNaN(n) && n > max) max = n;
-    }
-  });
-  return prefix + String(max + 1).padStart(3, '0');
+function hydrateTelaForm(){
+  document.getElementById('tela-numero').value=telaPreventivo.numero||'';
+  document.getElementById('tela-data').value=telaPreventivo.data||new Date().toISOString().slice(0,10);
+  document.getElementById('tela-sconto').value=telaPreventivo.sconto||0;
+  document.getElementById('tela-trasporto').value=telaPreventivo.trasporto??30;
+  renderTelaClienteSelect(); renderTelaRighe(); renderTelaDettaglio(); renderTelaTotali();
 }
-
-document.getElementById('btn-nuovo-preventivo').addEventListener('click', ()=>{
-  if(!confirm('Svuotare il preventivo corrente?')) return;
-  preventivo = { numero: prossimoNumero(), data:new Date().toISOString().slice(0,10), clienteId:'', sconto:0, trasporto:30, primerAttivo:false, righe:[] };
-  document.getElementById('pv-numero').value=preventivo.numero; document.getElementById('pv-data').value=preventivo.data;
-  document.getElementById('pv-sconto').value=0; document.getElementById('pv-trasporto').value=30; document.getElementById('pv-primer').checked=false;
-  renderClienteSelect(); renderRighe(); renderTotali(); renderRuler(); autosave();
+let telaAutosaveTimer;
+function autosaveTela(){ clearTimeout(telaAutosaveTimer); telaAutosaveTimer=setTimeout(()=>saveKey('tela-preventivo-bozza',telaPreventivo),400); }
+/* ===================== FORMAT ===================== */  
+const fmtEUR = n => '€ ' + (n||0).toLocaleString('it-IT', {minimumFractionDigits:2, maximumFractionDigits:2});  
+const fmtMM  = n => Math.round(n) + ' mm';  
+const fmtMQ  = n => (n||0).toLocaleString('it-IT', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' m²';  
+/* ===================== TABS ===================== */  
+document.querySelectorAll('.tab').forEach(btn=>{  
+  btn.addEventListener('click', ()=>{  
+    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));  
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));  
+    btn.classList.add('active');  
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');  
+    if(btn.dataset.tab==='salvati') renderSalvati();  
+  });  
+});  
+/* ===================== RENDER: PRODOTTI SELECT ===================== */  
+function renderClienteSelect(){  
+  const sel = document.getElementById('pv-cliente');  
+  sel.innerHTML = '<option value="">— Seleziona cliente —</option>' +  
+    clienti.map(c => `<option value="${c.id}" ${c.id===preventivo.clienteId?'selected':''}>${c.codice ? c.codice+' — ' : ''}${escapeHtml(c.nome)}</option>`).join('');  
+  sel.onchange = ()=>{ preventivo.clienteId = sel.value; renderClienteDettagli(); autosave(); };  
+  renderClienteDettagli();  
+}  
+function renderClienteDettagli(){  
+  const box = document.getElementById('pv-cliente-dettagli');  
+  const c = clienti.find(x=>x.id===preventivo.clienteId);  
+  if(!c){ box.textContent=''; return; }  
+  box.innerHTML = [c.indirizzo, [c.cap,c.citta,c.prov].filter(Boolean).join(' '), c.piva ? 'P.IVA '+c.piva : '', c.telefono].filter(Boolean).join(' · ');  
+}  
+/* ===================== RENDER: RIGHE ===================== */  
+function isSpecialEdition(prodotto){ return /special edition|s-edition/i.test(prodotto.descrizione); }  
+// se la grafica scelta è Special Edition, forza un prodotto Special Edition; ritorna true se il vincolo è attivo  
+function ensureProdottoValido(riga){  
+  const grafica = trovaGrafica(riga.codiceGrafica);  
+  const requireSpecial = !!(grafica && grafica.specialEdition);  
+  if(requireSpecial){  
+    const attuale = prodotti.find(p => p.id === riga.prodottoId);  
+    if(!attuale || !isSpecialEdition(attuale)){  
+      const primaSE = prodotti.find(isSpecialEdition);  
+      if(primaSE) riga.prodottoId = primaSE.id;  
+    }  
+  }  
+  return requireSpecial;  
+}  
+function buildProdottoOptionsHtml(riga, requireSpecial){  
+  return prodotti.map(p=>{  
+    const disabled = requireSpecial && !isSpecialEdition(p);  
+    return `<option value="${p.id}" ${p.id===riga.prodottoId?'selected':''} ${disabled?'disabled':''}>${escapeHtml(p.descrizione)}${disabled?' — non disp. (Special Edition)':''}</option>`;  
+  }).join('');  
+}  
+function renderRighe(){  
+  const body = document.getElementById('righe-body');  
+  const empty = document.getElementById('righe-empty');  
+  body.innerHTML = '';  
+  empty.style.display = preventivo.righe.length ? 'none' : 'block';  
+  preventivo.righe.forEach(riga=>{  
+    const requireSpecial = ensureProdottoValido(riga);  
+    const calc = calcolaRiga(riga);  
+    const tr = document.createElement('tr');  
+    const prodSel = document.createElement('select');  
+    prodSel.innerHTML = buildProdottoOptionsHtml(riga, requireSpecial);  
+    prodSel.onchange = ()=>{ riga.prodottoId = prodSel.value; renderRighe(); renderTotali(); renderRuler(); autosave(); };  
+    const tdP = document.createElement('td'); tdP.appendChild(prodSel);  
+    const tdAmb = td_input(riga, 'rifAmbiente', 'text');  
+    const tdRif = td_input(riga, 'rif', 'text');  
+    const tdGrafica = buildGraficaCell(riga);  
+    const tdL = td_input(riga, 'larghezza', 'number');  
+    const tdH = td_input(riga, 'altezza', 'number');  
+    const tdRolli = document.createElement('td'); tdRolli.className='num'; tdRolli.textContent = calc? calc.nRolli : '—';  
+    const tdSfrido = document.createElement('td'); tdSfrido.className='num';  
+    if(calc){  
+      const warn = calc.sfrido < 100;  
+      tdSfrido.innerHTML = `<span class="badge ${warn?'warn':'ok'}">${fmtMM(calc.sfrido)}</span>`;  
+    } else tdSfrido.textContent = '—';  
+    const tdMq = document.createElement('td'); tdMq.className='num'; tdMq.textContent = calc? fmtMQ(calc.mq) : '—';  
+    const tdImp = document.createElement('td'); tdImp.className='num'; tdImp.textContent = calc? fmtEUR(calc.importo) : '—';  
+    const tdDel = document.createElement('td');  
+    const delBtn = document.createElement('button'); delBtn.className='ghost no-print'; delBtn.textContent='✕';  
+    delBtn.onclick = ()=>{ preventivo.righe = preventivo.righe.filter(r=>r.id!==riga.id); renderRighe(); renderTotali(); renderRuler(); autosave(); };  
+    tdDel.appendChild(delBtn);  
+    tr.append(tdP, tdAmb, tdRif, tdGrafica, tdL, tdH, tdRolli, tdSfrido, tdMq, tdImp, tdDel);  
+    body.appendChild(tr);  
+  });  
+  function td_input(obj, field, type){  
+    const td = document.createElement('td');  
+    const inp = document.createElement('input');  
+    inp.className='row-mini-input'; inp.type=type; inp.value = obj[field];  
+    let pv = null;  
+    if(type==='text'){  
+      inp.classList.add('has-print-val');  
+      pv = document.createElement('span'); pv.className='print-val'; pv.textContent = obj[field] || '';  
+    }  
+    inp.oninput = ()=>{ obj[field] = type==='number' ? Number(inp.value) : inp.value; if(pv) pv.textContent = obj[field]; renderRighe_partial(); renderTotali(); renderRuler(); autosave(); };  
+    td.appendChild(inp);  
+    if(pv) td.appendChild(pv);  
+    return td;  
+  }  
+  function buildGraficaCell(riga){  
+    const td = document.createElement('td'); td.className='grafica-cell';  
+    const inp = document.createElement('input');  
+    inp.className='row-mini-input has-print-val'; inp.type='text'; inp.placeholder='INKFGIC2601'; inp.value = riga.codiceGrafica || ''; inp.setAttribute('list','grafiche-datalist');  
+    const pv = document.createElement('span'); pv.className='print-val'; pv.textContent = riga.codiceGrafica || '';  
+    const status = document.createElement('div'); status.className='grafica-status';  
+    status.innerHTML = graficaStatusHtml(riga.codiceGrafica);  
+    inp.oninput = ()=>{  
+      riga.codiceGrafica = inp.value;  
+      pv.textContent = inp.value;  
+      status.innerHTML = graficaStatusHtml(riga.codiceGrafica);  
+      aggiornaVincoloProdotto(riga, td.closest('tr'));  
+      renderRuler(); autosave();  
+    };  
+    td.append(inp, pv, status);  
+    return td;  
+  }  
+}  
+function aggiornaVincoloProdotto(riga, tr){  
+  if(!tr) return;  
+  const requireSpecial = ensureProdottoValido(riga);  
+  const select = tr.querySelector('select');  
+  if(select) select.innerHTML = buildProdottoOptionsHtml(riga, requireSpecial);  
+  renderRighe_partial();  
+  renderTotali();  
+}  
+function graficaStatusHtml(codice){  
+  if(!codice || !codice.trim()) return '';  
+  const match = trovaGrafica(codice);  
+  if(match){  
+    return `<a href="${escapeHtml(match.url)}" target="_blank">Apri pagina ↗</a>${match.specialEdition ? ' <span class="badge special">Special Edition</span>' : ''}`;  
+  }  
+  return `<a href="${googleSiteSearchUrl(codice)}" target="_blank">Cerca sul sito ↗</a> <span class="muted">— non in catalogo</span>`;  
+}  
+// lightweight refresh of computed cells only (avoids losing focus while typing dimensions)  
+function renderRighe_partial(){  
+  const rows = document.querySelectorAll('#righe-body tr');  
+  preventivo.righe.forEach((riga, i)=>{  
+    const calc = calcolaRiga(riga);  
+    const tr = rows[i]; if(!tr) return;  
+    const cells = tr.querySelectorAll('td');  
+    cells[6].textContent = calc? calc.nRolli : '—';  
+    if(calc){  
+      const warn = calc.sfrido < 100;  
+      cells[7].innerHTML = `<span class="badge ${warn?'warn':'ok'}">${fmtMM(calc.sfrido)}</span>`;  
+    } else cells[7].textContent='—';  
+    cells[8].textContent = calc? fmtMQ(calc.mq) : '—';  
+    cells[9].textContent = calc? fmtEUR(calc.importo) : '—';  
+  });  
+}  
+/* ===================== RENDER: RULER (elemento firma) ===================== */  
+/* Modello dell'inquadratura:  
+   l'immagine resta INTERA e a dimensione reale rispetto alla parete;  
+   il riquadro (misure + sfridi) è la finestra che ci scorre sopra, anche senza zoom.  
+   Tutte le posizioni sono percentuali del riquadro: il browser le ricalcola da solo  
+   (schermo, stampa, PDF) senza alcun calcolo JavaScript al momento della stampa. */  
+const imgARCache = {}; // url -> rapporto larghezza/altezza (0 = non caricabile, null = in caricamento)  
+function ottieniAR(url){  
+  if(!url) return undefined;  
+  if(url in imgARCache) return imgARCache[url] === null ? undefined : imgARCache[url];  
+  imgARCache[url] = null;  
+  const probe = new Image();  
+  probe.onload = () => { imgARCache[url] = (probe.naturalWidth && probe.naturalHeight) ? probe.naturalWidth / probe.naturalHeight : 0; renderRuler(); };  
+  probe.onerror = () => { imgARCache[url] = 0; renderRuler(); };  
+  probe.src = url;  
+  return undefined;  
+}  
+// F = rapporto del riquadro (larghezza arrotondata ai rotoli / altezza + 100mm), A = rapporto dell'immagine  
+function geomImmagine(riga, F, A){  
+  const s = (riga.imgScale || 100) / 100;  
+  const w = Math.max(100, 100 * A / F) * s;   // % larghezza del riquadro  
+  const h = Math.max(100, 100 * F / A) * s;   // % altezza del riquadro  
+  const ovX = 100 - w, ovY = 100 - h;         // sporgenza (<= 0): intervallo di spostamento  
+  const px = riga.imgPx === undefined ? 0.5 : riga.imgPx;  
+  const py = riga.imgPy === undefined ? 0.5 : riga.imgPy;  
+  return { w, h, ovX, ovY, left: ovX * px, top: ovY * py };  
+}  
+function stileImg(g){  
+  return `width:${g.w}%; height:${g.h}%; left:${g.left}%; top:${g.top}%;`;  
+}  
+function contestoImg(rigaId){  
+  const riga = preventivo.righe.find(r => r.id === rigaId);  
+  if(!riga) return null;  
+  const calc = calcolaRiga(riga);  
+  if(!calc) return null;  
+  const grafica = trovaGrafica(riga.codiceGrafica);  
+  const url = grafica && grafica.immagine ? grafica.immagine : '';  
+  const A = url ? imgARCache[url] : 0;  
+  if(!A) return null;  
+  const F = calc.larghezzaArr / (riga.altezza + 100);  
+  return { riga, calc, F, A, g: geomImmagine(riga, F, A) };  
+}  
+let trascinamentoStato = null;  
+function iniziaTrascinamento(ev, rigaId){  
+  const ctx = contestoImg(rigaId);  
+  if(!ctx) return;  
+  ev.preventDefault();  
+  const stage = document.getElementById('stage-' + rigaId);  
+  if(!stage) return;  
+  const rect = stage.querySelector('.crop-frame-anchor').getBoundingClientRect();  
+  const p = ev.touches ? ev.touches[0] : ev;  
+  trascinamentoStato = { rigaId, stage, startX: p.clientX, startY: p.clientY, startLeft: ctx.g.left, startTop: ctx.g.top, rectW: rect.width, rectH: rect.height };  
+  stage.classList.add('dragging');  
+  window.addEventListener('mousemove', muoviTrascinamento);  
+  window.addEventListener('mouseup', fineTrascinamento);  
+  window.addEventListener('touchmove', muoviTrascinamento, { passive: false });  
+  window.addEventListener('touchend', fineTrascinamento);  
+}  
+function muoviTrascinamento(ev){  
+  const st = trascinamentoStato;  
+  if(!st) return;  
+  ev.preventDefault();  
+  const ctx = contestoImg(st.rigaId);  
+  if(!ctx) return;  
+  const p = ev.touches ? ev.touches[0] : ev;  
+  const g = ctx.g;  
+  const nl = Math.max(g.ovX, Math.min(0, st.startLeft + (p.clientX - st.startX) / st.rectW * 100));  
+  const nt = Math.max(g.ovY, Math.min(0, st.startTop + (p.clientY - st.startY) / st.rectH * 100));  
+  ctx.riga.imgPx = g.ovX < 0 ? nl / g.ovX : 0.5;  
+  ctx.riga.imgPy = g.ovY < 0 ? nt / g.ovY : 0.5;  
+  applicaPosizioneImg(st.rigaId);  
+}  
+function fineTrascinamento(){  
+  if(trascinamentoStato){  
+    trascinamentoStato.stage.classList.remove('dragging');  
+    autosave();  
+  }  
+  trascinamentoStato = null;  
+  window.removeEventListener('mousemove', muoviTrascinamento);  
+  window.removeEventListener('mouseup', fineTrascinamento);  
+  window.removeEventListener('touchmove', muoviTrascinamento);  
+  window.removeEventListener('touchend', fineTrascinamento);  
+}  
+function applicaPosizioneImg(rigaId){  
+  const ctx = contestoImg(rigaId);  
+  if(!ctx) return;  
+  ['img-' + rigaId, 'editimg-' + rigaId].forEach(id => {  
+    const el = document.getElementById(id);  
+    if(el){ el.style.width = ctx.g.w + '%'; el.style.height = ctx.g.h + '%'; el.style.left = ctx.g.left + '%'; el.style.top = ctx.g.top + '%'; }  
+  });  
+}  
+function aggiornaZoom(rigaId, valore){  
+  const ctx = contestoImg(rigaId);  
+  if(!ctx) return;  
+  const { riga, F, A, g } = ctx;  
+  const cx = (50 - g.left) / g.w, cy = (50 - g.top) / g.h; // punto dell'immagine oggi al centro del riquadro  
+  riga.imgScale = Number(valore);  
+  const g1 = geomImmagine(riga, F, A);  
+  const nl = Math.max(g1.ovX, Math.min(0, 50 - cx * g1.w));  
+  const nt = Math.max(g1.ovY, Math.min(0, 50 - cy * g1.h));  
+  riga.imgPx = g1.ovX < 0 ? nl / g1.ovX : 0.5;  
+  riga.imgPy = g1.ovY < 0 ? nt / g1.ovY : 0.5;  
+  applicaPosizioneImg(rigaId);  
+  const lbl = document.getElementById('zoom-val-' + rigaId);  
+  if(lbl) lbl.textContent = riga.imgScale + '%';  
+  autosave();  
+}  
+function reimpostaImg(rigaId){  
+  const riga = preventivo.righe.find(r => r.id === rigaId);  
+  if(!riga) return;  
+  riga.imgScale = 100; riga.imgPx = 0.5; riga.imgPy = 0.5;  
+  renderRuler();  
+  autosave();  
+}  
+// sfridi (tinta unita semitrasparente) + linee di giunzione dei rotoli, tutto in % del riquadro  
+function overlayHtml(riga, calc){  
+  const tPct = 50 / (riga.altezza + 100) * 100;  
+  const wPct = (calc.sfrido / 2) / calc.larghezzaArr * 100;  
+  let h = `<div class="wb wb-t" style="top:0; left:0; width:100%; height:${tPct}%;"></div>`  
+        + `<div class="wb wb-b" style="bottom:0; left:0; width:100%; height:${tPct}%;"></div>`;  
+  if(wPct > 0){  
+    h += `<div class="wb wb-l" style="left:0; top:${tPct}%; bottom:${tPct}%; width:${wPct}%;"></div>`  
+       + `<div class="wb wb-r" style="right:0; top:${tPct}%; bottom:${tPct}%; width:${wPct}%;"></div>`;  
+  }  
+  for(let k = 1; k < calc.nRolli; k++){  
+    h += `<div class="roll-line" style="left:${k * calc.rollWidth / calc.larghezzaArr * 100}%;"></div>`;  
+  }  
+  return h;  
+}  
+function renderRuler(){  
+  const wrap = document.getElementById('ruler-section');  
+  const rows = preventivo.righe.map(r => ({ riga: r, calc: calcolaRiga(r) })).filter(x => x.calc);  
+  if(!rows.length){ wrap.innerHTML = ''; return; }  
+  wrap.innerHTML = `<div class="card"><h2><span class="num">＝</span> Taglio rotoli</h2>` +  
+    rows.map(({ riga, calc }) => {  
+      const grafica = trovaGrafica(riga.codiceGrafica);  
+      const url = grafica && grafica.immagine ? grafica.immagine : '';  
+      const A = url ? ottieniAR(url) : undefined;       // undefined = in caricamento, 0 = non caricabile  
+      const imgOk = !!A;  
+      const caricamento = !!url && A === undefined;  
+      const fallita = !!url && A === 0;  
+      const F = calc.larghezzaArr / (riga.altezza + 100);  
+      const wasteEach = calc.sfrido / 2;  
+      const label = (riga.rifAmbiente || riga.rif || calc.prodotto.descrizione);  
+      const specialTag = grafica && grafica.specialEdition ? ' <span class="badge special">Special Edition</span>' : '';  
+      const graficaLink = grafica ? ` · <a href="${escapeHtml(grafica.url)}" target="_blank" style="color:var(--gold); text-decoration:none;">${escapeHtml(grafica.nome || riga.codiceGrafica)} ↗</a>` : (riga.codiceGrafica ? ` · <a href="${googleSiteSearchUrl(riga.codiceGrafica)}" target="_blank" style="color:var(--gold); text-decoration:none;">cerca "${escapeHtml(riga.codiceGrafica)}" ↗</a>` : '');  
+      const g = imgOk ? geomImmagine(riga, F, A) : null;  
+      const overlays = overlayHtml(riga, calc);  
+      const scale = riga.imgScale || 100;  
+      const imgPreview = imgOk ? `<img class="wall-img" id="img-${riga.id}" src="${escapeHtml(url)}" style="${stileImg(g)}">` : '';  
+      let editor = '';  
+      if(imgOk){  
+        editor = `  
+          <div class="crop-tool-row no-print">  
+            <div class="crop-stage" id="stage-${riga.id}" style="--ar:${F};" onmousedown="iniziaTrascinamento(event,'${riga.id}')" ontouchstart="iniziaTrascinamento(event,'${riga.id}')">  
+              <div class="crop-frame-anchor"><img class="wall-img" id="editimg-${riga.id}" src="${escapeHtml(url)}" draggable="false" style="${stileImg(g)}"></div>  
+              <div class="crop-frame-visual">${overlays}</div>  
+            </div>  
+            <div class="img-controls">  
+              <label>Zoom <span class="val" id="zoom-val-${riga.id}">${scale}%</span>  
+                <input type="range" min="100" max="400" step="5" value="${scale}" oninput="aggiornaZoom('${riga.id}',this.value)">  
+              </label>  
+              <button type="button" class="ghost" onclick="reimpostaImg('${riga.id}')">Reimposta</button>  
+            </div>  
+            <div class="crop-hint">Trascina l'immagine per scegliere l'inquadratura: il riquadro dorato è ciò che verrà stampato, le fasce rosse sono lo sfrido.</div>  
+          </div>`;  
+      } else if(caricamento){  
+        editor = `<div class="crop-hint no-print">Caricamento immagine…</div>`;  
+      } else if(fallita){  
+        editor = `<div class="crop-hint warn no-print">Impossibile caricare l'immagine: controlla il link nel Catalogo grafiche.</div>`;  
+      }  
+      return `<div class="ruler-wrap">  
+          <div class="ruler-caption"><span>${escapeHtml(label)} — ${calc.prodotto.descrizione}${specialTag}${graficaLink}</span><span>${calc.nRolli} × ${calc.rollWidth}mm</span></div>  
+          ${editor}  
+          <div class="wall-rect-outer" style="--ar:${F};">  
+            <div class="dim-caption">↕ margine 50mm</div>  
+            <div class="wall-rect${imgOk ? '' : ' no-img'}" id="rect-${riga.id}">${imgPreview}${overlays}</div>  
+            <div class="dim-caption">↕ margine 50mm</div>  
+          </div>  
+          <div class="ruler-caption"><span>Larghezza richiesta ${fmtMM(riga.larghezza)} · Altezza ${fmtMM(riga.altezza)}</span><span class="${calc.sfrido < 100 ? 'waste-note' : ''}">Sfrido ${fmtMM(calc.sfrido)} totale — ${fmtMM(wasteEach)} primo + ${fmtMM(wasteEach)} ultimo rotolo${calc.sfrido < 100 ? ' · sotto il minimo 100mm' : ''}</span></div>  
+        </div>`;  
+    }).join('<div style="height:14px;"></div>') + `</div>`;  
+}  
+/* ===================== RENDER: TOTALI ===================== */  
+function renderTotali(){  
+  const t = calcolaTotali();  
+  const box = document.getElementById('totals-box');  
+  box.innerHTML = `  
+    <div class="line"><span class="lbl">Totale merce</span><span>${fmtEUR(t.totaleMerce)}</span></div>  
+    <div class="line"><span class="lbl">Totale superficie</span><span>${fmtMQ(t.totaleMq)}</span></div>  
+    <div class="line"><span class="lbl">Sconto ${preventivo.sconto||0}% (solo su merce)</span><span>− ${fmtEUR(t.totaleMerce - t.imponibile)}</span></div>  
+    <div class="line"><span class="lbl">Imponibile</span><span>${fmtEUR(t.imponibile)}</span></div>  
+    <div class="line"><span class="lbl">Primer G ${preventivo.primerAttivo? '('+t.primerKg+' kg)':'(non applicato)'}</span><span>${fmtEUR(t.primerCosto)}</span></div>  
+    <div class="line"><span class="lbl">Trasporto (non soggetto a sconto)</span><span>${fmtEUR(t.trasporto)}</span></div>  
+    <div class="line"><span class="lbl">IVA 22%</span><span>${fmtEUR(t.iva)}</span></div>  
+    <div class="line grand"><span class="lbl">Totale</span><span>${fmtEUR(t.totale)}</span></div>  
+  `;  
+}  
+/* ===================== EVENTS: TELA ===================== */
+document.getElementById('tela-numero').addEventListener('input',e=>{telaPreventivo.numero=e.target.value;autosaveTela();});
+document.getElementById('tela-data').addEventListener('input',e=>{telaPreventivo.data=e.target.value;autosaveTela();});
+document.getElementById('tela-sconto').addEventListener('input',e=>{telaPreventivo.sconto=Number(e.target.value)||0;renderTelaTotali();autosaveTela();});
+document.getElementById('tela-trasporto').addEventListener('input',e=>{telaPreventivo.trasporto=Number(e.target.value)||0;renderTelaTotali();autosaveTela();});
+document.getElementById('btn-add-tela-riga').addEventListener('click',()=>{telaPreventivo.righe.push(nuovaTelaRiga());renderTelaRighe();renderTelaDettaglio();renderTelaTotali();autosaveTela();});
+document.getElementById('btn-stampa-tela').addEventListener('click',()=>window.print());
+document.getElementById('btn-nuovo-tela').addEventListener('click',()=>{
+  if(!confirm('Svuotare il preventivo Tela corrente?')) return;
+  telaPreventivo={numero:prossimoNumeroTela(),data:new Date().toISOString().slice(0,10),clienteId:'',sconto:0,trasporto:30,righe:[]}; hydrateTelaForm(); autosaveTela();
 });
-
-document.getElementById('btn-stampa').addEventListener('click', ()=> window.print());
-
-document.getElementById('btn-salva-preventivo').addEventListener('click', async ()=>{
-  const t = calcolaTotali();
-  const cliente = clienti.find(c=>c.id===preventivo.clienteId);
-  const snapshot = {
-    id: uid(), salvatoIl: new Date().toISOString(),
-    numero: preventivo.numero || '(senza numero)',
-    data: preventivo.data,
-    clienteNome: cliente ? cliente.nome : '(nessun cliente)',
-    stato: JSON.parse(JSON.stringify(preventivo)),
-    totale: t.totale
-  };
-  preventiviSalvati.unshift(snapshot);
-  await saveKey('preventivi-salvati', preventiviSalvati);
-  alert('Preventivo salvato.');
+document.getElementById('btn-salva-tela').addEventListener('click',async()=>{
+  const t=calcolaTelaTotali(); if(!t.righeCalc.length){alert('Inserisci almeno un elemento Tela con misure valide.');return;}
+  const cliente=clienti.find(c=>c.id===telaPreventivo.clienteId);
+  preventiviSalvati.unshift({id:uid(),tipo:'tela',salvatoIl:new Date().toISOString(),numero:telaPreventivo.numero||'(senza numero)',data:telaPreventivo.data,clienteNome:cliente?cliente.nome:'(nessun cliente)',statoTela:JSON.parse(JSON.stringify(telaPreventivo)),totale:t.totale});
+  await saveKey('preventivi-salvati',preventiviSalvati); renderSalvati(); alert('Preventivo Tela salvato.');
 });
-
-/* ===================== CLIENTI ===================== */
-function renderClientiTable(){
-  const body = document.getElementById('clienti-body');
-  const empty = document.getElementById('clienti-empty');
-  body.innerHTML='';
-  empty.style.display = clienti.length? 'none':'block';
-  clienti.forEach(c=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${escapeHtml(c.codice||'')}</td><td>${escapeHtml(c.nome||'')}</td><td>${escapeHtml(c.citta||'')}</td><td>${escapeHtml(c.piva||'')}</td><td>${escapeHtml(c.telefono||'')}</td><td></td>`;
-    const del = document.createElement('button'); del.className='ghost'; del.textContent='✕';
-    del.onclick = async ()=>{ clienti = clienti.filter(x=>x.id!==c.id); await saveKey('clienti', clienti); renderClientiTable(); renderClienteSelect(); };
-    tr.lastElementChild.appendChild(del);
-    body.appendChild(tr);
-  });
+function prossimoNumeroTela(){
+  const anno=new Date().getFullYear(), prefix=anno+'-T'; let max=0;
+  preventiviSalvati.forEach(p=>{if(p.numero&&p.numero.startsWith(prefix)){const n=parseInt(p.numero.slice(prefix.length),10);if(!isNaN(n)&&n>max)max=n;}});
+  return prefix+String(max+1).padStart(3,'0');
 }
-document.getElementById('btn-add-cliente').addEventListener('click', async ()=>{
-  const nome = document.getElementById('cl-nome').value.trim();
-  if(!nome){ alert('Inserisci almeno la ragione sociale / nome.'); return; }
-  clienti.push({
-    id: uid(),
-    codice: document.getElementById('cl-codice').value.trim(),
-    nome,
-    piva: document.getElementById('cl-piva').value.trim(),
-    indirizzo: document.getElementById('cl-indirizzo').value.trim(),
-    cap: document.getElementById('cl-cap').value.trim(),
-    citta: document.getElementById('cl-citta').value.trim(),
-    prov: document.getElementById('cl-prov').value.trim(),
-    telefono: document.getElementById('cl-telefono').value.trim(),
-  });
-  await saveKey('clienti', clienti);
-  ['cl-codice','cl-nome','cl-piva','cl-indirizzo','cl-cap','cl-citta','cl-prov','cl-telefono'].forEach(id=>document.getElementById(id).value='');
-  renderClientiTable(); renderClienteSelect();
-});
-
-/* ===================== PRODOTTI ===================== */
-function renderProdottiTable(){
-  const body = document.getElementById('prodotti-body');
-  body.innerHTML='';
-  prodotti.forEach(p=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${escapeHtml(p.descrizione)}</td><td class="num">${fmtEUR(p.prezzo)}</td><td class="num">${p.larghezza} mm</td><td></td>`;
-    const del = document.createElement('button'); del.className='ghost'; del.textContent='✕';
-    del.onclick = async ()=>{
-      prodotti = prodotti.filter(x=>x.id!==p.id);
-      await saveKey('prodotti', prodotti);
-      renderProdottiTable(); renderRighe(); renderTotali(); renderRuler();
-    };
-    tr.lastElementChild.appendChild(del);
-    body.appendChild(tr);
-  });
-}
-document.getElementById('btn-add-prodotto').addEventListener('click', async ()=>{
-  const descrizione = document.getElementById('pr-descrizione').value.trim();
-  const prezzo = Number(document.getElementById('pr-prezzo').value);
-  const larghezza = Number(document.getElementById('pr-larghezza').value);
-  if(!descrizione || !prezzo || !larghezza){ alert('Compila descrizione, prezzo e larghezza rotolo.'); return; }
-  prodotti.push({ id: uid(), descrizione, prezzo, larghezza });
-  await saveKey('prodotti', prodotti);
-  document.getElementById('pr-descrizione').value=''; document.getElementById('pr-prezzo').value=''; document.getElementById('pr-larghezza').value='';
-  renderProdottiTable();
-});
-
-document.getElementById('btn-save-primer').addEventListener('click', async ()=>{
-  primerConfig.consumo = Number(document.getElementById('pg-consumo').value)||0;
-  primerConfig.prezzo = Number(document.getElementById('pg-prezzo').value)||0;
-  await saveKey('primer-config', primerConfig);
-  renderTotali();
-  alert('Impostazioni Primer G salvate.');
-});
-
-/* ===================== CATALOGO GRAFICHE ===================== */
-function renderGraficheDatalist(){
-  const dl = document.getElementById('grafiche-datalist');
-  dl.innerHTML = grafiche.map(g => `<option value="${escapeHtml(g.codice)}">${escapeHtml(g.nome||'')}${g.specialEdition?' — Special Edition':''}</option>`).join('');
-}
-function renderGraficheTable(){
-  const body = document.getElementById('grafiche-body');
-  const empty = document.getElementById('grafiche-empty');
-  body.innerHTML='';
-  empty.style.display = grafiche.length? 'none':'block';
-  grafiche.forEach(g=>{
-    const tr = document.createElement('tr');
-    const thumb = g.immagine ? `<img src="${escapeHtml(g.immagine)}" style="width:36px; height:24px; object-fit:cover; border-radius:3px; vertical-align:middle; margin-right:6px; border:1px solid var(--line);">` : '';
-    tr.innerHTML = `<td>${thumb}${escapeHtml(g.codice)}</td><td>${escapeHtml(g.nome||'')}${g.specialEdition?' <span class="badge special">Special Edition</span>':''}</td><td><a href="${escapeHtml(g.url)}" target="_blank" style="color:var(--gold);">Apri ↗</a></td><td></td>`;
-    const del = document.createElement('button'); del.className='ghost'; del.textContent='✕';
-    del.onclick = async ()=>{
-      grafiche = grafiche.filter(x=>x.id!==g.id);
-      await saveKey('grafiche', grafiche);
-      renderGraficheTable(); renderGraficheDatalist(); renderRighe(); renderRuler();
-    };
-    tr.lastElementChild.appendChild(del);
-    body.appendChild(tr);
-  });
-  renderGraficheDatalist();
-}
-document.getElementById('btn-add-grafica').addEventListener('click', async ()=>{
-  const codice = document.getElementById('gr-codice').value.trim();
-  const url = document.getElementById('gr-url').value.trim();
-  if(!codice || !url){ alert('Inserisci almeno codice e link.'); return; }
-  const esistente = trovaGrafica(codice);
-  const dati = {
-    codice,
-    nome: document.getElementById('gr-nome').value.trim(),
-    url,
-    immagine: document.getElementById('gr-immagine').value.trim(),
-    specialEdition: document.getElementById('gr-special').checked
-  };
-  if(esistente){ Object.assign(esistente, dati); }
-  else grafiche.push({ id: uid(), ...dati });
-  await saveKey('grafiche', grafiche);
-  ['gr-codice','gr-nome','gr-url','gr-immagine'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('gr-special').checked = false;
-  renderGraficheTable(); renderRighe(); renderRuler();
-});
-
-/* ===================== SALVATI ===================== */
-function renderSalvati(){
-  const list = document.getElementById('salvati-list');
-  const empty = document.getElementById('salvati-empty');
-  list.innerHTML='';
-  empty.style.display = preventiviSalvati.length? 'none':'block';
-  preventiviSalvati.forEach(s=>{
-    const div = document.createElement('div');
-    div.className='saved-item';
-    div.innerHTML = `<div class="meta"><b>${escapeHtml(s.numero)}</b> — ${escapeHtml(s.clienteNome)} · ${s.data} · ${fmtEUR(s.totale)}</div>`;
-    const btnGroup = document.createElement('div');
-    const loadBtn = document.createElement('button'); loadBtn.textContent='Apri';
+/* ===================== EVENTS: TESTATA ===================== */  
+document.getElementById('pv-numero').addEventListener('input', e=>{ preventivo.numero = e.target.value; autosave(); });  
+document.getElementById('pv-data').addEventListener('input', e=>{ preventivo.data = e.target.value; autosave(); });  
+document.getElementById('pv-sconto').addEventListener('input', e=>{ preventivo.sconto = Number(e.target.value)||0; renderTotali(); autosave(); });  
+document.getElementById('pv-trasporto').addEventListener('input', e=>{ preventivo.trasporto = Number(e.target.value)||0; renderTotali(); autosave(); });  
+document.getElementById('pv-primer').addEventListener('change', e=>{ preventivo.primerAttivo = e.target.checked; renderTotali(); autosave(); });  
+document.getElementById('btn-add-riga').addEventListener('click', ()=>{  
+  if(!prodotti.length){ alert('Aggiungi prima almeno un prodotto nella scheda "Prodotti".'); return; }  
+  preventivo.righe.push(nuovaRiga());  
+  renderRighe(); renderTotali(); renderRuler(); autosave();  
+});  
+function prossimoNumero(){  
+  const anno = new Date().getFullYear();  
+  const prefix = anno + '-';  
+  let max = 0;  
+  preventiviSalvati.forEach(p=>{  
+    if(p.numero && p.numero.startsWith(prefix)){  
+      const n = parseInt(p.numero.slice(prefix.length), 10);  
+      if(!isNaN(n) && n > max) max = n;  
+    }  
+  });  
+  return prefix + String(max + 1).padStart(3, '0');  
+}  
+document.getElementById('btn-nuovo-preventivo').addEventListener('click', ()=>{  
+  if(!confirm('Svuotare il preventivo corrente?')) return;  
+  preventivo = { numero: prossimoNumero(), data:new Date().toISOString().slice(0,10), clienteId:'', sconto:0, trasporto:30, primerAttivo:false, righe:[] };  
+  document.getElementById('pv-numero').value=preventivo.numero; document.getElementById('pv-data').value=preventivo.data;  
+  document.getElementById('pv-sconto').value=0; document.getElementById('pv-trasporto').value=30; document.getElementById('pv-primer').checked=false;  
+  renderClienteSelect(); renderRighe(); renderTotali(); renderRuler(); autosave();  
+});  
+document.getElementById('btn-stampa').addEventListener('click', ()=> window.print());  
+document.getElementById('btn-salva-preventivo').addEventListener('click', async ()=>{  
+  const t = calcolaTotali();  
+  const cliente = clienti.find(c=>c.id===preventivo.clienteId);  
+  const snapshot = {  
+    id: uid(), salvatoIl: new Date().toISOString(),  
+    numero: preventivo.numero || '(senza numero)',  
+    data: preventivo.data,  
+    clienteNome: cliente ? cliente.nome : '(nessun cliente)',  
+    stato: JSON.parse(JSON.stringify(preventivo)),  
+    totale: t.totale  
+  };  
+  preventiviSalvati.unshift(snapshot);  
+  await saveKey('preventivi-salvati', preventiviSalvati);  
+  alert('Preventivo salvato.');  
+});  
+/* ===================== CLIENTI ===================== */  
+function renderClientiTable(){  
+  const body = document.getElementById('clienti-body');  
+  const empty = document.getElementById('clienti-empty');  
+  body.innerHTML='';  
+  empty.style.display = clienti.length? 'none':'block';  
+  clienti.forEach(c=>{  
+    const tr = document.createElement('tr');  
+    tr.innerHTML = `<td>${escapeHtml(c.codice||'')}</td><td>${escapeHtml(c.nome||'')}</td><td>${escapeHtml(c.citta||'')}</td><td>${escapeHtml(c.piva||'')}</td><td>${escapeHtml(c.telefono||'')}</td><td></td>`;  
+    const del = document.createElement('button'); del.className='ghost'; del.textContent='✕';  
+    del.onclick = async ()=>{ clienti = clienti.filter(x=>x.id!==c.id); await saveKey('clienti', clienti); renderClientiTable(); renderClienteSelect(); renderTelaClienteSelect(); };  
+    tr.lastElementChild.appendChild(del);  
+    body.appendChild(tr);  
+  });  
+}  
+document.getElementById('btn-add-cliente').addEventListener('click', async ()=>{  
+  const nome = document.getElementById('cl-nome').value.trim();  
+  if(!nome){ alert('Inserisci almeno la ragione sociale / nome.'); return; }  
+  clienti.push({  
+    id: uid(),  
+    codice: document.getElementById('cl-codice').value.trim(),  
+    nome,  
+    piva: document.getElementById('cl-piva').value.trim(),  
+    indirizzo: document.getElementById('cl-indirizzo').value.trim(),  
+    cap: document.getElementById('cl-cap').value.trim(),  
+    citta: document.getElementById('cl-citta').value.trim(),  
+    prov: document.getElementById('cl-prov').value.trim(),  
+    telefono: document.getElementById('cl-telefono').value.trim(),  
+  });  
+  await saveKey('clienti', clienti);  
+  ['cl-codice','cl-nome','cl-piva','cl-indirizzo','cl-cap','cl-citta','cl-prov','cl-telefono'].forEach(id=>document.getElementById(id).value='');  
+  renderClientiTable(); renderClienteSelect(); renderTelaClienteSelect();  
+});  
+/* ===================== PRODOTTI ===================== */  
+function renderProdottiTable(){  
+  const body = document.getElementById('prodotti-body');  
+  body.innerHTML='';  
+  prodotti.forEach(p=>{  
+    const tr = document.createElement('tr');  
+    tr.innerHTML = `<td>${escapeHtml(p.descrizione)}</td><td class="num">${fmtEUR(p.prezzo)}</td><td class="num">${p.larghezza} mm</td><td></td>`;  
+    const del = document.createElement('button'); del.className='ghost'; del.textContent='✕';  
+    del.onclick = async ()=>{  
+      prodotti = prodotti.filter(x=>x.id!==p.id);  
+      await saveKey('prodotti', prodotti);  
+      renderProdottiTable(); renderRighe(); renderTotali(); renderRuler();  
+    };  
+    tr.lastElementChild.appendChild(del);  
+    body.appendChild(tr);  
+  });  
+}  
+document.getElementById('btn-add-prodotto').addEventListener('click', async ()=>{  
+  const descrizione = document.getElementById('pr-descrizione').value.trim();  
+  const prezzo = Number(document.getElementById('pr-prezzo').value);  
+  const larghezza = Number(document.getElementById('pr-larghezza').value);  
+  if(!descrizione || !prezzo || !larghezza){ alert('Compila descrizione, prezzo e larghezza rotolo.'); return; }  
+  prodotti.push({ id: uid(), descrizione, prezzo, larghezza });  
+  await saveKey('prodotti', prodotti);  
+  document.getElementById('pr-descrizione').value=''; document.getElementById('pr-prezzo').value=''; document.getElementById('pr-larghezza').value='';  
+  renderProdottiTable();  
+});  
+document.getElementById('btn-save-primer').addEventListener('click', async ()=>{  
+  primerConfig.consumo = Number(document.getElementById('pg-consumo').value)||0;  
+  primerConfig.prezzo = Number(document.getElementById('pg-prezzo').value)||0;  
+  await saveKey('primer-config', primerConfig);  
+  renderTotali();  
+  alert('Impostazioni Primer G salvate.');  
+});  
+/* ===================== CATALOGO GRAFICHE ===================== */  
+function renderGraficheDatalist(){  
+  const dl = document.getElementById('grafiche-datalist');  
+  dl.innerHTML = grafiche.map(g => `<option value="${escapeHtml(g.codice)}">${escapeHtml(g.nome||'')}${g.specialEdition?' — Special Edition':''}</option>`).join('');  
+}  
+function renderGraficheTable(){  
+  const body = document.getElementById('grafiche-body');  
+  const empty = document.getElementById('grafiche-empty');  
+  body.innerHTML='';  
+  empty.style.display = grafiche.length? 'none':'block';  
+  grafiche.forEach(g=>{  
+    const tr = document.createElement('tr');  
+    const thumb = g.immagine ? `<img src="${escapeHtml(g.immagine)}" style="width:36px; height:24px; object-fit:cover; border-radius:3px; vertical-align:middle; margin-right:6px; border:1px solid var(--line);">` : '';  
+    tr.innerHTML = `<td>${thumb}${escapeHtml(g.codice)}</td><td>${escapeHtml(g.nome||'')}${g.specialEdition?' <span class="badge special">Special Edition</span>':''}</td><td><a href="${escapeHtml(g.url)}" target="_blank" style="color:var(--gold);">Apri ↗</a></td><td></td>`;  
+    const del = document.createElement('button'); del.className='ghost'; del.textContent='✕';  
+    del.onclick = async ()=>{  
+      grafiche = grafiche.filter(x=>x.id!==g.id);  
+      await saveKey('grafiche', grafiche);  
+      renderGraficheTable(); renderGraficheDatalist(); renderRighe(); renderRuler();  
+    };  
+    tr.lastElementChild.appendChild(del);  
+    body.appendChild(tr);  
+  });  
+  renderGraficheDatalist();  
+}  
+document.getElementById('btn-add-grafica').addEventListener('click', async ()=>{  
+  const codice = document.getElementById('gr-codice').value.trim();  
+  const url = document.getElementById('gr-url').value.trim();  
+  if(!codice || !url){ alert('Inserisci almeno codice e link.'); return; }  
+  const esistente = trovaGrafica(codice);  
+  const dati = {  
+    codice,  
+    nome: document.getElementById('gr-nome').value.trim(),  
+    url,  
+    immagine: document.getElementById('gr-immagine').value.trim(),  
+    specialEdition: document.getElementById('gr-special').checked  
+  };  
+  if(esistente){ Object.assign(esistente, dati); }  
+  else grafiche.push({ id: uid(), ...dati });  
+  await saveKey('grafiche', grafiche);  
+  ['gr-codice','gr-nome','gr-url','gr-immagine'].forEach(id=>document.getElementById(id).value='');  
+  document.getElementById('gr-special').checked = false;  
+  renderGraficheTable(); renderRighe(); renderRuler();  
+});  
+/* ===================== SALVATI ===================== */  
+function renderSalvati(){  
+  const list = document.getElementById('salvati-list');  
+  const empty = document.getElementById('salvati-empty');  
+  list.innerHTML='';  
+  empty.style.display = preventiviSalvati.length? 'none':'block';  
+  preventiviSalvati.forEach(s=>{  
+    const div = document.createElement('div');  
+    div.className='saved-item';  
+    const tipoLabel=s.tipo==='tela'?'Tela':'Carta da parati';
+    div.innerHTML = `<div class="meta"><span class="badge ${s.tipo==='tela'?'special':'ok'}">${tipoLabel}</span> <b>${escapeHtml(s.numero)}</b> — ${escapeHtml(s.clienteNome)} · ${s.data} · ${fmtEUR(s.totale)}</div>`;  
+    const btnGroup = document.createElement('div');  
+    const loadBtn = document.createElement('button'); loadBtn.textContent='Apri';  
     loadBtn.onclick = ()=>{
-      preventivo = JSON.parse(JSON.stringify(s.stato));
-      document.querySelector('.tab[data-tab="preventivo"]').click();
-      hydratePreventivoForm();
+      if(s.tipo==='tela'){
+        telaPreventivo=JSON.parse(JSON.stringify(s.statoTela)); document.querySelector('.tab[data-tab="tela"]').click(); hydrateTelaForm();
+      }else{
+        preventivo=JSON.parse(JSON.stringify(s.stato)); document.querySelector('.tab[data-tab="preventivo"]').click(); hydratePreventivoForm();
+      }
     };
-    const delBtn = document.createElement('button'); delBtn.className='ghost danger'; delBtn.textContent='Elimina'; delBtn.style.marginLeft='8px';
-    delBtn.onclick = async ()=>{ preventiviSalvati = preventiviSalvati.filter(x=>x.id!==s.id); await saveKey('preventivi-salvati', preventiviSalvati); renderSalvati(); };
-    btnGroup.append(loadBtn, delBtn);
-    div.appendChild(btnGroup);
-    list.appendChild(div);
-  });
-}
-
-function hydratePreventivoForm(){
-  document.getElementById('pv-numero').value = preventivo.numero;
-  document.getElementById('pv-data').value = preventivo.data;
-  document.getElementById('pv-sconto').value = preventivo.sconto;
-  document.getElementById('pv-trasporto').value = preventivo.trasporto;
-  document.getElementById('pv-primer').checked = preventivo.primerAttivo;
-  renderClienteSelect(); renderRighe(); renderTotali(); renderRuler();
-}
-
-/* ===================== UTIL ===================== */
-function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
-let autosaveTimer;
-function autosave(){
-  clearTimeout(autosaveTimer);
-  autosaveTimer = setTimeout(()=> saveKey('preventivo-bozza', preventivo), 400);
-}
-
-/* ===================== INIT ===================== */
-/* ===================== BACKUP: esporta / importa ===================== */
-function exportBackup(){
-  const data = {
-    versione: 1,
-    esportatoIl: new Date().toISOString(),
-    prodotti, clienti, primerConfig, preventiviSalvati, grafiche,
-    preventivoBozza: preventivo
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `inchiostro-bianco-backup-${new Date().toISOString().slice(0,10)}.json`;
-  document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(url);
-}
-
-async function importBackup(file){
-  let data;
-  try{
-    data = JSON.parse(await file.text());
-  }catch(e){ alert('Il file scelto non è un backup valido (JSON non leggibile).'); return; }
-
-  if(!data || typeof data !== 'object' || (!data.prodotti && !data.clienti && !data.preventiviSalvati)){
-    alert('Il file non sembra un backup di questa applicazione.'); return;
-  }
-  if(!confirm('Importare questo backup? I dati attualmente salvati su questo dispositivo verranno sostituiti.')) return;
-
-  if(Array.isArray(data.prodotti)) prodotti = data.prodotti;
-  if(Array.isArray(data.clienti)) clienti = data.clienti;
-  if(Array.isArray(data.grafiche)) grafiche = data.grafiche;
-  if(Array.isArray(data.preventiviSalvati)) preventiviSalvati = data.preventiviSalvati;
-  if(data.primerConfig) primerConfig = data.primerConfig;
-  if(data.preventivoBozza) preventivo = data.preventivoBozza;
-
-  await Promise.all([
-    saveKey('prodotti', prodotti),
-    saveKey('clienti', clienti),
-    saveKey('grafiche', grafiche),
-    saveKey('preventivi-salvati', preventiviSalvati),
-    saveKey('primer-config', primerConfig),
-    saveKey('preventivo-bozza', preventivo)
-  ]);
-
-  document.getElementById('pg-consumo').value = primerConfig.consumo;
-  document.getElementById('pg-prezzo').value = primerConfig.prezzo;
-  renderProdottiTable(); renderClientiTable(); renderGraficheTable();
-  hydratePreventivoForm();
-  alert('Backup importato correttamente.');
-}
-
-document.getElementById('btn-export').addEventListener('click', exportBackup);
-document.getElementById('btn-import').addEventListener('click', ()=> document.getElementById('import-file').click());
-document.getElementById('import-file').addEventListener('change', async (e)=>{
-  const file = e.target.files[0];
-  if(file) await importBackup(file);
-  e.target.value = '';
-});
-
-async function init(){
-  prodotti = await loadKey('prodotti', null);
-  if(!prodotti){ prodotti = DEFAULT_PRODOTTI; await saveKey('prodotti', prodotti); }
-
-  clienti = await loadKey('clienti', []);
-  primerConfig = await loadKey('primer-config', DEFAULT_PRIMER);
-  preventiviSalvati = await loadKey('preventivi-salvati', []);
-  grafiche = await loadKey('grafiche', []);
-
-  const bozza = await loadKey('preventivo-bozza', null);
-  if(bozza && bozza.righe) preventivo = bozza;
-  if(!preventivo.numero) preventivo.numero = prossimoNumero();
-
-  document.getElementById('pg-consumo').value = primerConfig.consumo;
-  document.getElementById('pg-prezzo').value = primerConfig.prezzo;
-
-  renderProdottiTable();
-  renderClientiTable();
-  renderGraficheTable();
-  hydratePreventivoForm();
-}
-init();
-</script>
-</body>
+    const delBtn = document.createElement('button'); delBtn.className='ghost danger'; delBtn.textContent='Elimina'; delBtn.style.marginLeft='8px';  
+    delBtn.onclick = async ()=>{ preventiviSalvati = preventiviSalvati.filter(x=>x.id!==s.id); await saveKey('preventivi-salvati', preventiviSalvati); renderSalvati(); };  
+    btnGroup.append(loadBtn, delBtn);  
+    div.appendChild(btnGroup);  
+    list.appendChild(div);  
+  });  
+}  
+function hydratePreventivoForm(){  
+  document.getElementById('pv-numero').value = preventivo.numero;  
+  document.getElementById('pv-data').value = preventivo.data;  
+  document.getElementById('pv-sconto').value = preventivo.sconto;  
+  document.getElementById('pv-trasporto').value = preventivo.trasporto;  
+  document.getElementById('pv-primer').checked = preventivo.primerAttivo;  
+  renderClienteSelect(); renderRighe(); renderTotali(); renderRuler();  
+}  
+/* ===================== UTIL ===================== */  
+function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }  
+let autosaveTimer;  
+function autosave(){  
+  clearTimeout(autosaveTimer);  
+  autosaveTimer = setTimeout(()=> saveKey('preventivo-bozza', preventivo), 400);  
+}  
+/* ===================== INIT ===================== */  
+/* ===================== BACKUP: esporta / importa ===================== */  
+function exportBackup(){  
+  const data = {  
+    versione: 1,  
+    esportatoIl: new Date().toISOString(),  
+    prodotti, clienti, primerConfig, preventiviSalvati, grafiche,  
+    preventivoBozza: preventivo, telaPreventivoBozza: telaPreventivo  
+  };  
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });  
+  const url = URL.createObjectURL(blob);  
+  const a = document.createElement('a');  
+  a.href = url;  
+  a.download = `inchiostro-bianco-backup-${new Date().toISOString().slice(0,10)}.json`;  
+  document.body.appendChild(a); a.click(); a.remove();  
+  URL.revokeObjectURL(url);  
+}  
+async function importBackup(file){  
+  let data;  
+  try{  
+    data = JSON.parse(await file.text());  
+  }catch(e){ alert('Il file scelto non è un backup valido (JSON non leggibile).'); return; }  
+  if(!data || typeof data !== 'object' || (!data.prodotti && !data.clienti && !data.preventiviSalvati)){  
+    alert('Il file non sembra un backup di questa applicazione.'); return;  
+  }  
+  if(!confirm('Importare questo backup? I dati attualmente salvati su questo dispositivo verranno sostituiti.')) return;  
+  if(Array.isArray(data.prodotti)) prodotti = data.prodotti;  
+  if(Array.isArray(data.clienti)) clienti = data.clienti;  
+  if(Array.isArray(data.grafiche)) grafiche = data.grafiche;  
+  if(Array.isArray(data.preventiviSalvati)) preventiviSalvati = data.preventiviSalvati;  
+  if(data.primerConfig) primerConfig = data.primerConfig;  
+  if(data.preventivoBozza) preventivo = data.preventivoBozza;  
+  if(data.telaPreventivoBozza) telaPreventivo = data.telaPreventivoBozza;  
+  await Promise.all([  
+    saveKey('prodotti', prodotti),  
+    saveKey('clienti', clienti),  
+    saveKey('grafiche', grafiche),  
+    saveKey('preventivi-salvati', preventiviSalvati),  
+    saveKey('primer-config', primerConfig),  
+    saveKey('preventivo-bozza', preventivo),  
+    saveKey('tela-preventivo-bozza', telaPreventivo)  
+  ]);  
+  document.getElementById('pg-consumo').value = primerConfig.consumo;  
+  document.getElementById('pg-prezzo').value = primerConfig.prezzo;  
+  renderProdottiTable(); renderClientiTable(); renderGraficheTable();  
+  hydratePreventivoForm(); hydrateTelaForm();  
+  alert('Backup importato correttamente.');  
+}  
+document.getElementById('btn-export').addEventListener('click', exportBackup);  
+document.getElementById('btn-import').addEventListener('click', ()=> document.getElementById('import-file').click());  
+document.getElementById('import-file').addEventListener('change', async (e)=>{  
+  const file = e.target.files[0];  
+  if(file) await importBackup(file);  
+  e.target.value = '';  
+});  
+async function init(){  
+  prodotti = await loadKey('prodotti', null);  
+  if(!prodotti){ prodotti = DEFAULT_PRODOTTI; await saveKey('prodotti', prodotti); }  
+  clienti = await loadKey('clienti', []);  
+  primerConfig = await loadKey('primer-config', DEFAULT_PRIMER);  
+  preventiviSalvati = await loadKey('preventivi-salvati', []);  
+  grafiche = await loadKey('grafiche', []);  
+  const bozza = await loadKey('preventivo-bozza', null);  
+  if(bozza && bozza.righe) preventivo = bozza;  
+  const telaBozza = await loadKey('tela-preventivo-bozza', null);  
+  if(telaBozza && telaBozza.righe) telaPreventivo = telaBozza;  
+  if(!preventivo.numero) preventivo.numero = prossimoNumero();  
+  if(!telaPreventivo.numero) telaPreventivo.numero = prossimoNumeroTela();  
+  document.getElementById('pg-consumo').value = primerConfig.consumo;  
+  document.getElementById('pg-prezzo').value = primerConfig.prezzo;  
+  renderProdottiTable();  
+  renderClientiTable();  
+  renderGraficheTable();  
+  hydratePreventivoForm(); hydrateTelaForm();  
+}  
+init();  
+</script>  
+</body>  
 </html>
