@@ -1,8 +1,7 @@
-<!DOCTYPE html>  
-<html lang="it">  
-<head>  
-<meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<!DOCTYPE html>
+<html lang="it"><head>  
+<meta charset="utf-8"/>  
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>  
 <title>Inkiostro Bianco — Preventivi Carta da Parati e Tela</title>  
 <style>  
   :root{  
@@ -189,7 +188,7 @@
     <div style="display:flex; gap:8px;">  
       <button id="btn-export" title="Scarica un file con tutti i dati">⬇ Esporta backup</button>  
       <button id="btn-import" title="Carica un file di backup esportato in precedenza">⬆ Importa backup</button>  
-      <input type="file" id="import-file" accept="application/json" style="display:none;">  
+      <input accept="application/json" id="import-file" style="display:none;" type="file"/>  
     </div>  
   </div>  
   <!-- ================= PREVENTIVO ================= -->  
@@ -197,20 +196,20 @@
     <div class="card">  
       <h2><span class="num">01</span> Dati preventivo</h2>  
       <div class="grid cols-4">  
-        <div class="field"><label>Numero</label><input id="pv-numero" type="text" placeholder="2026-001"></div>  
-        <div class="field"><label>Data</label><input id="pv-data" type="date"></div>  
+        <div class="field"><label>Numero</label><input id="pv-numero" placeholder="2026-001" type="text"/></div>  
+        <div class="field"><label>Data</label><input id="pv-data" type="date"/></div>  
         <div class="field" style="grid-column: span 2;"><label>Cliente</label><select id="pv-cliente"></select></div>  
       </div>  
-      <div id="pv-cliente-dettagli" class="hint"></div>  
+      <div class="hint" id="pv-cliente-dettagli"></div>  
     </div>  
     <div class="card">  
       <h2><span class="num">02</span> Ambienti / righe</h2>  
       <div class="table-scroll-x">  
       <table id="righe-table">  
         <colgroup>  
-          <col style="width:19%"><col style="width:6%"><col style="width:6%"><col style="width:16%">  
-          <col style="width:8%"><col style="width:8%"><col style="width:7%"><col style="width:8%">  
-          <col style="width:7.5%"><col style="width:11%"><col style="width:3.5%">  
+          <col style="width:19%"/><col style="width:6%"/><col style="width:6%"/><col style="width:16%"/>  
+          <col style="width:8%"/><col style="width:8%"/><col style="width:7%"/><col style="width:8%"/>  
+          <col style="width:7.5%"/><col style="width:11%"/><col style="width:3.5%"/>  
         </colgroup>  
         <thead>  
           <tr>  
@@ -223,18 +222,18 @@
       </table>  
       </div>  
       <div style="margin-top:12px;"><button id="btn-add-riga">+ Aggiungi ambiente</button></div>  
-      <div id="righe-empty" class="empty" style="display:none;">Nessun ambiente inserito. Aggiungine uno per iniziare.</div>  
+      <div class="empty" id="righe-empty" style="display:none;">Nessun ambiente inserito. Aggiungine uno per iniziare.</div>  
       <div class="hint">Il margine di 100mm in altezza è ripartito 50mm sopra + 50mm sotto. Lo sfrido in larghezza è ripartito metà sul primo rotolo e metà sull'ultimo (vedi grafico "Taglio rotoli" più sotto).</div>  
     </div>  
     <div id="ruler-section"></div>  
     <div class="card">  
       <h2><span class="num">03</span> Riepilogo</h2>  
       <div class="grid cols-3" style="margin-bottom:16px;">  
-        <div class="field"><label>Sconto generale %</label><input id="pv-sconto" type="number" step="0.1" min="0" max="100" value="0"></div>  
-        <div class="field"><label>Trasporto € — non soggetto a sconto</label><input id="pv-trasporto" type="number" step="1" min="0" value="30"></div>  
+        <div class="field"><label>Sconto generale %</label><input id="pv-sconto" max="100" min="0" step="0.1" type="number" value="0"/></div>  
+        <div class="field"><label>Trasporto € — non soggetto a sconto</label><input id="pv-trasporto" min="0" step="1" type="number" value="30"/></div>  
         <div class="field" style="justify-content:flex-end;">  
           <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">  
-            <input id="pv-primer" type="checkbox"> Applica Primer G — facoltativo (adesione supporto)  
+            <input id="pv-primer" type="checkbox"/> Applica Primer G — facoltativo (adesione supporto)  
           </label>  
         </div>  
       </div>  
@@ -252,11 +251,11 @@
     <div class="card">
       <h2><span class="num">01</span> Dati preventivo Tela</h2>
       <div class="grid cols-4">
-        <div class="field"><label>Numero</label><input id="tela-numero" type="text" placeholder="2026-T001"></div>
-        <div class="field"><label>Data</label><input id="tela-data" type="date"></div>
+        <div class="field"><label>Numero</label><input id="tela-numero" placeholder="2026-T001" type="text"/></div>
+        <div class="field"><label>Data</label><input id="tela-data" type="date"/></div>
         <div class="field" style="grid-column:span 2;"><label>Cliente</label><select id="tela-cliente"></select></div>
       </div>
-      <div id="tela-cliente-dettagli" class="hint"></div>
+      <div class="hint" id="tela-cliente-dettagli"></div>
     </div>
     <div class="card">
       <h2><span class="num">02</span> Elementi Tela</h2>
@@ -267,7 +266,7 @@
         </table>
       </div>
       <div style="margin-top:12px;"><button id="btn-add-tela-riga">+ Aggiungi elemento Tela</button></div>
-      <div id="tela-righe-empty" class="empty">Nessun elemento inserito. Aggiungine uno per iniziare.</div>
+      <div class="empty" id="tela-righe-empty">Nessun elemento inserito. Aggiungine uno per iniziare.</div>
       <div class="hint tela-note">Altezza massima 2.970 mm. Profili, connettori e confezionamento vengono calcolati automaticamente secondo le misure inserite.</div>
     </div>
     <div class="card">
@@ -278,13 +277,13 @@
           <tbody id="tela-dettaglio-body"></tbody>
         </table>
       </div>
-      <div id="tela-dettaglio-empty" class="empty">Completa almeno una riga valida per visualizzare il dettaglio.</div>
+      <div class="empty" id="tela-dettaglio-empty">Completa almeno una riga valida per visualizzare il dettaglio.</div>
     </div>
     <div class="card">
       <h2><span class="num">04</span> Riepilogo Tela</h2>
       <div class="grid cols-2" style="margin-bottom:16px;">
-        <div class="field"><label>Sconto % — solo merce</label><input id="tela-sconto" type="number" step="0.1" min="0" max="100" value="0"></div>
-        <div class="field"><label>Trasporto € — non soggetto a sconto</label><input id="tela-trasporto" type="number" step="1" min="0" value="30"></div>
+        <div class="field"><label>Sconto % — solo merce</label><input id="tela-sconto" max="100" min="0" step="0.1" type="number" value="0"/></div>
+        <div class="field"><label>Trasporto € — non soggetto a sconto</label><input id="tela-trasporto" min="0" step="1" type="number" value="30"/></div>
       </div>
       <div class="totals" id="tela-totals-box"></div>
       <div class="hint tela-note">Lo sconto si applica esclusivamente alla merce. Il trasporto viene aggiunto dopo lo sconto e rientra nell'imponibile IVA.</div>
@@ -300,14 +299,14 @@
     <div class="card">  
       <h2><span class="num">＋</span> Nuovo cliente</h2>  
       <div class="grid cols-4">  
-        <div class="field"><label>Codice</label><input id="cl-codice" placeholder="C-01"></div>  
-        <div class="field" style="grid-column:span 2;"><label>Ragione sociale / Nome</label><input id="cl-nome"></div>  
-        <div class="field"><label>P.IVA / C.F.</label><input id="cl-piva"></div>  
-        <div class="field" style="grid-column:span 2;"><label>Indirizzo</label><input id="cl-indirizzo"></div>  
-        <div class="field"><label>CAP</label><input id="cl-cap"></div>  
-        <div class="field"><label>Città</label><input id="cl-citta"></div>  
-        <div class="field"><label>Prov.</label><input id="cl-prov" maxlength="2"></div>  
-        <div class="field"><label>Telefono</label><input id="cl-telefono"></div>  
+        <div class="field"><label>Codice</label><input id="cl-codice" placeholder="C-01"/></div>  
+        <div class="field" style="grid-column:span 2;"><label>Ragione sociale / Nome</label><input id="cl-nome"/></div>  
+        <div class="field"><label>P.IVA / C.F.</label><input id="cl-piva"/></div>  
+        <div class="field" style="grid-column:span 2;"><label>Indirizzo</label><input id="cl-indirizzo"/></div>  
+        <div class="field"><label>CAP</label><input id="cl-cap"/></div>  
+        <div class="field"><label>Città</label><input id="cl-citta"/></div>  
+        <div class="field"><label>Prov.</label><input id="cl-prov" maxlength="2"/></div>  
+        <div class="field"><label>Telefono</label><input id="cl-telefono"/></div>  
       </div>  
       <div style="margin-top:14px;"><button class="primary" id="btn-add-cliente">Aggiungi cliente</button></div>  
     </div>  
@@ -317,7 +316,7 @@
         <thead><tr><th>Codice</th><th>Ragione sociale</th><th>Città</th><th>P.IVA</th><th>Telefono</th><th></th></tr></thead>  
         <tbody id="clienti-body"></tbody>  
       </table>  
-      <div id="clienti-empty" class="empty" style="display:none;">Nessun cliente ancora registrato.</div>  
+      <div class="empty" id="clienti-empty" style="display:none;">Nessun cliente ancora registrato.</div>  
     </div>  
   </div>  
   <!-- ================= PRODOTTI ================= -->  
@@ -325,9 +324,9 @@
     <div class="card">  
       <h2><span class="num">＋</span> Nuovo prodotto / rotolo</h2>  
       <div class="grid cols-4">  
-        <div class="field" style="grid-column:span 2;"><label>Descrizione</label><input id="pr-descrizione" placeholder="es. Vinile - 68cm"></div>  
-        <div class="field"><label>Prezzo unitario €/mq</label><input id="pr-prezzo" type="number" step="0.01" min="0"></div>  
-        <div class="field"><label>Larghezza rotolo mm</label><input id="pr-larghezza" type="number" step="1" min="1"></div>  
+        <div class="field" style="grid-column:span 2;"><label>Descrizione</label><input id="pr-descrizione" placeholder="es. Vinile - 68cm"/></div>  
+        <div class="field"><label>Prezzo unitario €/mq</label><input id="pr-prezzo" min="0" step="0.01" type="number"/></div>  
+        <div class="field"><label>Larghezza rotolo mm</label><input id="pr-larghezza" min="1" step="1" type="number"/></div>  
       </div>  
       <div style="margin-top:14px;"><button class="primary" id="btn-add-prodotto">Aggiungi prodotto</button></div>  
     </div>  
@@ -341,8 +340,8 @@
     <div class="card">  
       <h2><span class="num">·</span> Primer G — impostazioni consumo</h2>  
       <div class="grid cols-2">  
-        <div class="field"><label>Consumo kg / mq</label><input id="pg-consumo" type="number" step="0.01" min="0"></div>  
-        <div class="field"><label>Prezzo € / kg (confezione)</label><input id="pg-prezzo" type="number" step="0.01" min="0"></div>  
+        <div class="field"><label>Consumo kg / mq</label><input id="pg-consumo" min="0" step="0.01" type="number"/></div>  
+        <div class="field"><label>Prezzo € / kg (confezione)</label><input id="pg-prezzo" min="0" step="0.01" type="number"/></div>  
       </div>  
       <div style="margin-top:12px;"><button id="btn-save-primer">Salva impostazioni Primer G</button></div>  
       <div class="hint">Il consumo viene arrotondato per eccesso alla confezione intera da 1 kg, come nel foglio originale.</div>  
@@ -352,13 +351,13 @@
   <div class="panel" id="panel-catalogo">  
     <div class="card">  
       <h2><span class="num">＋</span> Nuova grafica in catalogo</h2>  
-      <div class="hint" style="margin-bottom:12px;">Cerca la grafica sul <a href="https://www.inkiostrobianco.com/catalogo/" target="_blank" style="color:var(--gold);">catalogo Inkiostro Bianco</a>, copia il link della pagina e salvalo qui insieme al codice. La prossima volta che userai quel codice in un preventivo, il link comparirà automaticamente.</div>  
+      <div class="hint" style="margin-bottom:12px;">Cerca la grafica sul <a href="https://www.inkiostrobianco.com/catalogo/" style="color:var(--gold);" target="_blank">catalogo Inkiostro Bianco</a>, copia il link della pagina e salvalo qui insieme al codice. La prossima volta che userai quel codice in un preventivo, il link comparirà automaticamente.</div>  
       <div class="grid cols-4">  
-        <div class="field"><label>Codice grafica</label><input id="gr-codice" placeholder="INKFGIC2601"></div>  
-        <div class="field" style="grid-column:span 2;"><label>Nome grafica / collezione</label><input id="gr-nome" placeholder="House of the Gladiators"></div>  
-        <div class="field"><label style="display:flex; align-items:center; gap:8px; margin-top:6px; cursor:pointer;"><input id="gr-special" type="checkbox" style="width:auto;"> Special Edition</label></div>  
-        <div class="field" style="grid-column:span 4;"><label>Link pagina prodotto</label><input id="gr-url" placeholder="https://www.inkiostrobianco.com/collezioni/.../..."></div>  
-        <div class="field" style="grid-column:span 4;"><label>Link immagine anteprima (opzionale, per il grafico Taglio rotoli)</label><input id="gr-immagine" placeholder="https://www.inkiostrobianco.com/wp-content/uploads/.../nome-448x251.jpg"></div>  
+        <div class="field"><label>Codice grafica</label><input id="gr-codice" placeholder="INKFGIC2601"/></div>  
+        <div class="field" style="grid-column:span 2;"><label>Nome grafica / collezione</label><input id="gr-nome" placeholder="House of the Gladiators"/></div>  
+        <div class="field"><label style="display:flex; align-items:center; gap:8px; margin-top:6px; cursor:pointer;"><input id="gr-special" style="width:auto;" type="checkbox"/> Special Edition</label></div>  
+        <div class="field" style="grid-column:span 4;"><label>Link pagina prodotto</label><input id="gr-url" placeholder="https://www.inkiostrobianco.com/collezioni/.../..."/></div>  
+        <div class="field" style="grid-column:span 4;"><label>Link immagine anteprima (opzionale, per il grafico Taglio rotoli)</label><input id="gr-immagine" placeholder="https://www.inkiostrobianco.com/wp-content/uploads/.../nome-448x251.jpg"/></div>  
       </div>  
       <div style="margin-top:14px;"><button class="primary" id="btn-add-grafica">Aggiungi al catalogo</button></div>  
     </div>  
@@ -368,7 +367,7 @@
         <thead><tr><th>Codice</th><th>Nome</th><th></th><th></th></tr></thead>  
         <tbody id="grafiche-body"></tbody>  
       </table>  
-      <div id="grafiche-empty" class="empty" style="display:none;">Nessuna grafica salvata ancora.</div>  
+      <div class="empty" id="grafiche-empty" style="display:none;">Nessuna grafica salvata ancora.</div>  
     </div>  
   </div>  
   <!-- ================= SALVATI ================= -->  
@@ -376,7 +375,7 @@
     <div class="card">  
       <h2><span class="num">·</span> Preventivi salvati</h2>  
       <div id="salvati-list"></div>  
-      <div id="salvati-empty" class="empty" style="display:none;">Nessun preventivo salvato ancora.</div>  
+      <div class="empty" id="salvati-empty" style="display:none;">Nessun preventivo salvato ancora.</div>  
     </div>  
   </div>  
 </div>  
@@ -1226,5 +1225,118 @@ async function init(){
 }  
 init();  
 </script>  
-</body>  
-</html>
+  
+
+<div id="tela-revision">
+<style>
+#tela-righe-table{min-width:1080px}#tela-righe-table td:first-child{min-width:130px}#tela-righe-table td:nth-child(2),#tela-righe-table td:nth-child(3){min-width:105px}.tela-preview-title{font-size:15px;margin-block:18px 8px;color:var(--gold)}.tela-print-frame{border:2px solid var(--gold);border-radius:0}.tela-status{min-height:16px}.tela-crop-editor .crop-stage{max-width:100%;outline:none}.tela-crop-editor .crop-stage:focus-visible{outline:2px solid var(--gold)}.tela-crop-editor .wall-img{pointer-events:none;user-select:none}.tela-frame-label{color:var(--paper-dim);font-size:12px;margin-block:6px}.tela-preview-item{padding-block-end:20px;border-block-end:1px solid var(--line)}#tela-previews:empty{display:none}.tabs{flex-wrap:wrap}.tela-preview-message{color:var(--paper-dim);line-height:1.5}
+@media print{#tela-righe-table,#tela-dettaglio-table{min-width:0;font-size:10px}#tela-righe-table th,#tela-righe-table td{min-width:0!important;padding:5px 3px}#tela-righe-table .tela-error{display:none}.tela-preview-item{break-inside:avoid;page-break-inside:avoid}.tela-preview-item .wall-rect-outer{--ruler-maxh:360px}.tela-print-frame{border-color:#111}.tela-preview-title,.tela-frame-label{color:#111}.tela-preview-item .wall-img{print-color-adjust:exact}}
+</style>
+<script>
+/* Tela revision: stable input controls and exact-size, zero-waste artwork crop. */
+const telaImageCache=new Map();
+const originalHydrateTela=hydrateTelaForm;
+const originalGraficheTable=renderGraficheTable;
+function nuovaTelaRiga(){return {id:uid(),rifAmbiente:'',larghezza:'',altezza:'',spessore:'18',tipo:'standard',codiceGrafica:'',imgScale:100,imgPx:0.5,imgPy:0.5};}
+function telaImageSource(value){
+  const u=String(value||'').trim();
+  if(/^data:image\/(png|jpeg|webp|gif);base64,/i.test(u))return u;
+  try{const url=new URL(u);return ['https:','http:'].includes(url.protocol)?url.href:'';}catch{return '';}
+}
+function telaGraphicOptions(r){
+  let html='<option value="">— Scegli dal catalogo —</option>';
+  if(r.codiceGrafica&&!trovaGrafica(r.codiceGrafica))html+=`<option value="${escapeHtml(r.codiceGrafica)}" selected>${escapeHtml(r.codiceGrafica)} (non in catalogo)</option>`;
+  return html+grafiche.map(g=>`<option value="${escapeHtml(g.codice)}" ${String(g.codice).toLowerCase()===String(r.codiceGrafica||'').toLowerCase()?'selected':''}>${escapeHtml(g.codice)}${g.nome?' — '+escapeHtml(g.nome):''}${g.specialEdition?' — Special Edition':''}</option>`).join('');
+}
+function telaPrintValue(el,td){el.classList.add('has-print-val');const p=document.createElement('span');p.className='print-val';td.append(p);return p;}
+function renderTelaRighe(){
+  const body=document.getElementById('tela-righe-body');body.replaceChildren();
+  document.getElementById('tela-righe-empty').style.display=telaPreventivo.righe.length?'none':'block';
+  telaPreventivo.righe.forEach(r=>{
+    r.codiceGrafica=r.codiceGrafica||'';r.imgScale=r.imgScale||100;r.imgPx=r.imgPx??0.5;r.imgPy=r.imgPy??0.5;
+    const tr=document.createElement('tr');tr.dataset.telaRow=r.id;
+    function inputCell(field,type){
+      const td=document.createElement('td'),inp=document.createElement('input');inp.className='row-mini-input';inp.dataset.field=field;inp.type=type;inp.value=r[field]??'';inp.setAttribute('aria-label',field==='larghezza'?'Larghezza mm':field==='altezza'?'Altezza mm':'Riferimento ambiente');
+      if(type==='number'){inp.min='1';inp.step='1';if(field==='altezza')inp.max='2970';}td.append(inp);const pv=telaPrintValue(inp,td);
+      if(field==='altezza'){const err=document.createElement('div');err.className='tela-error';err.dataset.telaError='';td.append(err);}
+      inp.addEventListener('input',()=>{r[field]=inp.value;refreshTelaRow(tr,r);renderTelaDettaglio();renderTelaTotali();renderTelaPreview();autosaveTela();});return td;
+    }
+    tr.append(inputCell('rifAmbiente','text'),inputCell('larghezza','number'),inputCell('altezza','number'));
+    function selectCell(field,html,label){const td=document.createElement('td'),sel=document.createElement('select');sel.dataset.field=field;sel.setAttribute('aria-label',label);sel.innerHTML=html;sel.value=r[field];td.append(sel);telaPrintValue(sel,td);sel.addEventListener('change',()=>{
+      r[field]=sel.value;if(field==='codiceGrafica'){const g=trovaGrafica(sel.value);r.imgScale=100;r.imgPx=0.5;r.imgPy=0.5;if(g&&g.specialEdition){r.tipo='special';tr.querySelector('[data-field="tipo"]').value='special';}}
+      refreshTelaRow(tr,r);renderTelaDettaglio();renderTelaTotali();renderTelaPreview();autosaveTela();});return td;}
+    tr.append(selectCell('spessore','<option value="18">1,8 cm</option><option value="60">6 cm</option>','Spessore telaio'),selectCell('tipo','<option value="standard">Standard</option><option value="special">Special Edition</option>','Tipo tela'),selectCell('codiceGrafica',telaGraphicOptions(r),'Grafica dal catalogo'));
+    for(const key of ['mq','importo']){const td=document.createElement('td');td.className='num';td.dataset.telaComputed=key;tr.append(td);}
+    const td=document.createElement('td'),del=document.createElement('button');td.className='no-print';del.className='ghost danger';del.textContent='✕';del.setAttribute('aria-label','Elimina elemento Tela');del.addEventListener('click',()=>{telaPreventivo.righe=telaPreventivo.righe.filter(x=>x.id!==r.id);renderTelaRighe();renderTelaDettaglio();renderTelaTotali();autosaveTela();});td.append(del);tr.append(td);body.append(tr);refreshTelaRow(tr,r);
+  });renderTelaPreview();
+}
+function refreshTelaRow(tr,r){
+  const c=calcolaTelaRiga(r),err=Number(r.altezza)>2970?'Altezza massima 2.970 mm':((r.larghezza!==''||r.altezza!=='')&&!c?'Completa entrambe le misure con valori positivi':'');
+  tr.classList.toggle('tela-row-invalid',!!err);tr.querySelector('[data-tela-error]').textContent=err;
+  tr.querySelector('[data-tela-computed="mq"]').textContent=c?fmtMQ(c.mq):'—';tr.querySelector('[data-tela-computed="importo"]').textContent=c?fmtEUR(c.righe[0].importo):'—';
+  tr.querySelectorAll('[data-field]').forEach(el=>{const p=el.parentElement.querySelector('.print-val');if(p)p.textContent=el.tagName==='SELECT'?(el.selectedOptions[0]?.textContent||''):el.value;});
+  const g=trovaGrafica(r.codiceGrafica),type=tr.querySelector('[data-field="tipo"]');
+  type.querySelector('[value="standard"]').disabled=!!g?.specialEdition;
+  if(g?.specialEdition&&r.tipo!=='special'){r.tipo='special';type.value='special';tr.querySelector('[data-tela-computed="importo"]').textContent=fmtEUR(calcolaTelaRiga(r)?.righe[0].importo);}
+}
+function telaImageLoad(url){
+  if(!url)return null;
+  if(telaImageCache.has(url))return telaImageCache.get(url);
+  const record={status:'loading',ar:0};telaImageCache.set(url,record);const probe=new Image();
+  probe.onload=()=>{record.status='ready';record.ar=probe.naturalWidth/probe.naturalHeight;renderTelaPreview();};
+  probe.onerror=()=>{record.status='error';renderTelaPreview();};probe.src=url;return record;
+}
+function telaCropContext(id){const r=telaPreventivo.righe.find(x=>x.id===id),c=r&&calcolaTelaRiga(r),g=r&&trovaGrafica(r.codiceGrafica),src=telaImageSource(g?.immagine),image=telaImageCache.get(src);return c&&image?.status==='ready'?{r,c,image,F:c.L/c.H}:null;}
+function updateTelaCrop(id){const ctx=telaCropContext(id);if(!ctx)return;const geom=geomImmagine(ctx.r,ctx.F,ctx.image.ar);document.querySelectorAll('[data-tela-image]').forEach(el=>{if(el.dataset.telaImage===id)el.style.cssText=stileImg(geom);});document.querySelectorAll('[data-tela-scale-label]').forEach(el=>{if(el.dataset.telaScaleLabel===id)el.textContent=ctx.r.imgScale+'%';});}
+function renderTelaPreview(){
+  const wrap=document.getElementById('tela-previews');if(!wrap)return;wrap.replaceChildren();
+  if(!telaPreventivo.righe.length)return;
+  const card=document.createElement('div');card.className='card';card.innerHTML='<h2><span class="num">03</span> Grafica e inquadratura Tela</h2><div class="hint">La cornice delimita esattamente la stampa: nessun margine e nessuno sfrido. Ingrandisci e trascina per scegliere la porzione di grafica.</div>';wrap.append(card);
+  telaPreventivo.righe.forEach((r,i)=>{
+    const item=document.createElement('section');item.className='tela-preview-item';const title=document.createElement('h3');title.className='tela-preview-title';title.textContent=r.rifAmbiente||'Elemento '+(i+1);item.append(title);card.append(item);
+    const c=calcolaTelaRiga(r),g=trovaGrafica(r.codiceGrafica),src=telaImageSource(g?.immagine);
+    const message=document.createElement('p');message.className='tela-preview-message';
+    if(!g){message.textContent=grafiche.length?'Scegli una grafica dalla colonna "Grafica".':'Aggiungi una grafica nella scheda "Catalogo grafiche", poi selezionala qui.';item.append(message);return;}
+    if(!src){message.textContent='La grafica '+g.codice+' non ha un’immagine valida. Inserisci il link diretto dell’immagine nel catalogo (il link alla pagina non è sufficiente).';item.append(message);return;}
+    if(!c){message.textContent='Completa larghezza e altezza valide per visualizzare il perimetro di stampa.';item.append(message);return;}
+    const image=telaImageLoad(src);
+    if(image.status!=='ready'){message.textContent=image.status==='error'?'Immagine non caricabile. Verifica il link nel catalogo o carica una copia dal dispositivo.':'Caricamento immagine…';item.append(message);return;}
+    const F=c.L/c.H,geom=geomImmagine(r,F,image.ar);
+    const editor=document.createElement('div');editor.className='tela-crop-editor no-print';
+    const stage=document.createElement('div');stage.className='crop-stage';stage.style.setProperty('--ar',F);stage.tabIndex=0;stage.setAttribute('aria-label','Inquadratura Tela: trascina la grafica oppure usa i tasti freccia');
+    const anchor=document.createElement('div');anchor.className='crop-frame-anchor';
+    function makeImage(){const img=document.createElement('img');img.className='wall-img';img.src=src;img.alt='Grafica '+(g.nome||g.codice)+' ritagliata nelle dimensioni Tela';img.draggable=false;img.dataset.telaImage=r.id;img.style.cssText=stileImg(geom);return img;}
+    anchor.append(makeImage());const frame=document.createElement('div');frame.className='crop-frame-visual';stage.append(anchor,frame);editor.append(stage);
+    let drag=null;
+    stage.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();stage.focus({preventScroll:true});stage.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,px:r.imgPx??.5,py:r.imgPy??.5};stage.classList.add('dragging');});
+    stage.addEventListener('pointermove',e=>{if(!drag)return;const rect=anchor.getBoundingClientRect(),now=geomImmagine(r,F,image.ar);r.imgPx=now.ovX?Math.min(1,Math.max(0,drag.px+(e.clientX-drag.x)/rect.width*100/now.ovX)):0.5;r.imgPy=now.ovY?Math.min(1,Math.max(0,drag.py+(e.clientY-drag.y)/rect.height*100/now.ovY)):0.5;updateTelaCrop(r.id);});
+    const stop=()=>{if(!drag)return;drag=null;stage.classList.remove('dragging');autosaveTela();};stage.addEventListener('pointerup',stop);stage.addEventListener('pointercancel',stop);stage.addEventListener('lostpointercapture',stop);
+    stage.addEventListener('keydown',e=>{const delta={ArrowLeft:[.02,0],ArrowRight:[-.02,0],ArrowUp:[0,.02],ArrowDown:[0,-.02]}[e.key];if(!delta)return;e.preventDefault();r.imgPx=Math.min(1,Math.max(0,r.imgPx+delta[0]));r.imgPy=Math.min(1,Math.max(0,r.imgPy+delta[1]));updateTelaCrop(r.id);autosaveTela();});
+    const controls=document.createElement('div');controls.className='img-controls';const label=document.createElement('label');label.textContent='Zoom';const range=document.createElement('input');range.type='range';range.min=100;range.max=400;range.step=1;range.value=r.imgScale||100;range.setAttribute('aria-label','Ingrandimento grafica Tela');const val=document.createElement('span');val.className='val';val.dataset.telaScaleLabel=r.id;val.textContent=range.value+'%';label.append(range,val);controls.append(label);
+    range.addEventListener('input',()=>{r.imgScale=Number(range.value);updateTelaCrop(r.id);autosaveTela();});const reset=document.createElement('button');reset.textContent='Reimposta';reset.addEventListener('click',()=>{r.imgScale=100;r.imgPx=.5;r.imgPy=.5;range.value=100;updateTelaCrop(r.id);autosaveTela();});controls.append(reset);editor.append(controls);
+    const hint=document.createElement('p');hint.className='crop-hint';hint.textContent='Trascina con il mouse o il dito. La cornice dorata è il perimetro dimensionale della stampa.';editor.append(hint);item.append(editor);
+    const caption=document.createElement('p');caption.className='tela-frame-label';caption.textContent=(g.nome||g.codice)+' — '+fmtMM(c.L)+' × '+fmtMM(c.H)+' — senza sfridi';item.append(caption);
+    const outer=document.createElement('div');outer.className='wall-rect-outer';outer.style.setProperty('--ar',F);const final=document.createElement('div');final.className='wall-rect tela-print-frame';final.append(makeImage());outer.append(final);item.append(outer);
+  });
+}
+hydrateTelaForm=function(){originalHydrateTela();renderTelaPreview();};
+renderGraficheTable=function(){originalGraficheTable();document.querySelectorAll('#tela-righe-body tr').forEach(tr=>{const r=telaPreventivo.righe.find(x=>x.id===tr.dataset.telaRow);if(!r)return;const sel=tr.querySelector('[data-field="codiceGrafica"]');if(sel){sel.innerHTML=telaGraphicOptions(r);if(trovaGrafica(r.codiceGrafica)?.specialEdition)r.tipo='special';refreshTelaRow(tr,r);}});renderTelaPreview();};
+// Insert preview surface and new graphic column once.
+const telaPreviewSurface=document.createElement('div');telaPreviewSurface.id='tela-previews';const economicCard=document.getElementById('tela-dettaglio-table').closest('.card');economicCard.before(telaPreviewSurface);
+const graphicHeader=document.createElement('th');graphicHeader.textContent='Grafica';document.querySelector('#tela-righe-table thead tr').insertBefore(graphicHeader,document.querySelector('#tela-righe-table th:nth-child(6)'));document.querySelector('#tela-righe-table th:last-child').classList.add('no-print');
+// Optional local catalog artwork: embedded image remains available offline and in backups.
+const uploadField=document.createElement('div');uploadField.className='field no-print';uploadField.style.gridColumn='span 4';const uploadLabel=document.createElement('label');uploadLabel.textContent='Oppure carica l’immagine dal dispositivo';const upload=document.createElement('input');upload.type='file';upload.accept='image/png,image/jpeg,image/webp';upload.setAttribute('aria-label','Carica immagine nel catalogo');const uploadStatus=document.createElement('div');uploadStatus.className='hint';uploadField.append(uploadLabel,upload,uploadStatus);document.getElementById('gr-immagine').closest('.grid').append(uploadField);
+upload.addEventListener('change',()=>{const file=upload.files[0];if(!file)return;if(!['image/png','image/jpeg','image/webp'].includes(file.type)){uploadStatus.textContent='Formato non supportato: usa PNG, JPEG o WebP.';return;}if(file.size>3*1024*1024){uploadStatus.textContent='Usa un’immagine inferiore a 3 MB.';return;}const reader=new FileReader();reader.onload=()=>{document.getElementById('gr-immagine').value=reader.result;uploadStatus.textContent='Immagine pronta. Premi "Aggiungi al catalogo" per salvare.';};reader.onerror=()=>{uploadStatus.textContent='Impossibile leggere l’immagine.';};reader.readAsDataURL(file);});
+const validateTelaAction=e=>{if(telaPreventivo.righe.some(r=>!calcolaTelaRiga(r))||!telaPreventivo.righe.length){e.preventDefault();e.stopImmediatePropagation();alert('Completa tutte le righe Tela con misure valide prima di salvare o stampare.');}};
+document.getElementById('btn-salva-tela').addEventListener('click',validateTelaAction,true);document.getElementById('btn-stampa-tela').addEventListener('click',validateTelaAction,true);
+</script>
+
+</div>
+<div id="tela-responsive-fix"><style>
+#panel-tela .totals .line{gap:12px}#panel-tela .totals .line .lbl{min-width:0;overflow-wrap:anywhere}#panel-tela .totals .line>span:last-child{flex-shrink:0}#panel-tela .field{min-width:0}
+@media(max-width:540px){#panel-tela .grid.cols-2{grid-template-columns:minmax(0,1fr)}#panel-tela .grid.cols-4{grid-template-columns:repeat(2,minmax(0,1fr))}#panel-tela .img-controls{gap:8px}#panel-tela .img-controls input[type="range"]{max-width:125px}}
+
+@media(max-width:540px){.brand{min-width:0;max-width:100%}.brand .sub{letter-spacing:1px;font-size:10px;overflow-wrap:anywhere}.brand .mark{font-size:30px}}
+</style></div>
+
+</body></html>
