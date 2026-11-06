@@ -1294,9 +1294,14 @@ function renderTelaPreview(){
   const card=document.createElement('div');card.className='card';card.innerHTML='<h2><span class="num">03</span> Grafica e inquadratura Tela</h2><div class="hint">La cornice delimita esattamente la stampa: nessun margine e nessuno sfrido. Ingrandisci e trascina per scegliere la porzione di grafica.</div>';wrap.append(card);
   telaPreventivo.righe.forEach((r,i)=>{
     const item=document.createElement('section');item.className='tela-preview-item';const title=document.createElement('h3');title.className='tela-preview-title';title.textContent=r.rifAmbiente||'Elemento '+(i+1);item.append(title);card.append(item);
+    const graphicField=document.createElement('div');graphicField.className='field no-print';graphicField.style.maxWidth='540px';graphicField.style.marginBlock='12px';
+    const graphicLabel=document.createElement('label');graphicLabel.textContent='Codice grafica';graphicLabel.htmlFor='tela-grafica-'+r.id;
+    const graphicSelect=document.createElement('select');graphicSelect.id=graphicLabel.htmlFor;graphicSelect.dataset.telaGraphicSelector=r.id;graphicSelect.setAttribute('aria-label','Codice grafica - '+(r.rifAmbiente||('Elemento '+(i+1))));graphicSelect.innerHTML=telaGraphicOptions(r);graphicSelect.value=r.codiceGrafica||'';
+    graphicSelect.addEventListener('change',()=>{r.codiceGrafica=graphicSelect.value;r.imgScale=100;r.imgPx=.5;r.imgPy=.5;const chosen=trovaGrafica(r.codiceGrafica);if(chosen?.specialEdition)r.tipo='special';const row=Array.from(document.querySelectorAll('#tela-righe-body tr')).find(tr=>tr.dataset.telaRow===r.id);if(row){row.querySelector('[data-field="codiceGrafica"]').value=r.codiceGrafica;row.querySelector('[data-field="tipo"]').value=r.tipo;refreshTelaRow(row,r);}renderTelaDettaglio();renderTelaTotali();renderTelaPreview();autosaveTela();});
+    graphicField.append(graphicLabel,graphicSelect);item.append(graphicField);
     const c=calcolaTelaRiga(r),g=trovaGrafica(r.codiceGrafica),src=telaImageSource(g?.immagine);
     const message=document.createElement('p');message.className='tela-preview-message';
-    if(!g){message.textContent=grafiche.length?'Scegli una grafica dalla colonna "Grafica".':'Aggiungi una grafica nella scheda "Catalogo grafiche", poi selezionala qui.';item.append(message);return;}
+    if(!g){message.textContent=grafiche.length?'Scegli una grafica dal campo "Codice grafica" qui sopra.':'Aggiungi una grafica nella scheda "Catalogo grafiche", poi selezionala qui.';item.append(message);return;}
     if(!src){message.textContent='La grafica '+g.codice+' non ha un’immagine valida. Inserisci il link diretto dell’immagine nel catalogo (il link alla pagina non è sufficiente).';item.append(message);return;}
     if(!c){message.textContent='Completa larghezza e altezza valide per visualizzare il perimetro di stampa.';item.append(message);return;}
     const image=telaImageLoad(src);
@@ -1338,5 +1343,6 @@ document.getElementById('btn-salva-tela').addEventListener('click',validateTelaA
 
 @media(max-width:540px){.brand{min-width:0;max-width:100%}.brand .sub{letter-spacing:1px;font-size:10px;overflow-wrap:anywhere}.brand .mark{font-size:30px}}
 </style></div>
+
 
 </body></html>
