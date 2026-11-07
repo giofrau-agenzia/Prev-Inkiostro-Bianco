@@ -5,18 +5,18 @@
 <title>Inkiostro Bianco — Preventivi Carta da Parati, Tela e INK•RUGS</title>  
 <style>  
   :root{  
-    \--ink: #131211;  
-    \--surface: #1c1a17;  
-    \--surface-2: #242019;  
-    \--line: #423d34;  
-    \--paper: #F3EFE6;  
-    \--paper-dim: #b8b2a2;  
-    \--waste: #e2574c;  
-    \--waste-dim: #6b2f2a;  
-    \--gold: #c9a34e;  
-    \--gold-dim: #7a6432;  
-    \--ok: #7fae6a;  
-    \--ruler-maxh: 420px;  
+    --ink: #131211;  
+    --surface: #1c1a17;  
+    --surface-2: #242019;  
+    --line: #423d34;  
+    --paper: #F3EFE6;  
+    --paper-dim: #b8b2a2;  
+    --waste: #e2574c;  
+    --waste-dim: #6b2f2a;  
+    --gold: #c9a34e;  
+    --gold-dim: #7a6432;  
+    --ok: #7fae6a;  
+    --ruler-maxh: 420px;  
   }  
   *{ box-sizing: border-box; }  
   html,body{ margin:0; padding:0; background:var(--ink); color:var(--paper); font-family:Inter,Arial,sans-serif; }  
@@ -329,7 +329,7 @@
       <h2><span class="num">02</span> Tappeti</h2>
       <div class="table-scroll-x">
         <table id="rugs-table">
-          <thead><tr><th>Categoria</th><th>Forma / formato</th><th>Forma</th><th>Rif. grafica</th><th>Materiale</th><th>Bordatura</th><th class="num">Q.tà</th><th class="num">Prezzo unitario</th><th class="num">Importo</th><th></th></tr></thead>
+          <thead><tr><th>Categoria</th><th>Forma / formato</th><th>Forma</th><th>Codice Grafica</th><th>Materiale</th><th>Bordatura</th><th class="num">Q.tà</th><th class="num">Prezzo unitario</th><th class="num">Importo</th><th></th></tr></thead>
           <tbody id="rugs-body"></tbody>
         </table>
       </div>
@@ -560,10 +560,10 @@ function calcolaTelaRiga(r){
   const mq=(L/1000)*(H/1000), prezzoTela=TELA_LISTINO.tela[r.tipo==='special'?'special':'standard'];
   const prezzi=TELA_LISTINO.profili[r.spessore==='60'?'60':'18'];
   const righe=[
-    {descrizione:\`Tela ${r.tipo==='special'?'Special Edition':'Standard'} - telaio sp. ${r.spessore==='60'?'6':'1,8'} cm\`,qta:mq,prezzo:prezzoTela},
-    {descrizione:\`Profilo alluminio sp. ${r.spessore==='60'?'6':'1,8'} cm L. 50 cm\`,qta:q500,prezzo:prezzi[500]},
-    {descrizione:\`Profilo alluminio sp. ${r.spessore==='60'?'6':'1,8'} cm L. 100 cm\`,qta:q1000,prezzo:prezzi[1000]},
-    {descrizione:\`Profilo alluminio sp. ${r.spessore==='60'?'6':'1,8'} cm L. 150 cm\`,qta:q1500,prezzo:prezzi[1500]},
+    {descrizione:`Tela ${r.tipo==='special'?'Special Edition':'Standard'} - telaio sp. ${r.spessore==='60'?'6':'1,8'} cm`,qta:mq,prezzo:prezzoTela},
+    {descrizione:`Profilo alluminio sp. ${r.spessore==='60'?'6':'1,8'} cm L. 50 cm`,qta:q500,prezzo:prezzi[500]},
+    {descrizione:`Profilo alluminio sp. ${r.spessore==='60'?'6':'1,8'} cm L. 100 cm`,qta:q1000,prezzo:prezzi[1000]},
+    {descrizione:`Profilo alluminio sp. ${r.spessore==='60'?'6':'1,8'} cm L. 150 cm`,qta:q1500,prezzo:prezzi[1500]},
     {descrizione:'Connettori lineari in alluminio',qta:lineari,prezzo:TELA_LISTINO.lineare},
     {descrizione:'Connettori angolari in alluminio',qta:angolari,prezzo:TELA_LISTINO.angolare},
     {descrizione:'Confezionamento',qta:confezionamento,prezzo:TELA_LISTINO.confezionamento}
@@ -583,7 +583,7 @@ function calcolaTelaTotali(){
 }
 function renderTelaClienteSelect(){
   const sel=document.getElementById('tela-cliente');
-  sel.innerHTML='<option value="">— Seleziona cliente —</option>'+clienti.map(c=>\`<option value="${c.id}" ${c.id===telaPreventivo.clienteId?'selected':''}>${c.codice?escapeHtml(c.codice)+' — ':''}${escapeHtml(c.nome)}</option>\`).join('');
+  sel.innerHTML='<option value="">— Seleziona cliente —</option>'+clienti.map(c=>`<option value="${c.id}" ${c.id===telaPreventivo.clienteId?'selected':''}>${c.codice?escapeHtml(c.codice)+' — ':''}${escapeHtml(c.nome)}</option>`).join('');
   sel.onchange=()=>{ telaPreventivo.clienteId=sel.value; renderTelaClienteDettagli(); autosaveTela(); };
   renderTelaClienteDettagli();
 }
@@ -598,12 +598,12 @@ function renderTelaRighe(){
     const calc=calcolaTelaRiga(r), tr=document.createElement('tr');
     const err=Number(r.altezza)>2970?'Altezza max 2.970 mm':((r.larghezza||r.altezza)&&!calc?'Inserire misure valide':'');
     if(err) tr.className='tela-row-invalid';
-    tr.innerHTML=\`<td><input class="row-mini-input" data-field="rifAmbiente" type="text" value="${escapeHtml(r.rifAmbiente||'')}" placeholder="es. Sala"></td>
+    tr.innerHTML=`<td><input class="row-mini-input" data-field="rifAmbiente" type="text" value="${escapeHtml(r.rifAmbiente||'')}" placeholder="es. Sala"></td>
       <td><input class="row-mini-input" data-field="larghezza" type="number" min="1" step="1" value="${escapeHtml(r.larghezza)}"><div class="tela-error">${err&&Number(r.larghezza)<=0?err:''}</div></td>
       <td><input class="row-mini-input" data-field="altezza" type="number" min="1" max="2970" step="1" value="${escapeHtml(r.altezza)}"><div class="tela-error">${escapeHtml(err)}</div></td>
       <td><select data-field="spessore"><option value="18" ${r.spessore==='18'?'selected':''}>1,8 cm</option><option value="60" ${r.spessore==='60'?'selected':''}>6 cm</option></select></td>
       <td><select data-field="tipo"><option value="standard" ${r.tipo==='standard'?'selected':''}>Standard</option><option value="special" ${r.tipo==='special'?'selected':''}>Special Edition</option></select></td>
-      <td class="num">${calc?fmtMQ(calc.mq):'—'}</td><td class="num">${calc?fmtEUR(calc.righe[0].importo):'—'}</td><td><button class="ghost danger" data-action="delete" type="button">✕</button></td>\`;
+      <td class="num">${calc?fmtMQ(calc.mq):'—'}</td><td class="num">${calc?fmtEUR(calc.righe[0].importo):'—'}</td><td><button class="ghost danger" data-action="delete" type="button">✕</button></td>`;
     tr.querySelectorAll('[data-field]').forEach(el=>el.addEventListener('input',()=>{
       r[el.dataset.field]=el.type==='number'?el.value:el.value;
       renderTelaRighe(); renderTelaDettaglio(); renderTelaTotali(); autosaveTela();
@@ -617,20 +617,20 @@ function renderTelaDettaglio(){
   document.getElementById('tela-dettaglio-empty').style.display=t.righeCalc.length?'none':'block';
   t.righeCalc.forEach((x,i)=>{
     const h=document.createElement('tr'); h.className='tela-detail-group';
-    h.innerHTML=\`<td colspan="4">${escapeHtml(x.riga.rifAmbiente||('Elemento '+(i+1)))} — ${fmtMM(x.calc.L)} × ${fmtMM(x.calc.H)}</td>\`; body.appendChild(h);
-    x.calc.righe.forEach(item=>{ const tr=document.createElement('tr'); tr.innerHTML=\`<td>${escapeHtml(item.descrizione)}</td><td class="num">${Number.isInteger(item.qta)?item.qta:item.qta.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td class="num">${fmtEUR(item.prezzo)}</td><td class="num">${fmtEUR(item.importo)}</td>\`; body.appendChild(tr); });
+    h.innerHTML=`<td colspan="4">${escapeHtml(x.riga.rifAmbiente||('Elemento '+(i+1)))} — ${fmtMM(x.calc.L)} × ${fmtMM(x.calc.H)}</td>`; body.appendChild(h);
+    x.calc.righe.forEach(item=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${escapeHtml(item.descrizione)}</td><td class="num">${Number.isInteger(item.qta)?item.qta:item.qta.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td class="num">${fmtEUR(item.prezzo)}</td><td class="num">${fmtEUR(item.importo)}</td>`; body.appendChild(tr); });
   });
 }
 function renderTelaTotali(){
   const t=calcolaTelaTotali(), box=document.getElementById('tela-totals-box');
-  box.innerHTML=\`<div class="line"><span class="lbl">Totale merce</span><span>${fmtEUR(t.totaleMerce)}</span></div>
+  box.innerHTML=`<div class="line"><span class="lbl">Totale merce</span><span>${fmtEUR(t.totaleMerce)}</span></div>
     <div class="line"><span class="lbl">Totale superficie</span><span>${fmtMQ(t.totaleMq)}</span></div>
     <div class="line"><span class="lbl">Sconto ${t.sconto}% (solo merce)</span><span>− ${fmtEUR(t.totaleMerce-t.merceScontata)}</span></div>
     <div class="line"><span class="lbl">Merce dopo lo sconto</span><span>${fmtEUR(t.merceScontata)}</span></div>
     <div class="line"><span class="lbl">Trasporto (non soggetto a sconto)</span><span>${fmtEUR(t.trasporto)}</span></div>
     <div class="line"><span class="lbl">Imponibile IVA</span><span>${fmtEUR(t.imponibileIva)}</span></div>
     <div class="line"><span class="lbl">IVA 22%</span><span>${fmtEUR(t.iva)}</span></div>
-    <div class="line grand"><span class="lbl">Totale ivato</span><span>${fmtEUR(t.totale)}</span></div>\`;
+    <div class="line grand"><span class="lbl">Totale ivato</span><span>${fmtEUR(t.totale)}</span></div>`;
 }
 function hydrateTelaForm(){
   document.getElementById('tela-numero').value=telaPreventivo.numero||'';
@@ -659,7 +659,7 @@ document.querySelectorAll('.tab').forEach(btn=>{
 function renderClienteSelect(){  
   const sel = document.getElementById('pv-cliente');  
   sel.innerHTML = '<option value="">— Seleziona cliente —</option>' +  
-    clienti.map(c => \`<option value="${c.id}" ${c.id===preventivo.clienteId?'selected':''}>${c.codice ? c.codice+' — ' : ''}${escapeHtml(c.nome)}</option>\`).join('');  
+    clienti.map(c => `<option value="${c.id}" ${c.id===preventivo.clienteId?'selected':''}>${c.codice ? c.codice+' — ' : ''}${escapeHtml(c.nome)}</option>`).join('');  
   sel.onchange = ()=>{ preventivo.clienteId = sel.value; renderClienteDettagli(); autosave(); };  
   renderClienteDettagli();  
 }  
@@ -687,7 +687,7 @@ function ensureProdottoValido(riga){
 function buildProdottoOptionsHtml(riga, requireSpecial){  
   return prodotti.map(p=>{  
     const disabled = requireSpecial && !isSpecialEdition(p);  
-    return \`<option value="${p.id}" ${p.id===riga.prodottoId?'selected':''} ${disabled?'disabled':''}>${escapeHtml(p.descrizione)}${disabled?' — non disp. (Special Edition)':''}</option>\`;  
+    return `<option value="${p.id}" ${p.id===riga.prodottoId?'selected':''} ${disabled?'disabled':''}>${escapeHtml(p.descrizione)}${disabled?' — non disp. (Special Edition)':''}</option>`;  
   }).join('');  
 }  
 function renderRighe(){  
@@ -712,7 +712,7 @@ function renderRighe(){
     const tdSfrido = document.createElement('td'); tdSfrido.className='num';  
     if(calc){  
       const warn = calc.sfrido < 100;  
-      tdSfrido.innerHTML = \`<span class="badge ${warn?'warn':'ok'}">${fmtMM(calc.sfrido)}</span>\`;  
+      tdSfrido.innerHTML = `<span class="badge ${warn?'warn':'ok'}">${fmtMM(calc.sfrido)}</span>`;  
     } else tdSfrido.textContent = '—';  
     const tdMq = document.createElement('td'); tdMq.className='num'; tdMq.textContent = calc? fmtMQ(calc.mq) : '—';  
     const tdImp = document.createElement('td'); tdImp.className='num'; tdImp.textContent = calc? fmtEUR(calc.importo) : '—';  
@@ -767,9 +767,9 @@ function graficaStatusHtml(codice){
   if(!codice || !codice.trim()) return '';  
   const match = trovaGrafica(codice);  
   if(match){  
-    return \`<a href="${escapeHtml(match.url)}" target="_blank">Apri pagina ↗</a>${match.specialEdition ? ' <span class="badge special">Special Edition</span>' : ''}\`;  
+    return `<a href="${escapeHtml(match.url)}" target="_blank">Apri pagina ↗</a>${match.specialEdition ? ' <span class="badge special">Special Edition</span>' : ''}`;  
   }  
-  return \`<a href="${googleSiteSearchUrl(codice)}" target="_blank">Cerca sul sito ↗</a> <span class="muted">— non in catalogo</span>\`;  
+  return `<a href="${googleSiteSearchUrl(codice)}" target="_blank">Cerca sul sito ↗</a> <span class="muted">— non in catalogo</span>`;  
 }  
 // lightweight refresh of computed cells only (avoids losing focus while typing dimensions)  
 function renderRighe_partial(){  
@@ -781,7 +781,7 @@ function renderRighe_partial(){
     cells[6].textContent = calc? calc.nRolli : '—';  
     if(calc){  
       const warn = calc.sfrido < 100;  
-      cells[7].innerHTML = \`<span class="badge ${warn?'warn':'ok'}">${fmtMM(calc.sfrido)}</span>\`;  
+      cells[7].innerHTML = `<span class="badge ${warn?'warn':'ok'}">${fmtMM(calc.sfrido)}</span>`;  
     } else cells[7].textContent='—';  
     cells[8].textContent = calc? fmtMQ(calc.mq) : '—';  
     cells[9].textContent = calc? fmtEUR(calc.importo) : '—';  
@@ -815,7 +815,7 @@ function geomImmagine(riga, F, A){
   return { w, h, ovX, ovY, left: ovX * px, top: ovY * py };  
 }  
 function stileImg(g){  
-  return \`width:${g.w}%; height:${g.h}%; left:${g.left}%; top:${g.top}%;\`;  
+  return `width:${g.w}%; height:${g.h}%; left:${g.left}%; top:${g.top}%;`;  
 }  
 function contestoImg(rigaId){  
   const riga = preventivo.righe.find(r => r.id === rigaId);  
@@ -905,14 +905,14 @@ function reimpostaImg(rigaId){
 function overlayHtml(riga, calc){  
   const tPct = 50 / (riga.altezza + 100) * 100;  
   const wPct = (calc.sfrido / 2) / calc.larghezzaArr * 100;  
-  let h = \`<div class="wb wb-t" style="top:0; left:0; width:100%; height:${tPct}%;"></div>\`  
-        \+ \`<div class="wb wb-b" style="bottom:0; left:0; width:100%; height:${tPct}%;"></div>\`;  
+  let h = `<div class="wb wb-t" style="top:0; left:0; width:100%; height:${tPct}%;"></div>`  
+        + `<div class="wb wb-b" style="bottom:0; left:0; width:100%; height:${tPct}%;"></div>`;  
   if(wPct > 0){  
-    h += \`<div class="wb wb-l" style="left:0; top:${tPct}%; bottom:${tPct}%; width:${wPct}%;"></div>\`  
-       \+ \`<div class="wb wb-r" style="right:0; top:${tPct}%; bottom:${tPct}%; width:${wPct}%;"></div>\`;  
+    h += `<div class="wb wb-l" style="left:0; top:${tPct}%; bottom:${tPct}%; width:${wPct}%;"></div>`  
+       + `<div class="wb wb-r" style="right:0; top:${tPct}%; bottom:${tPct}%; width:${wPct}%;"></div>`;  
   }  
   for(let k = 1; k < calc.nRolli; k++){  
-    h += \`<div class="roll-line" style="left:${k * calc.rollWidth / calc.larghezzaArr * 100}%;"></div>\`;  
+    h += `<div class="roll-line" style="left:${k * calc.rollWidth / calc.larghezzaArr * 100}%;"></div>`;  
   }  
   return h;  
 }  
@@ -920,7 +920,7 @@ function renderRuler(){
   const wrap = document.getElementById('ruler-section');  
   const rows = preventivo.righe.map(r => ({ riga: r, calc: calcolaRiga(r) })).filter(x => x.calc);  
   if(!rows.length){ wrap.innerHTML = ''; return; }  
-  wrap.innerHTML = \`<div class="card"><h2><span class="num">＝</span> Taglio rotoli</h2>\` +  
+  wrap.innerHTML = `<div class="card"><h2><span class="num">＝</span> Taglio rotoli</h2>` +  
     rows.map(({ riga, calc }) => {  
       const grafica = trovaGrafica(riga.codiceGrafica);  
       const url = grafica && grafica.immagine ? grafica.immagine : '';  
@@ -932,14 +932,14 @@ function renderRuler(){
       const wasteEach = calc.sfrido / 2;  
       const label = (riga.rifAmbiente || riga.rif || calc.prodotto.descrizione);  
       const specialTag = grafica && grafica.specialEdition ? ' <span class="badge special">Special Edition</span>' : '';  
-      const graficaLink = grafica ? \` · <a href="${escapeHtml(grafica.url)}" target="_blank" style="color:var(--gold); text-decoration:none;">${escapeHtml(grafica.nome || riga.codiceGrafica)} ↗</a>\` : (riga.codiceGrafica ? \` · <a href="${googleSiteSearchUrl(riga.codiceGrafica)}" target="_blank" style="color:var(--gold); text-decoration:none;">cerca "${escapeHtml(riga.codiceGrafica)}" ↗</a>\` : '');  
+      const graficaLink = grafica ? ` · <a href="${escapeHtml(grafica.url)}" target="_blank" style="color:var(--gold); text-decoration:none;">${escapeHtml(grafica.nome || riga.codiceGrafica)} ↗</a>` : (riga.codiceGrafica ? ` · <a href="${googleSiteSearchUrl(riga.codiceGrafica)}" target="_blank" style="color:var(--gold); text-decoration:none;">cerca "${escapeHtml(riga.codiceGrafica)}" ↗</a>` : '');  
       const g = imgOk ? geomImmagine(riga, F, A) : null;  
       const overlays = overlayHtml(riga, calc);  
       const scale = riga.imgScale || 100;  
-      const imgPreview = imgOk ? \`<img class="wall-img" id="img-${riga.id}" src="${escapeHtml(url)}" style="${stileImg(g)}">\` : '';  
+      const imgPreview = imgOk ? `<img class="wall-img" id="img-${riga.id}" src="${escapeHtml(url)}" style="${stileImg(g)}">` : '';  
       let editor = '';  
       if(imgOk){  
-        editor = \`  
+        editor = `  
           <div class="crop-tool-row no-print">  
             <div class="crop-stage" id="stage-${riga.id}" style="--ar:${F};" onmousedown="iniziaTrascinamento(event,'${riga.id}')" ontouchstart="iniziaTrascinamento(event,'${riga.id}')">  
               <div class="crop-frame-anchor"><img class="wall-img" id="editimg-${riga.id}" src="${escapeHtml(url)}" draggable="false" style="${stileImg(g)}"></div>  
@@ -952,13 +952,13 @@ function renderRuler(){
               <button type="button" class="ghost" onclick="reimpostaImg('${riga.id}')">Reimposta</button>  
             </div>  
             <div class="crop-hint">Trascina l'immagine per scegliere l'inquadratura: il riquadro dorato è ciò che verrà stampato, le fasce rosse sono lo sfrido.</div>  
-          </div>\`;  
+          </div>`;  
       } else if(caricamento){  
-        editor = \`<div class="crop-hint no-print">Caricamento immagine…</div>\`;  
+        editor = `<div class="crop-hint no-print">Caricamento immagine…</div>`;  
       } else if(fallita){  
-        editor = \`<div class="crop-hint warn no-print">Impossibile caricare l'immagine: controlla il link nel Catalogo grafiche.</div>\`;  
+        editor = `<div class="crop-hint warn no-print">Impossibile caricare l'immagine: controlla il link nel Catalogo grafiche.</div>`;  
       }  
-      return \`<div class="ruler-wrap">  
+      return `<div class="ruler-wrap">  
           <div class="ruler-caption"><span>${escapeHtml(label)} — ${calc.prodotto.descrizione}${specialTag}${graficaLink}</span><span>${calc.nRolli} × ${calc.rollWidth}mm</span></div>  
           ${editor}  
           <div class="wall-rect-outer" style="--ar:${F};">  
@@ -967,14 +967,14 @@ function renderRuler(){
             <div class="dim-caption">↕ margine 50mm</div>  
           </div>  
           <div class="ruler-caption"><span>Larghezza richiesta ${fmtMM(riga.larghezza)} · Altezza ${fmtMM(riga.altezza)}</span><span class="${calc.sfrido < 100 ? 'waste-note' : ''}">Sfrido ${fmtMM(calc.sfrido)} totale — ${fmtMM(wasteEach)} primo + ${fmtMM(wasteEach)} ultimo rotolo${calc.sfrido < 100 ? ' · sotto il minimo 100mm' : ''}</span></div>  
-        </div>\`;  
-    }).join('<div style="height:14px;"></div>') + \`</div>\`;  
+        </div>`;  
+    }).join('<div style="height:14px;"></div>') + `</div>`;  
 }  
 /* ===================== RENDER: TOTALI ===================== */  
 function renderTotali(){  
   const t = calcolaTotali();  
   const box = document.getElementById('totals-box');  
-  box.innerHTML = \`  
+  box.innerHTML = `  
     <div class="line"><span class="lbl">Totale merce</span><span>${fmtEUR(t.totaleMerce)}</span></div>  
     <div class="line"><span class="lbl">Totale superficie</span><span>${fmtMQ(t.totaleMq)}</span></div>  
     <div class="line"><span class="lbl">Sconto ${preventivo.sconto||0}% (solo su merce)</span><span>− ${fmtEUR(t.totaleMerce - t.imponibile)}</span></div>  
@@ -983,7 +983,7 @@ function renderTotali(){
     <div class="line"><span class="lbl">Trasporto (non soggetto a sconto)</span><span>${fmtEUR(t.trasporto)}</span></div>  
     <div class="line"><span class="lbl">IVA 22%</span><span>${fmtEUR(t.iva)}</span></div>  
     <div class="line grand"><span class="lbl">Totale</span><span>${fmtEUR(t.totale)}</span></div>  
-  \`;  
+  `;  
 }  
 /* ===================== EVENTS: TELA ===================== */
 document.getElementById('tela-numero').addEventListener('input',e=>{telaPreventivo.numero=e.target.value;autosaveTela();});
@@ -1061,7 +1061,7 @@ function renderClientiTable(){
   empty.style.display = clienti.length? 'none':'block';  
   clienti.forEach(c=>{  
     const tr = document.createElement('tr');  
-    tr.innerHTML = \`<td>${escapeHtml(c.codice||'')}</td><td>${escapeHtml(c.nome||'')}</td><td>${escapeHtml(c.citta||'')}</td><td>${escapeHtml(c.piva||'')}</td><td>${escapeHtml(c.telefono||'')}</td><td></td>\`;  
+    tr.innerHTML = `<td>${escapeHtml(c.codice||'')}</td><td>${escapeHtml(c.nome||'')}</td><td>${escapeHtml(c.citta||'')}</td><td>${escapeHtml(c.piva||'')}</td><td>${escapeHtml(c.telefono||'')}</td><td></td>`;  
     const del = document.createElement('button'); del.className='ghost'; del.textContent='✕';  
     del.onclick = async ()=>{ clienti = clienti.filter(x=>x.id!==c.id); await saveKey('clienti', clienti); renderClientiTable(); renderClienteSelect(); renderTelaClienteSelect(); };  
     tr.lastElementChild.appendChild(del);  
@@ -1092,7 +1092,7 @@ function renderProdottiTable(){
   body.innerHTML='';  
   prodotti.forEach(p=>{  
     const tr = document.createElement('tr');  
-    tr.innerHTML = \`<td>${escapeHtml(p.descrizione)}</td><td class="num">${fmtEUR(p.prezzo)}</td><td class="num">${p.larghezza} mm</td><td></td>\`;  
+    tr.innerHTML = `<td>${escapeHtml(p.descrizione)}</td><td class="num">${fmtEUR(p.prezzo)}</td><td class="num">${p.larghezza} mm</td><td></td>`;  
     const del = document.createElement('button'); del.className='ghost'; del.textContent='✕';  
     del.onclick = async ()=>{  
       prodotti = prodotti.filter(x=>x.id!==p.id);  
@@ -1123,7 +1123,7 @@ document.getElementById('btn-save-primer').addEventListener('click', async ()=>{
 /* ===================== CATALOGO GRAFICHE ===================== */  
 function renderGraficheDatalist(){  
   const dl = document.getElementById('grafiche-datalist');  
-  dl.innerHTML = grafiche.map(g => \`<option value="${escapeHtml(g.codice)}">${escapeHtml(g.nome||'')}${g.specialEdition?' — Special Edition':''}</option>\`).join('');  
+  dl.innerHTML = grafiche.map(g => `<option value="${escapeHtml(g.codice)}">${escapeHtml(g.nome||'')}${g.specialEdition?' — Special Edition':''}</option>`).join('');  
 }  
 function renderGraficheTable(){  
   const body = document.getElementById('grafiche-body');  
@@ -1132,8 +1132,8 @@ function renderGraficheTable(){
   empty.style.display = grafiche.length? 'none':'block';  
   grafiche.forEach(g=>{  
     const tr = document.createElement('tr');  
-    const thumb = g.immagine ? \`<img src="${escapeHtml(g.immagine)}" style="width:36px; height:24px; object-fit:cover; border-radius:3px; vertical-align:middle; margin-right:6px; border:1px solid var(--line);">\` : '';  
-    tr.innerHTML = \`<td>${thumb}${escapeHtml(g.codice)}</td><td>${escapeHtml(g.nome||'')}${g.specialEdition?' <span class="badge special">Special Edition</span>':''}</td><td><a href="${escapeHtml(g.url)}" target="_blank" style="color:var(--gold);">Apri ↗</a></td><td></td>\`;  
+    const thumb = g.immagine ? `<img src="${escapeHtml(g.immagine)}" style="width:36px; height:24px; object-fit:cover; border-radius:3px; vertical-align:middle; margin-right:6px; border:1px solid var(--line);">` : '';  
+    tr.innerHTML = `<td>${thumb}${escapeHtml(g.codice)}</td><td>${escapeHtml(g.nome||'')}${g.specialEdition?' <span class="badge special">Special Edition</span>':''}</td><td><a href="${escapeHtml(g.url)}" target="_blank" style="color:var(--gold);">Apri ↗</a></td><td></td>`;  
     const del = document.createElement('button'); del.className='ghost'; del.textContent='✕';  
     del.onclick = async ()=>{  
       grafiche = grafiche.filter(x=>x.id!==g.id);  
@@ -1174,7 +1174,7 @@ function renderSalvati(){
     const div = document.createElement('div');  
     div.className='saved-item';  
     const tipoLabel=s.tipo==='tela'?'Tela':'Carta da parati';
-    div.innerHTML = \`<div class="meta"><span class="badge ${s.tipo==='tela'?'special':'ok'}">${tipoLabel}</span> <b>${escapeHtml(s.numero)}</b> — ${escapeHtml(s.clienteNome)} · ${s.data} · ${fmtEUR(s.totale)}</div>\`;  
+    div.innerHTML = `<div class="meta"><span class="badge ${s.tipo==='tela'?'special':'ok'}">${tipoLabel}</span> <b>${escapeHtml(s.numero)}</b> — ${escapeHtml(s.clienteNome)} · ${s.data} · ${fmtEUR(s.totale)}</div>`;  
     const btnGroup = document.createElement('div');  
     const loadBtn = document.createElement('button'); loadBtn.textContent='Apri';  
     loadBtn.onclick = ()=>{
@@ -1219,7 +1219,7 @@ function exportBackup(){
   const url = URL.createObjectURL(blob);  
   const a = document.createElement('a');  
   a.href = url;  
-  a.download = \`inchiostro-bianco-backup-${new Date().toISOString().slice(0,10)}.json\`;  
+  a.download = `inchiostro-bianco-backup-${new Date().toISOString().slice(0,10)}.json`;  
   document.body.appendChild(a); a.click(); a.remove();  
   URL.revokeObjectURL(url);  
 }  
@@ -1296,13 +1296,13 @@ const originalGraficheTable=renderGraficheTable;
 function nuovaTelaRiga(){return {id:uid(),rifAmbiente:'',larghezza:'',altezza:'',spessore:'18',tipo:'standard',codiceGrafica:'',imgScale:100,imgPx:0.5,imgPy:0.5};}
 function telaImageSource(value){
   const u=String(value||'').trim();
-  if(/^data:image\\/(png|jpeg|webp|gif);base64,/i.test(u))return u;
+  if(/^data:image\/(png|jpeg|webp|gif);base64,/i.test(u))return u;
   try{const url=new URL(u);return ['https:','http:'].includes(url.protocol)?url.href:'';}catch{return '';}
 }
 function telaGraphicOptions(r){
   let html='<option value="">— Scegli dal catalogo —</option>';
-  if(r.codiceGrafica&&!trovaGrafica(r.codiceGrafica))html+=\`<option value="${escapeHtml(r.codiceGrafica)}" selected>${escapeHtml(r.codiceGrafica)} (non in catalogo)</option>\`;
-  return html+grafiche.map(g=>\`<option value="${escapeHtml(g.codice)}" ${String(g.codice).toLowerCase()===String(r.codiceGrafica||'').toLowerCase()?'selected':''}>${escapeHtml(g.codice)}${g.nome?' — '+escapeHtml(g.nome):''}${g.specialEdition?' — Special Edition':''}</option>\`).join('');
+  if(r.codiceGrafica&&!trovaGrafica(r.codiceGrafica))html+=`<option value="${escapeHtml(r.codiceGrafica)}" selected>${escapeHtml(r.codiceGrafica)} (non in catalogo)</option>`;
+  return html+grafiche.map(g=>`<option value="${escapeHtml(g.codice)}" ${String(g.codice).toLowerCase()===String(r.codiceGrafica||'').toLowerCase()?'selected':''}>${escapeHtml(g.codice)}${g.nome?' — '+escapeHtml(g.nome):''}${g.specialEdition?' — Special Edition':''}</option>`).join('');
 }
 function telaPrintValue(el,td){el.classList.add('has-print-val');const p=document.createElement('span');p.className='print-val';td.append(p);return p;}
 function renderTelaRighe(){
@@ -1421,7 +1421,7 @@ const RUGS_LISTINO=[
 {cat:'FORME SPECIALI',nome:'The potion 245x250 cm',dim:'245x250 cm',compact:2580,soft:2900,luxury:207.90,onlyLuxury:true}
 ];
 let rugsPreventivo={numero:'',data:new Date().toISOString().slice(0,10),clienteId:'',sconto:0,righe:[]};
-function nuovaRugRiga(){return{id:uid(),cat:'FORME BASE',forma:RUGS_LISTINO[0].nome,rif:'',materiale:'SOFT TOUCH',bordatura:'RIBBON',qta:1};}
+function nuovaRugRiga(){return{id:uid(),cat:'FORME BASE',forma:RUGS_LISTINO[0].nome,codiceGrafica:'',materiale:'SOFT TOUCH',bordatura:'RIBBON',qta:1};}
 function rugItem(r){return RUGS_LISTINO.find(x=>x.cat===r.cat&&x.nome===r.forma)||null;}
 function calcRug(r){const x=rugItem(r),q=Math.max(0,Number(r.qta)||0);if(!x||!q)return null;const base=r.materiale==='COMPACT'?x.compact:x.soft;const key={OVERLOCK:'overlock',RIBBON:'ribbon',LUXURY:'luxury'}[r.bordatura];const bordo=x[key];if(!Number.isFinite(bordo))return null;return{unit:base+bordo,tot:(base+bordo)*q};}
 function calcRugsTotali(){const valid=rugsPreventivo.righe.map(r=>({r,c:calcRug(r)})).filter(x=>x.c);const merce=valid.reduce((s,x)=>s+x.c.tot,0),sconto=Math.min(100,Math.max(0,Number(rugsPreventivo.sconto)||0)),imponibile=merce*(1-sconto/100),iva=imponibile*.22;return{merce,sconto,imponibile,iva,totale:imponibile+iva,valid};}
@@ -1438,13 +1438,13 @@ function renderRugs(){
   tr.innerHTML=`<td><select data-f="cat"><option>FORME BASE</option><option>FORME SPECIALI</option></select></td>
   <td><select data-f="forma">${rugOptions(r.cat,r.forma)}</select></td>
   <td><div class="rug-preview" title="${escapeHtml(r.forma)}"><span class="rug-shape ${rugShapeClass(x)}"></span></div></td>
-  <td><input data-f="rif" value="${escapeHtml(r.rif||'')}" placeholder="Codice / riferimento"></td>
+  <td><input data-f="codiceGrafica" value="${escapeHtml(r.codiceGrafica||r.rif||'')}" placeholder="es. INKRG001" aria-label="Codice Grafica"></td>
   <td><select data-f="materiale"><option>COMPACT</option><option>SOFT TOUCH</option></select></td>
   <td><select data-f="bordatura">${rugBorderOptions(x,r.bordatura)}</select>${c?'':'<div class="rug-error">Combinazione non disponibile</div>'}</td>
   <td><input data-f="qta" type="number" min="1" step="1" value="${r.qta}"></td><td class="num">${c?fmtEUR(c.unit):'—'}</td><td class="num">${c?fmtEUR(c.tot):'—'}</td><td class="no-print"><button class="ghost danger" data-del>✕</button></td>`;
   tr.querySelector('[data-f="cat"]').value=r.cat;tr.querySelector('[data-f="materiale"]').value=r.materiale;tr.querySelector('[data-f="bordatura"]').value=r.bordatura;
   tr.querySelectorAll('[data-f]').forEach(el=>el.addEventListener('change',()=>{r[el.dataset.f]=el.type==='number'?Number(el.value):el.value;if(el.dataset.f==='cat'){r.forma=RUGS_LISTINO.find(y=>y.cat===r.cat).nome;r.bordatura='RIBBON';}renderRugs();renderRugsTotali();autosaveRugs();}));
-  tr.querySelector('[data-f="rif"]').addEventListener('input',e=>{r.rif=e.target.value;autosaveRugs();});
+  tr.querySelector('[data-f="codiceGrafica"]').addEventListener('input',e=>{r.codiceGrafica=e.target.value;autosaveRugs();});
   tr.querySelector('[data-del]').onclick=()=>{rugsPreventivo.righe=rugsPreventivo.righe.filter(x=>x.id!==r.id);renderRugs();renderRugsTotali();autosaveRugs();};body.append(tr);
  });
 }
