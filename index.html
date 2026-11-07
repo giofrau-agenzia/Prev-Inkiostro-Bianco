@@ -2,21 +2,21 @@
 <html lang="it"><head>  
 <meta charset="utf-8"/>  
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>  
-<title>Inkiostro Bianco — Preventivi Carta da Parati e Tela</title>  
+<title>Inkiostro Bianco — Preventivi Carta da Parati, Tela e INK•RUGS</title>  
 <style>  
   :root{  
-    --ink: #131211;  
-    --surface: #1c1a17;  
-    --surface-2: #242019;  
-    --line: #423d34;  
-    --paper: #F3EFE6;  
-    --paper-dim: #b8b2a2;  
-    --waste: #e2574c;  
-    --waste-dim: #6b2f2a;  
-    --gold: #c9a34e;  
-    --gold-dim: #7a6432;  
-    --ok: #7fae6a;  
-    --ruler-maxh: 420px;  
+    \--ink: #131211;  
+    \--surface: #1c1a17;  
+    \--surface-2: #242019;  
+    \--line: #423d34;  
+    \--paper: #F3EFE6;  
+    \--paper-dim: #b8b2a2;  
+    \--waste: #e2574c;  
+    \--waste-dim: #6b2f2a;  
+    \--gold: #c9a34e;  
+    \--gold-dim: #7a6432;  
+    \--ok: #7fae6a;  
+    \--ruler-maxh: 420px;  
   }  
   *{ box-sizing: border-box; }  
   html,body{ margin:0; padding:0; background:var(--ink); color:var(--paper); font-family:Inter,Arial,sans-serif; }  
@@ -165,6 +165,24 @@
     .ruler-caption{ font-size:12px; }  
   }  
 </style>  
+
+<style>
+#rugs-table{min-width:1120px}
+#rugs-table th,#rugs-table td{vertical-align:middle}
+#rugs-table select,#rugs-table input{min-width:105px}
+#rugs-table td:nth-child(2) select{min-width:220px}
+.rug-preview{width:82px;height:58px;display:grid;place-items:center;margin:auto}
+.rug-shape{display:block;width:64px;height:40px;background:linear-gradient(135deg,#c7ad70,#8d6f35);box-shadow:inset 0 0 0 2px rgba(255,255,255,.25),0 2px 8px rgba(0,0,0,.3)}
+.rug-shape.circle{width:46px;height:46px;border-radius:50%}
+.rug-shape.special{border-radius:48% 35% 52% 38% / 38% 52% 35% 48%;transform:rotate(-7deg)}
+.rug-shape.fold{clip-path:polygon(8% 18%,45% 0,91% 18%,100% 66%,68% 100%,20% 87%,0 52%)}
+.rug-shape.pelagia{border-radius:50% 42% 55% 40%;transform:rotate(12deg)}
+.rug-shape.potion{clip-path:polygon(18% 8%,72% 0,100% 35%,82% 88%,36% 100%,0 68%)}
+.rug-invalid{background:rgba(226,87,76,.08)}
+.rug-error{color:var(--waste);font-size:11px;margin-top:4px}
+@media print{#rugs-table{min-width:0;font-size:9px}.rug-preview{width:62px;height:44px}.rug-shape{transform:scale(.78)}}
+</style>
+
 </head>  
 <body>  
 <div class="app">  
@@ -172,11 +190,12 @@
   <div class="masthead">  
     <div class="brand">  
       <div class="mark">Inkiostro<span>·</span>Bianco</div>  
-      <div class="sub">Preventivi — Carta da Parati e Tela</div>  
+      <div class="sub">Preventivi — Carta da Parati, Tela e INK•RUGS</div>  
     </div>  
     <div class="tabs no-print">  
       <button class="tab active" data-tab="preventivo">Carta da parati</button>  
-      <button class="tab" data-tab="tela">Tela</button>  
+      <button class="tab" data-tab="tela">Tela</button>
+      <button class="tab" data-tab="rugs">INK•RUGS</button>  
       <button class="tab" data-tab="clienti">Clienti</button>  
       <button class="tab" data-tab="prodotti">Prodotti</button>  
       <button class="tab" data-tab="catalogo">Catalogo grafiche</button>  
@@ -294,6 +313,45 @@
       <button id="btn-stampa-tela">Stampa / PDF</button>
     </div>
   </div>
+
+  <!-- ================= INK RUGS ================= -->
+  <div class="panel" id="panel-rugs">
+    <div class="card">
+      <h2><span class="num">01</span> Dati preventivo INK•RUGS</h2>
+      <div class="grid cols-4">
+        <div class="field"><label>Numero</label><input id="rugs-numero" placeholder="2026-R001" type="text"/></div>
+        <div class="field"><label>Data</label><input id="rugs-data" type="date"/></div>
+        <div class="field" style="grid-column:span 2;"><label>Cliente</label><select id="rugs-cliente"></select></div>
+      </div>
+      <div class="hint" id="rugs-cliente-dettagli"></div>
+    </div>
+    <div class="card">
+      <h2><span class="num">02</span> Tappeti</h2>
+      <div class="table-scroll-x">
+        <table id="rugs-table">
+          <thead><tr><th>Categoria</th><th>Forma / formato</th><th>Forma</th><th>Rif. grafica</th><th>Materiale</th><th>Bordatura</th><th class="num">Q.tà</th><th class="num">Prezzo unitario</th><th class="num">Importo</th><th></th></tr></thead>
+          <tbody id="rugs-body"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px;"><button id="btn-add-rug">+ Aggiungi tappeto</button></div>
+      <div class="empty" id="rugs-empty">Nessun tappeto inserito. Aggiungine uno per iniziare.</div>
+      <div class="hint">Scegli prima la categoria: l’elenco delle forme mostra solo i prodotti corrispondenti. Per Stones, Stamps, Loose, Yu Wu, Konao, Shui, Fold, Pelagia e The potion è disponibile esclusivamente la bordatura LUXURY.</div>
+    </div>
+    <div class="card">
+      <h2><span class="num">03</span> Riepilogo INK•RUGS</h2>
+      <div class="grid cols-2" style="margin-bottom:16px;">
+        <div class="field"><label>Sconto riservato %</label><input id="rugs-sconto" max="100" min="0" step="0.1" type="number" value="0"/></div>
+      </div>
+      <div class="totals" id="rugs-totals"></div>
+      <div class="hint">Prezzi al pubblico IVA esclusa. Trasporto franco fabbrica. Tempi di evasione: 4 settimane dalla conferma d’ordine.</div>
+    </div>
+    <div class="toolbar no-print">
+      <button class="primary" id="btn-salva-rugs">Salva preventivo INK•RUGS</button>
+      <button id="btn-nuovo-rugs">Nuovo (svuota)</button>
+      <button id="btn-stampa-rugs">Stampa / PDF</button>
+    </div>
+  </div>
+
   <!-- ================= CLIENTI ================= -->  
   <div class="panel" id="panel-clienti">  
     <div class="card">  
@@ -502,10 +560,10 @@ function calcolaTelaRiga(r){
   const mq=(L/1000)*(H/1000), prezzoTela=TELA_LISTINO.tela[r.tipo==='special'?'special':'standard'];
   const prezzi=TELA_LISTINO.profili[r.spessore==='60'?'60':'18'];
   const righe=[
-    {descrizione:`Tela ${r.tipo==='special'?'Special Edition':'Standard'} - telaio sp. ${r.spessore==='60'?'6':'1,8'} cm`,qta:mq,prezzo:prezzoTela},
-    {descrizione:`Profilo alluminio sp. ${r.spessore==='60'?'6':'1,8'} cm L. 50 cm`,qta:q500,prezzo:prezzi[500]},
-    {descrizione:`Profilo alluminio sp. ${r.spessore==='60'?'6':'1,8'} cm L. 100 cm`,qta:q1000,prezzo:prezzi[1000]},
-    {descrizione:`Profilo alluminio sp. ${r.spessore==='60'?'6':'1,8'} cm L. 150 cm`,qta:q1500,prezzo:prezzi[1500]},
+    {descrizione:\`Tela ${r.tipo==='special'?'Special Edition':'Standard'} - telaio sp. ${r.spessore==='60'?'6':'1,8'} cm\`,qta:mq,prezzo:prezzoTela},
+    {descrizione:\`Profilo alluminio sp. ${r.spessore==='60'?'6':'1,8'} cm L. 50 cm\`,qta:q500,prezzo:prezzi[500]},
+    {descrizione:\`Profilo alluminio sp. ${r.spessore==='60'?'6':'1,8'} cm L. 100 cm\`,qta:q1000,prezzo:prezzi[1000]},
+    {descrizione:\`Profilo alluminio sp. ${r.spessore==='60'?'6':'1,8'} cm L. 150 cm\`,qta:q1500,prezzo:prezzi[1500]},
     {descrizione:'Connettori lineari in alluminio',qta:lineari,prezzo:TELA_LISTINO.lineare},
     {descrizione:'Connettori angolari in alluminio',qta:angolari,prezzo:TELA_LISTINO.angolare},
     {descrizione:'Confezionamento',qta:confezionamento,prezzo:TELA_LISTINO.confezionamento}
@@ -525,7 +583,7 @@ function calcolaTelaTotali(){
 }
 function renderTelaClienteSelect(){
   const sel=document.getElementById('tela-cliente');
-  sel.innerHTML='<option value="">— Seleziona cliente —</option>'+clienti.map(c=>`<option value="${c.id}" ${c.id===telaPreventivo.clienteId?'selected':''}>${c.codice?escapeHtml(c.codice)+' — ':''}${escapeHtml(c.nome)}</option>`).join('');
+  sel.innerHTML='<option value="">— Seleziona cliente —</option>'+clienti.map(c=>\`<option value="${c.id}" ${c.id===telaPreventivo.clienteId?'selected':''}>${c.codice?escapeHtml(c.codice)+' — ':''}${escapeHtml(c.nome)}</option>\`).join('');
   sel.onchange=()=>{ telaPreventivo.clienteId=sel.value; renderTelaClienteDettagli(); autosaveTela(); };
   renderTelaClienteDettagli();
 }
@@ -540,12 +598,12 @@ function renderTelaRighe(){
     const calc=calcolaTelaRiga(r), tr=document.createElement('tr');
     const err=Number(r.altezza)>2970?'Altezza max 2.970 mm':((r.larghezza||r.altezza)&&!calc?'Inserire misure valide':'');
     if(err) tr.className='tela-row-invalid';
-    tr.innerHTML=`<td><input class="row-mini-input" data-field="rifAmbiente" type="text" value="${escapeHtml(r.rifAmbiente||'')}" placeholder="es. Sala"></td>
+    tr.innerHTML=\`<td><input class="row-mini-input" data-field="rifAmbiente" type="text" value="${escapeHtml(r.rifAmbiente||'')}" placeholder="es. Sala"></td>
       <td><input class="row-mini-input" data-field="larghezza" type="number" min="1" step="1" value="${escapeHtml(r.larghezza)}"><div class="tela-error">${err&&Number(r.larghezza)<=0?err:''}</div></td>
       <td><input class="row-mini-input" data-field="altezza" type="number" min="1" max="2970" step="1" value="${escapeHtml(r.altezza)}"><div class="tela-error">${escapeHtml(err)}</div></td>
       <td><select data-field="spessore"><option value="18" ${r.spessore==='18'?'selected':''}>1,8 cm</option><option value="60" ${r.spessore==='60'?'selected':''}>6 cm</option></select></td>
       <td><select data-field="tipo"><option value="standard" ${r.tipo==='standard'?'selected':''}>Standard</option><option value="special" ${r.tipo==='special'?'selected':''}>Special Edition</option></select></td>
-      <td class="num">${calc?fmtMQ(calc.mq):'—'}</td><td class="num">${calc?fmtEUR(calc.righe[0].importo):'—'}</td><td><button class="ghost danger" data-action="delete" type="button">✕</button></td>`;
+      <td class="num">${calc?fmtMQ(calc.mq):'—'}</td><td class="num">${calc?fmtEUR(calc.righe[0].importo):'—'}</td><td><button class="ghost danger" data-action="delete" type="button">✕</button></td>\`;
     tr.querySelectorAll('[data-field]').forEach(el=>el.addEventListener('input',()=>{
       r[el.dataset.field]=el.type==='number'?el.value:el.value;
       renderTelaRighe(); renderTelaDettaglio(); renderTelaTotali(); autosaveTela();
@@ -559,20 +617,20 @@ function renderTelaDettaglio(){
   document.getElementById('tela-dettaglio-empty').style.display=t.righeCalc.length?'none':'block';
   t.righeCalc.forEach((x,i)=>{
     const h=document.createElement('tr'); h.className='tela-detail-group';
-    h.innerHTML=`<td colspan="4">${escapeHtml(x.riga.rifAmbiente||('Elemento '+(i+1)))} — ${fmtMM(x.calc.L)} × ${fmtMM(x.calc.H)}</td>`; body.appendChild(h);
-    x.calc.righe.forEach(item=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${escapeHtml(item.descrizione)}</td><td class="num">${Number.isInteger(item.qta)?item.qta:item.qta.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td class="num">${fmtEUR(item.prezzo)}</td><td class="num">${fmtEUR(item.importo)}</td>`; body.appendChild(tr); });
+    h.innerHTML=\`<td colspan="4">${escapeHtml(x.riga.rifAmbiente||('Elemento '+(i+1)))} — ${fmtMM(x.calc.L)} × ${fmtMM(x.calc.H)}</td>\`; body.appendChild(h);
+    x.calc.righe.forEach(item=>{ const tr=document.createElement('tr'); tr.innerHTML=\`<td>${escapeHtml(item.descrizione)}</td><td class="num">${Number.isInteger(item.qta)?item.qta:item.qta.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td class="num">${fmtEUR(item.prezzo)}</td><td class="num">${fmtEUR(item.importo)}</td>\`; body.appendChild(tr); });
   });
 }
 function renderTelaTotali(){
   const t=calcolaTelaTotali(), box=document.getElementById('tela-totals-box');
-  box.innerHTML=`<div class="line"><span class="lbl">Totale merce</span><span>${fmtEUR(t.totaleMerce)}</span></div>
+  box.innerHTML=\`<div class="line"><span class="lbl">Totale merce</span><span>${fmtEUR(t.totaleMerce)}</span></div>
     <div class="line"><span class="lbl">Totale superficie</span><span>${fmtMQ(t.totaleMq)}</span></div>
     <div class="line"><span class="lbl">Sconto ${t.sconto}% (solo merce)</span><span>− ${fmtEUR(t.totaleMerce-t.merceScontata)}</span></div>
     <div class="line"><span class="lbl">Merce dopo lo sconto</span><span>${fmtEUR(t.merceScontata)}</span></div>
     <div class="line"><span class="lbl">Trasporto (non soggetto a sconto)</span><span>${fmtEUR(t.trasporto)}</span></div>
     <div class="line"><span class="lbl">Imponibile IVA</span><span>${fmtEUR(t.imponibileIva)}</span></div>
     <div class="line"><span class="lbl">IVA 22%</span><span>${fmtEUR(t.iva)}</span></div>
-    <div class="line grand"><span class="lbl">Totale ivato</span><span>${fmtEUR(t.totale)}</span></div>`;
+    <div class="line grand"><span class="lbl">Totale ivato</span><span>${fmtEUR(t.totale)}</span></div>\`;
 }
 function hydrateTelaForm(){
   document.getElementById('tela-numero').value=telaPreventivo.numero||'';
@@ -601,7 +659,7 @@ document.querySelectorAll('.tab').forEach(btn=>{
 function renderClienteSelect(){  
   const sel = document.getElementById('pv-cliente');  
   sel.innerHTML = '<option value="">— Seleziona cliente —</option>' +  
-    clienti.map(c => `<option value="${c.id}" ${c.id===preventivo.clienteId?'selected':''}>${c.codice ? c.codice+' — ' : ''}${escapeHtml(c.nome)}</option>`).join('');  
+    clienti.map(c => \`<option value="${c.id}" ${c.id===preventivo.clienteId?'selected':''}>${c.codice ? c.codice+' — ' : ''}${escapeHtml(c.nome)}</option>\`).join('');  
   sel.onchange = ()=>{ preventivo.clienteId = sel.value; renderClienteDettagli(); autosave(); };  
   renderClienteDettagli();  
 }  
@@ -629,7 +687,7 @@ function ensureProdottoValido(riga){
 function buildProdottoOptionsHtml(riga, requireSpecial){  
   return prodotti.map(p=>{  
     const disabled = requireSpecial && !isSpecialEdition(p);  
-    return `<option value="${p.id}" ${p.id===riga.prodottoId?'selected':''} ${disabled?'disabled':''}>${escapeHtml(p.descrizione)}${disabled?' — non disp. (Special Edition)':''}</option>`;  
+    return \`<option value="${p.id}" ${p.id===riga.prodottoId?'selected':''} ${disabled?'disabled':''}>${escapeHtml(p.descrizione)}${disabled?' — non disp. (Special Edition)':''}</option>\`;  
   }).join('');  
 }  
 function renderRighe(){  
@@ -654,7 +712,7 @@ function renderRighe(){
     const tdSfrido = document.createElement('td'); tdSfrido.className='num';  
     if(calc){  
       const warn = calc.sfrido < 100;  
-      tdSfrido.innerHTML = `<span class="badge ${warn?'warn':'ok'}">${fmtMM(calc.sfrido)}</span>`;  
+      tdSfrido.innerHTML = \`<span class="badge ${warn?'warn':'ok'}">${fmtMM(calc.sfrido)}</span>\`;  
     } else tdSfrido.textContent = '—';  
     const tdMq = document.createElement('td'); tdMq.className='num'; tdMq.textContent = calc? fmtMQ(calc.mq) : '—';  
     const tdImp = document.createElement('td'); tdImp.className='num'; tdImp.textContent = calc? fmtEUR(calc.importo) : '—';  
@@ -709,9 +767,9 @@ function graficaStatusHtml(codice){
   if(!codice || !codice.trim()) return '';  
   const match = trovaGrafica(codice);  
   if(match){  
-    return `<a href="${escapeHtml(match.url)}" target="_blank">Apri pagina ↗</a>${match.specialEdition ? ' <span class="badge special">Special Edition</span>' : ''}`;  
+    return \`<a href="${escapeHtml(match.url)}" target="_blank">Apri pagina ↗</a>${match.specialEdition ? ' <span class="badge special">Special Edition</span>' : ''}\`;  
   }  
-  return `<a href="${googleSiteSearchUrl(codice)}" target="_blank">Cerca sul sito ↗</a> <span class="muted">— non in catalogo</span>`;  
+  return \`<a href="${googleSiteSearchUrl(codice)}" target="_blank">Cerca sul sito ↗</a> <span class="muted">— non in catalogo</span>\`;  
 }  
 // lightweight refresh of computed cells only (avoids losing focus while typing dimensions)  
 function renderRighe_partial(){  
@@ -723,7 +781,7 @@ function renderRighe_partial(){
     cells[6].textContent = calc? calc.nRolli : '—';  
     if(calc){  
       const warn = calc.sfrido < 100;  
-      cells[7].innerHTML = `<span class="badge ${warn?'warn':'ok'}">${fmtMM(calc.sfrido)}</span>`;  
+      cells[7].innerHTML = \`<span class="badge ${warn?'warn':'ok'}">${fmtMM(calc.sfrido)}</span>\`;  
     } else cells[7].textContent='—';  
     cells[8].textContent = calc? fmtMQ(calc.mq) : '—';  
     cells[9].textContent = calc? fmtEUR(calc.importo) : '—';  
@@ -757,7 +815,7 @@ function geomImmagine(riga, F, A){
   return { w, h, ovX, ovY, left: ovX * px, top: ovY * py };  
 }  
 function stileImg(g){  
-  return `width:${g.w}%; height:${g.h}%; left:${g.left}%; top:${g.top}%;`;  
+  return \`width:${g.w}%; height:${g.h}%; left:${g.left}%; top:${g.top}%;\`;  
 }  
 function contestoImg(rigaId){  
   const riga = preventivo.righe.find(r => r.id === rigaId);  
@@ -847,14 +905,14 @@ function reimpostaImg(rigaId){
 function overlayHtml(riga, calc){  
   const tPct = 50 / (riga.altezza + 100) * 100;  
   const wPct = (calc.sfrido / 2) / calc.larghezzaArr * 100;  
-  let h = `<div class="wb wb-t" style="top:0; left:0; width:100%; height:${tPct}%;"></div>`  
-        + `<div class="wb wb-b" style="bottom:0; left:0; width:100%; height:${tPct}%;"></div>`;  
+  let h = \`<div class="wb wb-t" style="top:0; left:0; width:100%; height:${tPct}%;"></div>\`  
+        \+ \`<div class="wb wb-b" style="bottom:0; left:0; width:100%; height:${tPct}%;"></div>\`;  
   if(wPct > 0){  
-    h += `<div class="wb wb-l" style="left:0; top:${tPct}%; bottom:${tPct}%; width:${wPct}%;"></div>`  
-       + `<div class="wb wb-r" style="right:0; top:${tPct}%; bottom:${tPct}%; width:${wPct}%;"></div>`;  
+    h += \`<div class="wb wb-l" style="left:0; top:${tPct}%; bottom:${tPct}%; width:${wPct}%;"></div>\`  
+       \+ \`<div class="wb wb-r" style="right:0; top:${tPct}%; bottom:${tPct}%; width:${wPct}%;"></div>\`;  
   }  
   for(let k = 1; k < calc.nRolli; k++){  
-    h += `<div class="roll-line" style="left:${k * calc.rollWidth / calc.larghezzaArr * 100}%;"></div>`;  
+    h += \`<div class="roll-line" style="left:${k * calc.rollWidth / calc.larghezzaArr * 100}%;"></div>\`;  
   }  
   return h;  
 }  
@@ -862,7 +920,7 @@ function renderRuler(){
   const wrap = document.getElementById('ruler-section');  
   const rows = preventivo.righe.map(r => ({ riga: r, calc: calcolaRiga(r) })).filter(x => x.calc);  
   if(!rows.length){ wrap.innerHTML = ''; return; }  
-  wrap.innerHTML = `<div class="card"><h2><span class="num">＝</span> Taglio rotoli</h2>` +  
+  wrap.innerHTML = \`<div class="card"><h2><span class="num">＝</span> Taglio rotoli</h2>\` +  
     rows.map(({ riga, calc }) => {  
       const grafica = trovaGrafica(riga.codiceGrafica);  
       const url = grafica && grafica.immagine ? grafica.immagine : '';  
@@ -874,14 +932,14 @@ function renderRuler(){
       const wasteEach = calc.sfrido / 2;  
       const label = (riga.rifAmbiente || riga.rif || calc.prodotto.descrizione);  
       const specialTag = grafica && grafica.specialEdition ? ' <span class="badge special">Special Edition</span>' : '';  
-      const graficaLink = grafica ? ` · <a href="${escapeHtml(grafica.url)}" target="_blank" style="color:var(--gold); text-decoration:none;">${escapeHtml(grafica.nome || riga.codiceGrafica)} ↗</a>` : (riga.codiceGrafica ? ` · <a href="${googleSiteSearchUrl(riga.codiceGrafica)}" target="_blank" style="color:var(--gold); text-decoration:none;">cerca "${escapeHtml(riga.codiceGrafica)}" ↗</a>` : '');  
+      const graficaLink = grafica ? \` · <a href="${escapeHtml(grafica.url)}" target="_blank" style="color:var(--gold); text-decoration:none;">${escapeHtml(grafica.nome || riga.codiceGrafica)} ↗</a>\` : (riga.codiceGrafica ? \` · <a href="${googleSiteSearchUrl(riga.codiceGrafica)}" target="_blank" style="color:var(--gold); text-decoration:none;">cerca "${escapeHtml(riga.codiceGrafica)}" ↗</a>\` : '');  
       const g = imgOk ? geomImmagine(riga, F, A) : null;  
       const overlays = overlayHtml(riga, calc);  
       const scale = riga.imgScale || 100;  
-      const imgPreview = imgOk ? `<img class="wall-img" id="img-${riga.id}" src="${escapeHtml(url)}" style="${stileImg(g)}">` : '';  
+      const imgPreview = imgOk ? \`<img class="wall-img" id="img-${riga.id}" src="${escapeHtml(url)}" style="${stileImg(g)}">\` : '';  
       let editor = '';  
       if(imgOk){  
-        editor = `  
+        editor = \`  
           <div class="crop-tool-row no-print">  
             <div class="crop-stage" id="stage-${riga.id}" style="--ar:${F};" onmousedown="iniziaTrascinamento(event,'${riga.id}')" ontouchstart="iniziaTrascinamento(event,'${riga.id}')">  
               <div class="crop-frame-anchor"><img class="wall-img" id="editimg-${riga.id}" src="${escapeHtml(url)}" draggable="false" style="${stileImg(g)}"></div>  
@@ -894,13 +952,13 @@ function renderRuler(){
               <button type="button" class="ghost" onclick="reimpostaImg('${riga.id}')">Reimposta</button>  
             </div>  
             <div class="crop-hint">Trascina l'immagine per scegliere l'inquadratura: il riquadro dorato è ciò che verrà stampato, le fasce rosse sono lo sfrido.</div>  
-          </div>`;  
+          </div>\`;  
       } else if(caricamento){  
-        editor = `<div class="crop-hint no-print">Caricamento immagine…</div>`;  
+        editor = \`<div class="crop-hint no-print">Caricamento immagine…</div>\`;  
       } else if(fallita){  
-        editor = `<div class="crop-hint warn no-print">Impossibile caricare l'immagine: controlla il link nel Catalogo grafiche.</div>`;  
+        editor = \`<div class="crop-hint warn no-print">Impossibile caricare l'immagine: controlla il link nel Catalogo grafiche.</div>\`;  
       }  
-      return `<div class="ruler-wrap">  
+      return \`<div class="ruler-wrap">  
           <div class="ruler-caption"><span>${escapeHtml(label)} — ${calc.prodotto.descrizione}${specialTag}${graficaLink}</span><span>${calc.nRolli} × ${calc.rollWidth}mm</span></div>  
           ${editor}  
           <div class="wall-rect-outer" style="--ar:${F};">  
@@ -909,14 +967,14 @@ function renderRuler(){
             <div class="dim-caption">↕ margine 50mm</div>  
           </div>  
           <div class="ruler-caption"><span>Larghezza richiesta ${fmtMM(riga.larghezza)} · Altezza ${fmtMM(riga.altezza)}</span><span class="${calc.sfrido < 100 ? 'waste-note' : ''}">Sfrido ${fmtMM(calc.sfrido)} totale — ${fmtMM(wasteEach)} primo + ${fmtMM(wasteEach)} ultimo rotolo${calc.sfrido < 100 ? ' · sotto il minimo 100mm' : ''}</span></div>  
-        </div>`;  
-    }).join('<div style="height:14px;"></div>') + `</div>`;  
+        </div>\`;  
+    }).join('<div style="height:14px;"></div>') + \`</div>\`;  
 }  
 /* ===================== RENDER: TOTALI ===================== */  
 function renderTotali(){  
   const t = calcolaTotali();  
   const box = document.getElementById('totals-box');  
-  box.innerHTML = `  
+  box.innerHTML = \`  
     <div class="line"><span class="lbl">Totale merce</span><span>${fmtEUR(t.totaleMerce)}</span></div>  
     <div class="line"><span class="lbl">Totale superficie</span><span>${fmtMQ(t.totaleMq)}</span></div>  
     <div class="line"><span class="lbl">Sconto ${preventivo.sconto||0}% (solo su merce)</span><span>− ${fmtEUR(t.totaleMerce - t.imponibile)}</span></div>  
@@ -925,7 +983,7 @@ function renderTotali(){
     <div class="line"><span class="lbl">Trasporto (non soggetto a sconto)</span><span>${fmtEUR(t.trasporto)}</span></div>  
     <div class="line"><span class="lbl">IVA 22%</span><span>${fmtEUR(t.iva)}</span></div>  
     <div class="line grand"><span class="lbl">Totale</span><span>${fmtEUR(t.totale)}</span></div>  
-  `;  
+  \`;  
 }  
 /* ===================== EVENTS: TELA ===================== */
 document.getElementById('tela-numero').addEventListener('input',e=>{telaPreventivo.numero=e.target.value;autosaveTela();});
@@ -1003,7 +1061,7 @@ function renderClientiTable(){
   empty.style.display = clienti.length? 'none':'block';  
   clienti.forEach(c=>{  
     const tr = document.createElement('tr');  
-    tr.innerHTML = `<td>${escapeHtml(c.codice||'')}</td><td>${escapeHtml(c.nome||'')}</td><td>${escapeHtml(c.citta||'')}</td><td>${escapeHtml(c.piva||'')}</td><td>${escapeHtml(c.telefono||'')}</td><td></td>`;  
+    tr.innerHTML = \`<td>${escapeHtml(c.codice||'')}</td><td>${escapeHtml(c.nome||'')}</td><td>${escapeHtml(c.citta||'')}</td><td>${escapeHtml(c.piva||'')}</td><td>${escapeHtml(c.telefono||'')}</td><td></td>\`;  
     const del = document.createElement('button'); del.className='ghost'; del.textContent='✕';  
     del.onclick = async ()=>{ clienti = clienti.filter(x=>x.id!==c.id); await saveKey('clienti', clienti); renderClientiTable(); renderClienteSelect(); renderTelaClienteSelect(); };  
     tr.lastElementChild.appendChild(del);  
@@ -1034,7 +1092,7 @@ function renderProdottiTable(){
   body.innerHTML='';  
   prodotti.forEach(p=>{  
     const tr = document.createElement('tr');  
-    tr.innerHTML = `<td>${escapeHtml(p.descrizione)}</td><td class="num">${fmtEUR(p.prezzo)}</td><td class="num">${p.larghezza} mm</td><td></td>`;  
+    tr.innerHTML = \`<td>${escapeHtml(p.descrizione)}</td><td class="num">${fmtEUR(p.prezzo)}</td><td class="num">${p.larghezza} mm</td><td></td>\`;  
     const del = document.createElement('button'); del.className='ghost'; del.textContent='✕';  
     del.onclick = async ()=>{  
       prodotti = prodotti.filter(x=>x.id!==p.id);  
@@ -1065,7 +1123,7 @@ document.getElementById('btn-save-primer').addEventListener('click', async ()=>{
 /* ===================== CATALOGO GRAFICHE ===================== */  
 function renderGraficheDatalist(){  
   const dl = document.getElementById('grafiche-datalist');  
-  dl.innerHTML = grafiche.map(g => `<option value="${escapeHtml(g.codice)}">${escapeHtml(g.nome||'')}${g.specialEdition?' — Special Edition':''}</option>`).join('');  
+  dl.innerHTML = grafiche.map(g => \`<option value="${escapeHtml(g.codice)}">${escapeHtml(g.nome||'')}${g.specialEdition?' — Special Edition':''}</option>\`).join('');  
 }  
 function renderGraficheTable(){  
   const body = document.getElementById('grafiche-body');  
@@ -1074,8 +1132,8 @@ function renderGraficheTable(){
   empty.style.display = grafiche.length? 'none':'block';  
   grafiche.forEach(g=>{  
     const tr = document.createElement('tr');  
-    const thumb = g.immagine ? `<img src="${escapeHtml(g.immagine)}" style="width:36px; height:24px; object-fit:cover; border-radius:3px; vertical-align:middle; margin-right:6px; border:1px solid var(--line);">` : '';  
-    tr.innerHTML = `<td>${thumb}${escapeHtml(g.codice)}</td><td>${escapeHtml(g.nome||'')}${g.specialEdition?' <span class="badge special">Special Edition</span>':''}</td><td><a href="${escapeHtml(g.url)}" target="_blank" style="color:var(--gold);">Apri ↗</a></td><td></td>`;  
+    const thumb = g.immagine ? \`<img src="${escapeHtml(g.immagine)}" style="width:36px; height:24px; object-fit:cover; border-radius:3px; vertical-align:middle; margin-right:6px; border:1px solid var(--line);">\` : '';  
+    tr.innerHTML = \`<td>${thumb}${escapeHtml(g.codice)}</td><td>${escapeHtml(g.nome||'')}${g.specialEdition?' <span class="badge special">Special Edition</span>':''}</td><td><a href="${escapeHtml(g.url)}" target="_blank" style="color:var(--gold);">Apri ↗</a></td><td></td>\`;  
     const del = document.createElement('button'); del.className='ghost'; del.textContent='✕';  
     del.onclick = async ()=>{  
       grafiche = grafiche.filter(x=>x.id!==g.id);  
@@ -1116,7 +1174,7 @@ function renderSalvati(){
     const div = document.createElement('div');  
     div.className='saved-item';  
     const tipoLabel=s.tipo==='tela'?'Tela':'Carta da parati';
-    div.innerHTML = `<div class="meta"><span class="badge ${s.tipo==='tela'?'special':'ok'}">${tipoLabel}</span> <b>${escapeHtml(s.numero)}</b> — ${escapeHtml(s.clienteNome)} · ${s.data} · ${fmtEUR(s.totale)}</div>`;  
+    div.innerHTML = \`<div class="meta"><span class="badge ${s.tipo==='tela'?'special':'ok'}">${tipoLabel}</span> <b>${escapeHtml(s.numero)}</b> — ${escapeHtml(s.clienteNome)} · ${s.data} · ${fmtEUR(s.totale)}</div>\`;  
     const btnGroup = document.createElement('div');  
     const loadBtn = document.createElement('button'); loadBtn.textContent='Apri';  
     loadBtn.onclick = ()=>{
@@ -1161,7 +1219,7 @@ function exportBackup(){
   const url = URL.createObjectURL(blob);  
   const a = document.createElement('a');  
   a.href = url;  
-  a.download = `inchiostro-bianco-backup-${new Date().toISOString().slice(0,10)}.json`;  
+  a.download = \`inchiostro-bianco-backup-${new Date().toISOString().slice(0,10)}.json\`;  
   document.body.appendChild(a); a.click(); a.remove();  
   URL.revokeObjectURL(url);  
 }  
@@ -1224,9 +1282,7 @@ async function init(){
   hydratePreventivoForm(); hydrateTelaForm();  
 }  
 init();  
-</script>  
-  
-
+</script>    
 <div id="tela-revision">
 <style>
 #tela-righe-table{min-width:1080px}#tela-righe-table td:first-child{min-width:130px}#tela-righe-table td:nth-child(2),#tela-righe-table td:nth-child(3){min-width:105px}.tela-preview-title{font-size:15px;margin-block:18px 8px;color:var(--gold)}.tela-print-frame{border:2px solid var(--gold);border-radius:0}.tela-status{min-height:16px}.tela-crop-editor .crop-stage{max-width:100%;outline:none}.tela-crop-editor .crop-stage:focus-visible{outline:2px solid var(--gold)}.tela-crop-editor .wall-img{pointer-events:none;user-select:none}.tela-frame-label{color:var(--paper-dim);font-size:12px;margin-block:6px}.tela-preview-item{padding-block-end:20px;border-block-end:1px solid var(--line)}#tela-previews:empty{display:none}.tabs{flex-wrap:wrap}.tela-preview-message{color:var(--paper-dim);line-height:1.5}
@@ -1240,13 +1296,13 @@ const originalGraficheTable=renderGraficheTable;
 function nuovaTelaRiga(){return {id:uid(),rifAmbiente:'',larghezza:'',altezza:'',spessore:'18',tipo:'standard',codiceGrafica:'',imgScale:100,imgPx:0.5,imgPy:0.5};}
 function telaImageSource(value){
   const u=String(value||'').trim();
-  if(/^data:image\/(png|jpeg|webp|gif);base64,/i.test(u))return u;
+  if(/^data:image\\/(png|jpeg|webp|gif);base64,/i.test(u))return u;
   try{const url=new URL(u);return ['https:','http:'].includes(url.protocol)?url.href:'';}catch{return '';}
 }
 function telaGraphicOptions(r){
   let html='<option value="">— Scegli dal catalogo —</option>';
-  if(r.codiceGrafica&&!trovaGrafica(r.codiceGrafica))html+=`<option value="${escapeHtml(r.codiceGrafica)}" selected>${escapeHtml(r.codiceGrafica)} (non in catalogo)</option>`;
-  return html+grafiche.map(g=>`<option value="${escapeHtml(g.codice)}" ${String(g.codice).toLowerCase()===String(r.codiceGrafica||'').toLowerCase()?'selected':''}>${escapeHtml(g.codice)}${g.nome?' — '+escapeHtml(g.nome):''}${g.specialEdition?' — Special Edition':''}</option>`).join('');
+  if(r.codiceGrafica&&!trovaGrafica(r.codiceGrafica))html+=\`<option value="${escapeHtml(r.codiceGrafica)}" selected>${escapeHtml(r.codiceGrafica)} (non in catalogo)</option>\`;
+  return html+grafiche.map(g=>\`<option value="${escapeHtml(g.codice)}" ${String(g.codice).toLowerCase()===String(r.codiceGrafica||'').toLowerCase()?'selected':''}>${escapeHtml(g.codice)}${g.nome?' — '+escapeHtml(g.nome):''}${g.specialEdition?' — Special Edition':''}</option>\`).join('');
 }
 function telaPrintValue(el,td){el.classList.add('has-print-val');const p=document.createElement('span');p.className='print-val';td.append(p);return p;}
 function renderTelaRighe(){
@@ -1335,14 +1391,77 @@ upload.addEventListener('change',()=>{const file=upload.files[0];if(!file)return
 const validateTelaAction=e=>{if(telaPreventivo.righe.some(r=>!calcolaTelaRiga(r))||!telaPreventivo.righe.length){e.preventDefault();e.stopImmediatePropagation();alert('Completa tutte le righe Tela con misure valide prima di salvare o stampare.');}};
 document.getElementById('btn-salva-tela').addEventListener('click',validateTelaAction,true);document.getElementById('btn-stampa-tela').addEventListener('click',validateTelaAction,true);
 </script>
-
 </div>
 <div id="tela-responsive-fix"><style>
 #panel-tela .totals .line{gap:12px}#panel-tela .totals .line .lbl{min-width:0;overflow-wrap:anywhere}#panel-tela .totals .line>span:last-child{flex-shrink:0}#panel-tela .field{min-width:0}
 @media(max-width:540px){#panel-tela .grid.cols-2{grid-template-columns:minmax(0,1fr)}#panel-tela .grid.cols-4{grid-template-columns:repeat(2,minmax(0,1fr))}#panel-tela .img-controls{gap:8px}#panel-tela .img-controls input[type="range"]{max-width:125px}}
-
 @media(max-width:540px){.brand{min-width:0;max-width:100%}.brand .sub{letter-spacing:1px;font-size:10px;overflow-wrap:anywhere}.brand .mark{font-size:30px}}
 </style></div>
 
+<script>
+/* INK RUGS module */
+const RUGS_LISTINO=[
+{cat:'FORME BASE',nome:'Rettangolo 300x200 cm',dim:'300x200 cm',compact:1630,soft:1850,overlock:100,ribbon:140,luxury:210},
+{cat:'FORME BASE',nome:'Rettangolo 240x180 cm',dim:'240x180 cm',compact:1197,soft:1315,overlock:84,ribbon:117.60,luxury:176.40},
+{cat:'FORME BASE',nome:'Cerchio diam. 200 cm',dim:'diam. 200 cm',compact:1115,soft:1260,overlock:80,ribbon:112,luxury:168},
+{cat:'FORME BASE',nome:'Cerchio diam. 284 cm',dim:'diam. 284 cm',compact:2190,soft:2500,overlock:113.60,ribbon:159.04,luxury:238.56},
+{cat:'FORME BASE',nome:'Rettangolo 600x400 cm',dim:'600x400 cm',compact:6500,soft:7390,overlock:200,ribbon:280,luxury:420},
+{cat:'FORME BASE',nome:'Rettangolo 450x300 cm',dim:'450x300 cm',compact:3650,soft:4150,overlock:150,ribbon:210,luxury:315},
+{cat:'FORME BASE',nome:'Rettangolo 300x225 cm',dim:'300x225 cm',compact:1900,soft:2100,overlock:105,ribbon:147,luxury:220.50},
+{cat:'FORME SPECIALI',nome:'The first woman on Mars 165x241,5 cm',dim:'165x241,5 cm',compact:1870,soft:1998,overlock:81.30,ribbon:113.82,luxury:170.73},
+{cat:'FORME SPECIALI',nome:'Stones 194,5x291 cm',dim:'194,5x291 cm',compact:1870,soft:1998,luxury:203.91,onlyLuxury:true},
+{cat:'FORME SPECIALI',nome:'Fields 266x400 cm',dim:'266x400 cm',compact:2750,soft:3150,overlock:133.20,ribbon:186.48,luxury:279.72},
+{cat:'FORME SPECIALI',nome:'Stamps 250x400 cm',dim:'250x400 cm',compact:2750,soft:3150,luxury:273,onlyLuxury:true},
+{cat:'FORME SPECIALI',nome:'Loose 225x375 cm',dim:'225x375 cm',compact:2350,soft:2640,luxury:252,onlyLuxury:true},
+{cat:'FORME SPECIALI',nome:'Yu Wu 200x283 cm',dim:'200x283 cm',compact:2100,soft:2400,luxury:202.86,onlyLuxury:true},
+{cat:'FORME SPECIALI',nome:'Konao 170x290 cm',dim:'170x290 cm',compact:1750,soft:2000,luxury:193.20,onlyLuxury:true},
+{cat:'FORME SPECIALI',nome:'Shui 200x280 cm',dim:'200x280 cm',compact:2100,soft:2400,luxury:201.60,onlyLuxury:true},
+{cat:'FORME SPECIALI',nome:'Fold 328x318 cm',dim:'328x318 cm',compact:3280,soft:3730,luxury:271.32,onlyLuxury:true},
+{cat:'FORME SPECIALI',nome:'Pelagia 400x400 cm',dim:'400x400 cm',compact:5600,soft:6400,luxury:336,onlyLuxury:true},
+{cat:'FORME SPECIALI',nome:'The potion 245x250 cm',dim:'245x250 cm',compact:2580,soft:2900,luxury:207.90,onlyLuxury:true}
+];
+let rugsPreventivo={numero:'',data:new Date().toISOString().slice(0,10),clienteId:'',sconto:0,righe:[]};
+function nuovaRugRiga(){return{id:uid(),cat:'FORME BASE',forma:RUGS_LISTINO[0].nome,rif:'',materiale:'SOFT TOUCH',bordatura:'RIBBON',qta:1};}
+function rugItem(r){return RUGS_LISTINO.find(x=>x.cat===r.cat&&x.nome===r.forma)||null;}
+function calcRug(r){const x=rugItem(r),q=Math.max(0,Number(r.qta)||0);if(!x||!q)return null;const base=r.materiale==='COMPACT'?x.compact:x.soft;const key={OVERLOCK:'overlock',RIBBON:'ribbon',LUXURY:'luxury'}[r.bordatura];const bordo=x[key];if(!Number.isFinite(bordo))return null;return{unit:base+bordo,tot:(base+bordo)*q};}
+function calcRugsTotali(){const valid=rugsPreventivo.righe.map(r=>({r,c:calcRug(r)})).filter(x=>x.c);const merce=valid.reduce((s,x)=>s+x.c.tot,0),sconto=Math.min(100,Math.max(0,Number(rugsPreventivo.sconto)||0)),imponibile=merce*(1-sconto/100),iva=imponibile*.22;return{merce,sconto,imponibile,iva,totale:imponibile+iva,valid};}
+function rugOptions(cat,selected){return RUGS_LISTINO.filter(x=>x.cat===cat).map(x=>`<option ${x.nome===selected?'selected':''}>${escapeHtml(x.nome)}</option>`).join('');}
+function rugBorderOptions(x,selected){const all=x&&x.onlyLuxury?['LUXURY']:['OVERLOCK','RIBBON','LUXURY'];return all.map(v=>`<option ${v===selected?'selected':''}>${v}</option>`).join('');}
+function rugShapeClass(x){if(!x)return'';if(/Cerchio/.test(x.nome))return'circle';if(/Fold/.test(x.nome))return'special fold';if(/Pelagia/.test(x.nome))return'special pelagia';if(/potion/i.test(x.nome))return'special potion';return x.cat==='FORME SPECIALI'?'special':'';}
+function renderRugsCliente(){const s=document.getElementById('rugs-cliente');s.innerHTML='<option value="">— Seleziona cliente —</option>'+clienti.map(c=>`<option value="${c.id}" ${c.id===rugsPreventivo.clienteId?'selected':''}>${c.codice?escapeHtml(c.codice)+' — ':''}${escapeHtml(c.nome)}</option>`).join('');s.onchange=()=>{rugsPreventivo.clienteId=s.value;renderRugsClienteDettagli();autosaveRugs();};renderRugsClienteDettagli();}
+function renderRugsClienteDettagli(){const c=clienti.find(x=>x.id===rugsPreventivo.clienteId);document.getElementById('rugs-cliente-dettagli').textContent=c?[c.indirizzo,[c.cap,c.citta,c.prov].filter(Boolean).join(' '),c.piva?'P.IVA '+c.piva:'',c.telefono].filter(Boolean).join(' · '):'';}
+function renderRugs(){
+ const body=document.getElementById('rugs-body');body.replaceChildren();document.getElementById('rugs-empty').style.display=rugsPreventivo.righe.length?'none':'block';
+ rugsPreventivo.righe.forEach(r=>{
+  let x=rugItem(r);if(!x){r.forma=RUGS_LISTINO.find(y=>y.cat===r.cat)?.nome||'';x=rugItem(r);}if(x?.onlyLuxury)r.bordatura='LUXURY';
+  const tr=document.createElement('tr'),c=calcRug(r);tr.classList.toggle('rug-invalid',!c);
+  tr.innerHTML=`<td><select data-f="cat"><option>FORME BASE</option><option>FORME SPECIALI</option></select></td>
+  <td><select data-f="forma">${rugOptions(r.cat,r.forma)}</select></td>
+  <td><div class="rug-preview" title="${escapeHtml(r.forma)}"><span class="rug-shape ${rugShapeClass(x)}"></span></div></td>
+  <td><input data-f="rif" value="${escapeHtml(r.rif||'')}" placeholder="Codice / riferimento"></td>
+  <td><select data-f="materiale"><option>COMPACT</option><option>SOFT TOUCH</option></select></td>
+  <td><select data-f="bordatura">${rugBorderOptions(x,r.bordatura)}</select>${c?'':'<div class="rug-error">Combinazione non disponibile</div>'}</td>
+  <td><input data-f="qta" type="number" min="1" step="1" value="${r.qta}"></td><td class="num">${c?fmtEUR(c.unit):'—'}</td><td class="num">${c?fmtEUR(c.tot):'—'}</td><td class="no-print"><button class="ghost danger" data-del>✕</button></td>`;
+  tr.querySelector('[data-f="cat"]').value=r.cat;tr.querySelector('[data-f="materiale"]').value=r.materiale;tr.querySelector('[data-f="bordatura"]').value=r.bordatura;
+  tr.querySelectorAll('[data-f]').forEach(el=>el.addEventListener('change',()=>{r[el.dataset.f]=el.type==='number'?Number(el.value):el.value;if(el.dataset.f==='cat'){r.forma=RUGS_LISTINO.find(y=>y.cat===r.cat).nome;r.bordatura='RIBBON';}renderRugs();renderRugsTotali();autosaveRugs();}));
+  tr.querySelector('[data-f="rif"]').addEventListener('input',e=>{r.rif=e.target.value;autosaveRugs();});
+  tr.querySelector('[data-del]').onclick=()=>{rugsPreventivo.righe=rugsPreventivo.righe.filter(x=>x.id!==r.id);renderRugs();renderRugsTotali();autosaveRugs();};body.append(tr);
+ });
+}
+function renderRugsTotali(){const t=calcRugsTotali();document.getElementById('rugs-totals').innerHTML=`<div class="line"><span class="lbl">Totale merce</span><span>${fmtEUR(t.merce)}</span></div><div class="line"><span class="lbl">Sconto ${t.sconto}%</span><span>− ${fmtEUR(t.merce-t.imponibile)}</span></div><div class="line"><span class="lbl">Imponibile</span><span>${fmtEUR(t.imponibile)}</span></div><div class="line"><span class="lbl">IVA 22%</span><span>${fmtEUR(t.iva)}</span></div><div class="line grand"><span class="lbl">Totale ivato</span><span>${fmtEUR(t.totale)}</span></div>`;}
+function hydrateRugs(){document.getElementById('rugs-numero').value=rugsPreventivo.numero||'';document.getElementById('rugs-data').value=rugsPreventivo.data||new Date().toISOString().slice(0,10);document.getElementById('rugs-sconto').value=rugsPreventivo.sconto||0;renderRugsCliente();renderRugs();renderRugsTotali();}
+let rugsTimer;function autosaveRugs(){clearTimeout(rugsTimer);rugsTimer=setTimeout(()=>saveKey('rugs-preventivo-bozza',rugsPreventivo),400);}
+function prossimoNumeroRugs(){const y=new Date().getFullYear(),n=preventiviSalvati.filter(x=>x.tipo==='rugs').length+1;return`${y}-R${String(n).padStart(3,'0')}`;}
+document.getElementById('btn-add-rug').onclick=()=>{rugsPreventivo.righe.push(nuovaRugRiga());renderRugs();renderRugsTotali();autosaveRugs();};
+document.getElementById('rugs-numero').oninput=e=>{rugsPreventivo.numero=e.target.value;autosaveRugs();};
+document.getElementById('rugs-data').oninput=e=>{rugsPreventivo.data=e.target.value;autosaveRugs();};
+document.getElementById('rugs-sconto').oninput=e=>{rugsPreventivo.sconto=Number(e.target.value)||0;renderRugsTotali();autosaveRugs();};
+document.getElementById('btn-nuovo-rugs').onclick=()=>{if(!confirm('Svuotare il preventivo INK•RUGS corrente?'))return;rugsPreventivo={numero:prossimoNumeroRugs(),data:new Date().toISOString().slice(0,10),clienteId:'',sconto:0,righe:[]};hydrateRugs();autosaveRugs();};
+document.getElementById('btn-stampa-rugs').onclick=()=>{if(!rugsPreventivo.righe.length||calcRugsTotali().valid.length!==rugsPreventivo.righe.length){alert('Completa tutte le righe INK•RUGS prima di stampare.');return;}window.print();};
+document.getElementById('btn-salva-rugs').onclick=async()=>{const t=calcRugsTotali(),c=clienti.find(x=>x.id===rugsPreventivo.clienteId);if(!rugsPreventivo.righe.length||t.valid.length!==rugsPreventivo.righe.length){alert('Completa tutte le righe INK•RUGS prima di salvare.');return;}preventiviSalvati.push({id:uid(),tipo:'rugs',numero:rugsPreventivo.numero||prossimoNumeroRugs(),data:rugsPreventivo.data,clienteNome:c?.nome||'',totale:t.totale,statoRugs:JSON.parse(JSON.stringify(rugsPreventivo))});await saveKey('preventivi-salvati',preventiviSalvati);alert('Preventivo INK•RUGS salvato.');};
+const oldRenderSalvati=renderSalvati;
+renderSalvati=function(){oldRenderSalvati();document.querySelectorAll('#salvati-list .saved-item').forEach((div,i)=>{const s=preventiviSalvati[i];if(s?.tipo!=='rugs')return;const badge=div.querySelector('.badge');if(badge){badge.textContent='INK•RUGS';badge.className='badge special';}const open=div.querySelector('button');if(open)open.onclick=()=>{rugsPreventivo=JSON.parse(JSON.stringify(s.statoRugs));document.querySelector('.tab[data-tab="rugs"]').click();hydrateRugs();};});};
+const rugsBoot=setInterval(async()=>{if(!Array.isArray(clienti)||!document.getElementById('rugs-cliente'))return;clearInterval(rugsBoot);const b=await loadKey('rugs-preventivo-bozza',null);if(b?.righe)rugsPreventivo=b;if(!rugsPreventivo.numero)rugsPreventivo.numero=prossimoNumeroRugs();hydrateRugs();},50);
+</script>
 
 </body></html>
