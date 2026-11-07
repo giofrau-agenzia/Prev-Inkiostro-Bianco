@@ -343,7 +343,7 @@
         <div class="field"><label>Sconto riservato %</label><input id="rugs-sconto" max="100" min="0" step="0.1" type="number" value="0"/></div>
       </div>
       <div class="totals" id="rugs-totals"></div>
-      <div class="hint">Prezzi al pubblico IVA esclusa. Trasporto franco fabbrica. Tempi di evasione: 4 settimane dalla conferma d’ordine.</div>
+      <div class="hint">Prezzi al pubblico IVA esclusa. Trasporto €30 non soggetto a sconto. Tempi di evasione: 4 settimane dalla conferma d’ordine.</div>
     </div>
     <div class="toolbar no-print">
       <button class="primary" id="btn-salva-rugs">Salva preventivo INK•RUGS</button>
@@ -1424,7 +1424,7 @@ let rugsPreventivo={numero:'',data:new Date().toISOString().slice(0,10),clienteI
 function nuovaRugRiga(){return{id:uid(),cat:'FORME BASE',forma:RUGS_LISTINO[0].nome,codiceGrafica:'',materiale:'SOFT TOUCH',bordatura:'RIBBON',qta:1};}
 function rugItem(r){return RUGS_LISTINO.find(x=>x.cat===r.cat&&x.nome===r.forma)||null;}
 function calcRug(r){const x=rugItem(r),q=Math.max(0,Number(r.qta)||0);if(!x||!q)return null;const base=r.materiale==='COMPACT'?x.compact:x.soft;const key={OVERLOCK:'overlock',RIBBON:'ribbon',LUXURY:'luxury'}[r.bordatura];const bordo=x[key];if(!Number.isFinite(bordo))return null;return{unit:base+bordo,tot:(base+bordo)*q};}
-function calcRugsTotali(){const valid=rugsPreventivo.righe.map(r=>({r,c:calcRug(r)})).filter(x=>x.c);const merce=valid.reduce((s,x)=>s+x.c.tot,0),sconto=Math.min(100,Math.max(0,Number(rugsPreventivo.sconto)||0)),imponibile=merce*(1-sconto/100),iva=imponibile*.22;return{merce,sconto,imponibile,iva,totale:imponibile+iva,valid};}
+function calcRugsTotali(){const valid=rugsPreventivo.righe.map(r=>({r,c:calcRug(r)})).filter(x=>x.c);const merce=valid.reduce((s,x)=>s+x.c.tot,0),sconto=Math.min(100,Math.max(0,Number(rugsPreventivo.sconto)||0)),merceScontata=merce*(1-sconto/100),trasporto=30,imponibile=merceScontata+trasporto,iva=imponibile*.22;return{merce,sconto,merceScontata,trasporto,imponibile,iva,totale:imponibile+iva,valid};}
 function rugOptions(cat,selected){return RUGS_LISTINO.filter(x=>x.cat===cat).map(x=>`<option ${x.nome===selected?'selected':''}>${escapeHtml(x.nome)}</option>`).join('');}
 function rugBorderOptions(x,selected){return['OVERLOCK','RIBBON','LUXURY'].map(v=>`<option value="${v}" ${v===selected?'selected':''} ${x?.onlyLuxury&&v!=='LUXURY'?'disabled':''}>${v}${x?.onlyLuxury&&v!=='LUXURY'?' — non disponibile':''}</option>`).join('');}
 function rugShapeClass(x){if(!x)return'';if(/Cerchio/.test(x.nome))return'circle';if(/Fold/.test(x.nome))return'special fold';if(/Pelagia/.test(x.nome))return'special pelagia';if(/potion/i.test(x.nome))return'special potion';return x.cat==='FORME SPECIALI'?'special':'';}
@@ -1448,7 +1448,7 @@ function renderRugs(){
   tr.querySelector('[data-del]').onclick=()=>{rugsPreventivo.righe=rugsPreventivo.righe.filter(x=>x.id!==r.id);renderRugs();renderRugsTotali();autosaveRugs();};body.append(tr);
  });
 }
-function renderRugsTotali(){const t=calcRugsTotali();document.getElementById('rugs-totals').innerHTML=`<div class="line"><span class="lbl">Totale merce</span><span>${fmtEUR(t.merce)}</span></div><div class="line"><span class="lbl">Sconto ${t.sconto}%</span><span>− ${fmtEUR(t.merce-t.imponibile)}</span></div><div class="line"><span class="lbl">Imponibile</span><span>${fmtEUR(t.imponibile)}</span></div><div class="line"><span class="lbl">IVA 22%</span><span>${fmtEUR(t.iva)}</span></div><div class="line grand"><span class="lbl">Totale ivato</span><span>${fmtEUR(t.totale)}</span></div>`;}
+function renderRugsTotali(){const t=calcRugsTotali();document.getElementById('rugs-totals').innerHTML=`<div class="line"><span class="lbl">Totale merce</span><span>${fmtEUR(t.merce)}</span></div><div class="line"><span class="lbl">Sconto ${t.sconto}%</span><span>− ${fmtEUR(t.merce-t.merceScontata)}</span></div><div class="line"><span class="lbl">Merce dopo lo sconto</span><span>${fmtEUR(t.merceScontata)}</span></div><div class="line"><span class="lbl">Trasporto (non soggetto a sconto)</span><span>${fmtEUR(t.trasporto)}</span></div><div class="line"><span class="lbl">Imponibile IVA</span><span>${fmtEUR(t.imponibile)}</span></div><div class="line"><span class="lbl">IVA 22%</span><span>${fmtEUR(t.iva)}</span></div><div class="line grand"><span class="lbl">Totale ivato</span><span>${fmtEUR(t.totale)}</span></div>`;}
 function hydrateRugs(){document.getElementById('rugs-numero').value=rugsPreventivo.numero||'';document.getElementById('rugs-data').value=rugsPreventivo.data||new Date().toISOString().slice(0,10);document.getElementById('rugs-sconto').value=rugsPreventivo.sconto||0;renderRugsCliente();renderRugs();renderRugsTotali();}
 let rugsTimer;function autosaveRugs(){clearTimeout(rugsTimer);rugsTimer=setTimeout(()=>saveKey('rugs-preventivo-bozza',rugsPreventivo),400);}
 function prossimoNumeroRugs(){const y=new Date().getFullYear(),n=preventiviSalvati.filter(x=>x.tipo==='rugs').length+1;return`${y}-R${String(n).padStart(3,'0')}`;}
