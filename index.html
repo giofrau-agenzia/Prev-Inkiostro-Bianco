@@ -335,7 +335,7 @@
       </div>
       <div style="margin-top:12px;"><button id="btn-add-rug">+ Aggiungi tappeto</button></div>
       <div class="empty" id="rugs-empty">Nessun tappeto inserito. Aggiungine uno per iniziare.</div>
-      <div class="hint">Scegli prima la categoria: l’elenco delle forme mostra solo i prodotti corrispondenti. Per Stones, Stamps, Loose, Yu Wu, Konao, Shui, Fold, Pelagia e The potion è disponibile esclusivamente la bordatura LUXURY.</div>
+      <div class="hint">Scegli prima la categoria: l’elenco mostra 7 forme base oppure tutte le 11 forme speciali. Il Codice Grafica propone i codici del catalogo, ma accetta anche un codice inserito manualmente. Per Stones, Stamps, Loose, Yu Wu, Konao, Shui, Fold, Pelagia e The potion è disponibile esclusivamente la bordatura LUXURY.</div>
     </div>
     <div class="card">
       <h2><span class="num">03</span> Riepilogo INK•RUGS</h2>
@@ -1426,7 +1426,7 @@ function rugItem(r){return RUGS_LISTINO.find(x=>x.cat===r.cat&&x.nome===r.forma)
 function calcRug(r){const x=rugItem(r),q=Math.max(0,Number(r.qta)||0);if(!x||!q)return null;const base=r.materiale==='COMPACT'?x.compact:x.soft;const key={OVERLOCK:'overlock',RIBBON:'ribbon',LUXURY:'luxury'}[r.bordatura];const bordo=x[key];if(!Number.isFinite(bordo))return null;return{unit:base+bordo,tot:(base+bordo)*q};}
 function calcRugsTotali(){const valid=rugsPreventivo.righe.map(r=>({r,c:calcRug(r)})).filter(x=>x.c);const merce=valid.reduce((s,x)=>s+x.c.tot,0),sconto=Math.min(100,Math.max(0,Number(rugsPreventivo.sconto)||0)),imponibile=merce*(1-sconto/100),iva=imponibile*.22;return{merce,sconto,imponibile,iva,totale:imponibile+iva,valid};}
 function rugOptions(cat,selected){return RUGS_LISTINO.filter(x=>x.cat===cat).map(x=>`<option ${x.nome===selected?'selected':''}>${escapeHtml(x.nome)}</option>`).join('');}
-function rugBorderOptions(x,selected){const all=x&&x.onlyLuxury?['LUXURY']:['OVERLOCK','RIBBON','LUXURY'];return all.map(v=>`<option ${v===selected?'selected':''}>${v}</option>`).join('');}
+function rugBorderOptions(x,selected){return['OVERLOCK','RIBBON','LUXURY'].map(v=>`<option value="${v}" ${v===selected?'selected':''} ${x?.onlyLuxury&&v!=='LUXURY'?'disabled':''}>${v}${x?.onlyLuxury&&v!=='LUXURY'?' — non disponibile':''}</option>`).join('');}
 function rugShapeClass(x){if(!x)return'';if(/Cerchio/.test(x.nome))return'circle';if(/Fold/.test(x.nome))return'special fold';if(/Pelagia/.test(x.nome))return'special pelagia';if(/potion/i.test(x.nome))return'special potion';return x.cat==='FORME SPECIALI'?'special':'';}
 function renderRugsCliente(){const s=document.getElementById('rugs-cliente');s.innerHTML='<option value="">— Seleziona cliente —</option>'+clienti.map(c=>`<option value="${c.id}" ${c.id===rugsPreventivo.clienteId?'selected':''}>${c.codice?escapeHtml(c.codice)+' — ':''}${escapeHtml(c.nome)}</option>`).join('');s.onchange=()=>{rugsPreventivo.clienteId=s.value;renderRugsClienteDettagli();autosaveRugs();};renderRugsClienteDettagli();}
 function renderRugsClienteDettagli(){const c=clienti.find(x=>x.id===rugsPreventivo.clienteId);document.getElementById('rugs-cliente-dettagli').textContent=c?[c.indirizzo,[c.cap,c.citta,c.prov].filter(Boolean).join(' '),c.piva?'P.IVA '+c.piva:'',c.telefono].filter(Boolean).join(' · '):'';}
@@ -1438,13 +1438,13 @@ function renderRugs(){
   tr.innerHTML=`<td><select data-f="cat"><option>FORME BASE</option><option>FORME SPECIALI</option></select></td>
   <td><select data-f="forma">${rugOptions(r.cat,r.forma)}</select></td>
   <td><div class="rug-preview" title="${escapeHtml(r.forma)}"><span class="rug-shape ${rugShapeClass(x)}"></span></div></td>
-  <td><input data-f="codiceGrafica" value="${escapeHtml(r.codiceGrafica||r.rif||'')}" placeholder="es. INKRG001" aria-label="Codice Grafica"></td>
+  <td><input data-f="codiceGrafica" list="grafiche-datalist" value="${escapeHtml(r.codiceGrafica||r.rif||'')}" placeholder="Seleziona o digita il codice" aria-label="Codice Grafica"><div class="grafica-status">${graficaStatusHtml(r.codiceGrafica||r.rif||'')}</div></td>
   <td><select data-f="materiale"><option>COMPACT</option><option>SOFT TOUCH</option></select></td>
   <td><select data-f="bordatura">${rugBorderOptions(x,r.bordatura)}</select>${c?'':'<div class="rug-error">Combinazione non disponibile</div>'}</td>
   <td><input data-f="qta" type="number" min="1" step="1" value="${r.qta}"></td><td class="num">${c?fmtEUR(c.unit):'—'}</td><td class="num">${c?fmtEUR(c.tot):'—'}</td><td class="no-print"><button class="ghost danger" data-del>✕</button></td>`;
   tr.querySelector('[data-f="cat"]').value=r.cat;tr.querySelector('[data-f="materiale"]').value=r.materiale;tr.querySelector('[data-f="bordatura"]').value=r.bordatura;
-  tr.querySelectorAll('[data-f]').forEach(el=>el.addEventListener('change',()=>{r[el.dataset.f]=el.type==='number'?Number(el.value):el.value;if(el.dataset.f==='cat'){r.forma=RUGS_LISTINO.find(y=>y.cat===r.cat).nome;r.bordatura='RIBBON';}renderRugs();renderRugsTotali();autosaveRugs();}));
-  tr.querySelector('[data-f="codiceGrafica"]').addEventListener('input',e=>{r.codiceGrafica=e.target.value;autosaveRugs();});
+  tr.querySelectorAll('select[data-f],input[type="number"][data-f]').forEach(el=>el.addEventListener('change',()=>{r[el.dataset.f]=el.type==='number'?Number(el.value):el.value;if(el.dataset.f==='cat'){const first=RUGS_LISTINO.find(y=>y.cat===r.cat);r.forma=first?.nome||'';r.bordatura=first?.onlyLuxury?'LUXURY':'RIBBON';}if(el.dataset.f==='forma'){const chosen=rugItem(r);if(chosen?.onlyLuxury)r.bordatura='LUXURY';}renderRugs();renderRugsTotali();autosaveRugs();}));
+  const code=tr.querySelector('[data-f="codiceGrafica"]');code.addEventListener('input',e=>{r.codiceGrafica=e.target.value;const status=code.parentElement.querySelector('.grafica-status');if(status)status.innerHTML=graficaStatusHtml(r.codiceGrafica);autosaveRugs();});
   tr.querySelector('[data-del]').onclick=()=>{rugsPreventivo.righe=rugsPreventivo.righe.filter(x=>x.id!==r.id);renderRugs();renderRugsTotali();autosaveRugs();};body.append(tr);
  });
 }
